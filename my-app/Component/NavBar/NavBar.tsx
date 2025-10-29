@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import LoginForm from "@/Component/Models/LoginForm";
 type NavbarProps = {};
 const NavBar: React.FC<NavbarProps> = () => {
   return (
