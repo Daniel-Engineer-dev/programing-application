@@ -63,7 +63,7 @@ export default function NavBar() {
         </ul>
 
         {/* Right: Auth placeholder */}
-        <Link href="/routes/auth" className="hidden md:block">
+        <Link href="/routes/auth/login" className="hidden md:block">
           <button className=" hover:bg-blue-700 hover:text-white font-bold py-2 px-4 rounded-full hover:cursor-pointer transition-all duration-300 hover:duration-0">
             Sign In
           </button>

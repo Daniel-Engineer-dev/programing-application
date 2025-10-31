@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -96,9 +97,14 @@ const SignupForm = () => {
             Google
           </a>
         </div>
-        <button className="text-gray-500 hover:text-gray-700 hover:cursor-pointer mt-5">
-          Back to login
-        </button>
+        <div className="mt-3">
+          <Link
+            href="/routes/auth/login"
+            className="text-gray-500 hover:text-gray-700 hover:cursor-pointer mt-5"
+          >
+            Back to login
+          </Link>
+        </div>
       </div>
     </div>
   );

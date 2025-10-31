@@ -31,13 +31,18 @@ const ForgotPasswordForm = () => {
               placeholder="your@email.com"
             />
           </div>
-          <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition-colors hover:cursor-pointer">
+          <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition-colors hover:cursor-pointer ">
             Reset Password
           </button>
         </form>
-        <button className="text-gray-500 hover:text-gray-700 hover:cursor-pointer mt-5">
-          Back to login
-        </button>
+        <div className="mt-5">
+          <Link
+            href="/routes/auth/login"
+            className="text-gray-500 hover:text-gray-700 hover:cursor-pointer mt-5"
+          >
+            Back to login
+          </Link>
+        </div>
       </div>
     </div>
   );

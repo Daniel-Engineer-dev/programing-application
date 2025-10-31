@@ -5,7 +5,7 @@ const LoginForm = () => {
   return (
     <div className=" min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
-        <div>
+        <div className="flex justify-end">
           <Link
             href="/"
             className="text-gray-500 hover:text-gray-700 hover:cursor-pointer"
@@ -41,18 +41,19 @@ const LoginForm = () => {
           </div>
 
           <div className="flex items-center justify-between">
-            <label className="flex items-center">
+            <label className="flex items-center ">
               <input
                 type="checkbox"
-                className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 hover:cursor-pointer"
               />
-              <span className="ml-2 text-sm text-gray-600 hover:cursor-pointer">
-                Remember me
-              </span>
+              <span className="ml-2 text-sm text-gray-600 ">Remember me</span>
             </label>
-            <button className="text-sm text-indigo-600 hover:text-indigo-500">
+            <Link
+              href="/routes/auth/resetpass"
+              className="text-sm text-indigo-600 hover:text-indigo-500 hover:cursor-pointer"
+            >
               Forgot password?
-            </button>
+            </Link>
           </div>
 
           <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition-colors hover:cursor-pointer">
@@ -62,9 +63,12 @@ const LoginForm = () => {
 
         <div className="mt-6 text-center text-sm text-gray-600">
           Don't have an account?
-          <button className="text-indigo-600 hover:text-indigo-500 font-medium">
+          <Link
+            href="/routes/auth/signup"
+            className="text-indigo-600 hover:text-indigo-500 font-medium hover:cursor-pointer"
+          >
             Sign up
-          </button>
+          </Link>
         </div>
       </div>
     </div>
