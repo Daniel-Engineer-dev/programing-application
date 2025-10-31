@@ -1,7 +1,6 @@
 // app/layout.tsx
 import "./globals.css";
 import NavBar from "@/src/Component/NavBar/NavBar"; // CHÚ Ý: "Component" viết hoa
-import { Providers } from "./provider";
 import ChatbotWidget from "@/src/Component/ChatbotWidget/ChatbotWidget";
 export const metadata = {
   title: "Codepro",

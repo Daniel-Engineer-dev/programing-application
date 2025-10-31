@@ -1,9 +1,18 @@
 import React from "react";
-
+import { X } from "lucide-react";
+import Link from "next/link";
 const LoginForm = () => {
   return (
     <div className=" min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
+        <div>
+          <Link
+            href="/"
+            className="text-gray-500 hover:text-gray-700 hover:cursor-pointer"
+          >
+            <X size={20} />
+          </Link>
+        </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
           Sign In
         </h2>
@@ -37,14 +46,13 @@ const LoginForm = () => {
                 type="checkbox"
                 className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
               />
-              <span className="ml-2 text-sm text-gray-600">Remember me</span>
+              <span className="ml-2 text-sm text-gray-600 hover:cursor-pointer">
+                Remember me
+              </span>
             </label>
-            <a
-              href="#"
-              className="text-sm text-indigo-600 hover:text-indigo-500"
-            >
+            <button className="text-sm text-indigo-600 hover:text-indigo-500">
               Forgot password?
-            </a>
+            </button>
           </div>
 
           <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition-colors hover:cursor-pointer">
@@ -54,12 +62,9 @@ const LoginForm = () => {
 
         <div className="mt-6 text-center text-sm text-gray-600">
           Don't have an account?
-          <a
-            href="#/signup"
-            className="text-indigo-600 hover:text-indigo-500 font-medium"
-          >
+          <button className="text-indigo-600 hover:text-indigo-500 font-medium">
             Sign up
-          </a>
+          </button>
         </div>
       </div>
     </div>

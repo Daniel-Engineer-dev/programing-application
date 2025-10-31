@@ -59,7 +59,7 @@ export default function ProblemsTable() {
         <table className="min-w-full table-fixed text-sm">
           <thead className="bg-gray-50">
             <tr className="text-left">
-              <th className="w-[48px] px-4 py-3">#</th>
+              <th className="w-12 px-4 py-3">#</th>
               <th className="px-4 py-3">Title</th>
               <th className="w-28 px-4 py-3">Difficulty</th>
               <th className="w-32 px-4 py-3">Acceptance</th>
