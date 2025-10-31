@@ -1,11 +1,10 @@
 "use client";
-import React from "react";
-import { RecoilRoot } from "recoil";
+import { ThemeProvider } from "next-themes";
 
-export default function RecoilProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <RecoilRoot>{children}</RecoilRoot>;
-}
+export const Providers = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+      {children}
+    </ThemeProvider>
+  );
+};

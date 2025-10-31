@@ -1,9 +1,10 @@
 // app/layout.tsx
 import "./globals.css";
 import NavBar from "@/src/Component/NavBar/NavBar"; // CHÚ Ý: "Component" viết hoa
-import { ThemeProvider } from "next-themes";
+import { Providers } from "./provider";
+import ChatbotWidget from "@/src/Component/ChatbotWidget/ChatbotWidget";
 export const metadata = {
-  title: "LeetCode",
+  title: "Codepro",
   description: "Practice coding problems like LeetCode",
 };
 
@@ -13,16 +14,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi">
+    <html lang="vi " suppressHydrationWarning>
       <body className="min-h-screen bg-gray-50 text-gray-900 antialiased">
         <NavBar />
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem={false}
-        >
-          {children}
-        </ThemeProvider>
+        {children}
+        <ChatbotWidget />
       </body>
     </html>
   );

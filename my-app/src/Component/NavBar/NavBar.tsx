@@ -38,8 +38,8 @@ export default function NavBar() {
       <nav className="flex h-14 w-full items-center justify-between px-4 bg-white shadow">
         {/* Left: Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <Image src="/logo.png" alt="Logo" width={100} height={100} />
-          <span className="text-lg font-semibold tracking-tight">CODE PRO</span>
+          <Image src="/codepro.png" alt="Logo" width={150} height={150} />
+          {/* <span className="text-lg font-semibold tracking-tight">CODE PRO</span> */}
         </Link>
 
         {/* Desktop menu */}
@@ -54,7 +54,9 @@ export default function NavBar() {
                     : "text-gray-700 hover:text-blue-600"
                 }`}
               >
-                {l.label}
+                <button className=" hover:bg-blue-700 hover:text-white font-bold py-2 px-4 rounded-full hover:cursor-pointer transition-all duration-300 hover:duration-0">
+                  {l.label}
+                </button>
               </Link>
             </li>
           ))}
@@ -62,7 +64,7 @@ export default function NavBar() {
 
         {/* Right: Auth placeholder */}
         <Link href="/routes/auth" className="hidden md:block">
-          <button className="rounded-md border px-3 py-1.5 text-sm hover:bg-blue-500 cursor-pointer hover:text-white hover:border-black hover:border-2">
+          <button className=" hover:bg-blue-700 hover:text-white font-bold py-2 px-4 rounded-full hover:cursor-pointer transition-all duration-300 hover:duration-0">
             Sign In
           </button>
         </Link>
@@ -98,12 +100,6 @@ export default function NavBar() {
                 </Link>
               </li>
             ))}
-            <li>
-              {/* <Link
-              >
-                Sign In
-              </Link> */}
-            </li>
           </ul>
         </div>
       )}
