@@ -27,14 +27,14 @@ export default function HomePage() {
             <div className="flex gap-3 pt-2">
               {/* Dẫn sang trang Problems */}
               <Link
-                href="/problems"
+                href="/"
                 className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
               >
                 Bắt đầu
               </Link>
 
               <Link
-                href="/docs"
+                href="/"
                 className="rounded-md border px-4 py-2 hover:bg-gray-50"
               >
                 Tài liệu
