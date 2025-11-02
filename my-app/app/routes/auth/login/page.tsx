@@ -3,6 +3,7 @@ import LoginForm from "@/src/component/Auth/LoginForm";
 import React, { useEffect } from "react";
 import { useAuthContext } from "@/src/userHook/context/authContext";
 import { useRouter } from "next/navigation";
+import PageTransition from "@/src/pageTransition/pageTransition";
 const page = () => {
   const { user, loading } = useAuthContext();
   const router = useRouter();
@@ -12,7 +13,11 @@ const page = () => {
       router.push("/");
     }
   }, [user, loading, router]);
-  return <LoginForm />;
+  return (
+    <PageTransition>
+      <LoginForm />
+    </PageTransition>
+  );
 };
 
 export default page;

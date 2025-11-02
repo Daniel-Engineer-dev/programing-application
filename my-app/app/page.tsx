@@ -1,10 +1,11 @@
 // app/page.tsx
+import PageTransition from "@/src/pageTransition/pageTransition";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <>
+    <PageTransition>
       {/* Hero */}
       <section className="mt-4 rounded-2xl border bg-white p-6 mx-6">
         <div className="flex flex-col items-center gap-6 text-center md:flex-row md:text-left ">
@@ -43,6 +44,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-    </>
+    </PageTransition>
   );
 }
