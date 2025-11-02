@@ -2,7 +2,7 @@
 import React from "react";
 import { useState } from "react";
 import { sendPasswordResetEmail } from "firebase/auth";
-import { auth } from "@/src/lib/firebase";
+import { auth } from "@/src/api/firebase";
 import { X } from "lucide-react";
 import Link from "next/link";
 const ForgotPasswordForm = () => {

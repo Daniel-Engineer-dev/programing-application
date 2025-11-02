@@ -1,5 +1,5 @@
 // app/problems/page.tsx
-import ProblemsTable from "@/src/Component/ProblemsTable/ProblemsTable";
+import ProblemsTable from "@/src/component/ProblemsTable/ProblemsTable";
 
 export default function ProblemsPage() {
   return (

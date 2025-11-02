@@ -6,6 +6,9 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
+import { signOut } from "firebase/auth";
+import { auth } from "@/src/api/firebase";
+
 const links = [
   { href: "/routes/problems", label: "Problems" },
   { href: "/routes/explore", label: "Explore" },
@@ -29,6 +32,9 @@ export default function NavBar() {
   const isActive = (href: string) =>
     pathname === href || (href !== "/" && pathname.startsWith(href));
 
+  const handleLogout = async () => {
+    await signOut(auth);
+  };
   return (
     <header
       className={`sticky top-0 z-50 bg-white/80 backdrop-blur ${
@@ -61,7 +67,6 @@ export default function NavBar() {
             </li>
           ))}
         </ul>
-
         {/* Right: Auth placeholder */}
         <Link href="/routes/auth/login" className="hidden md:block">
           <button className=" hover:bg-blue-700 hover:text-white font-bold py-2 px-4 rounded-full hover:cursor-pointer transition-all duration-300 hover:duration-0">

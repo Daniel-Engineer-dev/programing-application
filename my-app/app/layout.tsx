@@ -1,7 +1,10 @@
 // app/layout.tsx
 import "./globals.css";
-import NavBar from "@/src/Component/NavBar/NavBar"; // CHÚ Ý: "Component" viết hoa
-import ChatbotWidget from "@/src/Component/ChatbotWidget/ChatbotWidget";
+import NavBar from "@/src/component/NavBar/NavBar"; // CHÚ Ý: "Component" viết hoa
+import ChatbotWidget from "@/src/component/ChatbotWidget/ChatbotWidget";
+import { AuthProvider } from "@/src/userHook/context/authContext";
+import PageTransition from "@/src/pageTransition/pageTransition";
+
 export const metadata = {
   title: "Codepro",
   description: "Practice coding problems like LeetCode",
@@ -14,9 +17,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="vi " suppressHydrationWarning>
-      <body className="min-h-screen bg-gray-50 text-gray-900 antialiased">
+      <body className="min-h-screen bg-gray-50 text-gray-900 antialiased  relative overflow-hidden">
         <NavBar />
-        {children}
+        <AuthProvider>{children}</AuthProvider>
         <ChatbotWidget />
       </body>
     </html>

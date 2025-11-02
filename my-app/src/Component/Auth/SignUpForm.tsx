@@ -5,7 +5,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { X } from "lucide-react";
 import Link from "next/link";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/src/lib/firebase";
+import { auth } from "@/src/api/firebase";
 
 const SignupForm = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null); // State to hold the selected date

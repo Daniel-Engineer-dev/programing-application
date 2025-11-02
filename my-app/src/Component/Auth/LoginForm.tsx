@@ -4,7 +4,9 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import Link from "next/link";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/src/lib/firebase";
+import { auth } from "@/src/api/firebase";
+import PageTransition from "@/src/pageTransition/pageTransition";
+
 const LoginForm = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
