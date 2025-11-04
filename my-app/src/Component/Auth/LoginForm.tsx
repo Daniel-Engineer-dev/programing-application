@@ -4,17 +4,42 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import Link from "next/link";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/src/api/firebase";
-import PageTransition from "@/src/pageTransition/pageTransition";
+import { auth, db } from "@/src/api/firebase";
+import {
+  setPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence,
+} from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 
 const LoginForm = () => {
-  const [email, setEmail] = useState<string>("");
+  // const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
-
+  const [isRememberMe, setIsRememberMe] = useState<boolean>(false);
+  const [message, setMessage] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
+      let email = identifier;
+
+      // Nếu người dùng nhập username → tra Firestore
+      if (!identifier.includes("@")) {
+        const ref = doc(db, "usernames", identifier);
+        const snap = await getDoc(ref);
+        if (!snap.exists()) {
+          setMessage("❌ Username not found");
+          return;
+        }
+        email = snap.data().email;
+      }
+
+      const persistence = isRememberMe
+        ? browserLocalPersistence
+        : browserSessionPersistence;
+
+      await setPersistence(auth, persistence);
       await signInWithEmailAndPassword(auth, email, password);
       alert("Logged in successfully!");
     } catch (err: any) {
@@ -43,11 +68,11 @@ const LoginForm = () => {
               Email
             </label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-              placeholder="your@email.com"
+              placeholder="Email or username"
             />
           </div>
           <div>
@@ -67,6 +92,9 @@ const LoginForm = () => {
               <input
                 type="checkbox"
                 className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 hover:cursor-pointer"
+                onChange={(e) => {
+                  setIsRememberMe(e.target.checked);
+                }}
               />
               <span className="ml-2 text-sm text-gray-600 ">Remember me</span>
             </label>
@@ -79,6 +107,7 @@ const LoginForm = () => {
           </div>
           {/* Display error message if any */}
           {error && <p className="text-red-500">Invalid email or password</p>}
+          {message && <p className="text-red-500">{message}</p>}
           <button
             type="submit"
             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition-colors hover:cursor-pointer"

@@ -1,9 +1,12 @@
 // app/page.tsx
+"use client";
 import PageTransition from "@/src/pageTransition/pageTransition";
 import Image from "next/image";
 import Link from "next/link";
+import { useAuthContext } from "@/src/userHook/context/authContext";
 
 export default function HomePage() {
+  const { user } = useAuthContext();
   return (
     <PageTransition>
       {/* Hero */}
@@ -28,7 +31,7 @@ export default function HomePage() {
             <div className="flex gap-3 pt-2">
               {/* Dẫn sang trang Problems */}
               <Link
-                href="/"
+                href={user ? "/routes/problems" : "/routes/auth/login"}
                 className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
               >
                 Bắt đầu

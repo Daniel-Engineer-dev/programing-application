@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "../../api/firebase";
+import { setPersistence, browserSessionPersistence } from "firebase/auth";
 
 /**
  * Hook theo dõi trạng thái đăng nhập Firebase
@@ -13,6 +14,7 @@ export function useAuth() {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    
     // Lắng nghe khi trạng thái đăng nhập thay đổi
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);

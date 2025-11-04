@@ -17,9 +17,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="vi " suppressHydrationWarning>
-      <body className="min-h-screen bg-gray-50 text-gray-900 antialiased  relative overflow-hidden">
-        <NavBar />
-        <AuthProvider>{children}</AuthProvider>
+      <body className="min-h-screen bg-gray-50 text-gray-900 antialiased ">
+        <AuthProvider>
+          <NavBar />
+          {children}
+        </AuthProvider>
         <ChatbotWidget />
       </body>
     </html>

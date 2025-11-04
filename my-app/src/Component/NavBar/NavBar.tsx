@@ -6,8 +6,8 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
-import { signOut } from "firebase/auth";
-import { auth } from "@/src/api/firebase";
+import { useAuthContext } from "@/src/userHook/context/authContext";
+import UserMenu from "@/src/component/AvatarUser/AvatarUser";
 
 const links = [
   { href: "/routes/problems", label: "Problems" },
@@ -20,6 +20,7 @@ export default function NavBar() {
   const [open, setOpen] = useState(false);
   const [elevated, setElevated] = useState(false);
   const pathname = usePathname();
+  const { user, username } = useAuthContext();
 
   // Đổ bóng khi scroll nhẹ
   useEffect(() => {
@@ -32,9 +33,6 @@ export default function NavBar() {
   const isActive = (href: string) =>
     pathname === href || (href !== "/" && pathname.startsWith(href));
 
-  const handleLogout = async () => {
-    await signOut(auth);
-  };
   return (
     <header
       className={`sticky top-0 z-50 bg-white/80 backdrop-blur ${
@@ -68,11 +66,15 @@ export default function NavBar() {
           ))}
         </ul>
         {/* Right: Auth placeholder */}
-        <Link href="/routes/auth/login" className="hidden md:block">
-          <button className=" hover:bg-blue-700 hover:text-white font-bold py-2 px-4 rounded-full hover:cursor-pointer transition-all duration-300 hover:duration-0">
-            Sign In
-          </button>
-        </Link>
+        {!user ? (
+          <Link href="/routes/auth/login" className="hidden md:block">
+            <button className=" hover:bg-blue-700 hover:text-white font-bold py-2 px-4 rounded-full hover:cursor-pointer transition-all duration-300 hover:duration-0">
+              Sign In
+            </button>
+          </Link>
+        ) : (
+          <UserMenu name={username} />
+        )}
 
         {/* Mobile hamburger */}
         <button
