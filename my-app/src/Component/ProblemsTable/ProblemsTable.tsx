@@ -73,7 +73,7 @@ export default function ProblemsTable() {
                 <td className="px-4 py-3">{i + 1}</td>
                 <td className="px-4 py-3">
                   <Link
-                    href={`/problems/${p.id}`}
+                    href={`/routes/problems/${p.id}`}
                     className="font-medium hover:text-blue-600"
                   >
                     {p.title}

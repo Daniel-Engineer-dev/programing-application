@@ -132,7 +132,11 @@ export default function UserMenu({
                   icon={Gamepad2}
                   label="My Playgrounds"
                 />
-                <MenuItem href="/settings" icon={Settings} label="Settings" />
+                <MenuItem
+                  href="/routes/avatar/settings"
+                  icon={Settings}
+                  label="Settings"
+                />
 
                 {/* Appearance submenu */}
                 <button

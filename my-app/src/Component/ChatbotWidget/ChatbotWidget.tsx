@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bot, MessageCircle, X } from "lucide-react"; // icon từ lucide-react
+import { Bot, X } from "lucide-react"; // icon từ lucide-react
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function ChatbotWidget() {

@@ -3,7 +3,6 @@ import "./globals.css";
 import NavBar from "@/src/component/NavBar/NavBar"; // CHÚ Ý: "Component" viết hoa
 import ChatbotWidget from "@/src/component/ChatbotWidget/ChatbotWidget";
 import { AuthProvider } from "@/src/userHook/context/authContext";
-import PageTransition from "@/src/pageTransition/pageTransition";
 
 export const metadata = {
   title: "Codepro",
