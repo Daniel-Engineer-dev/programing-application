@@ -1,6 +1,6 @@
 // Component/ProblemsTable.tsx
 import Link from "next/link";
-
+import { Search, ChevronDown } from "lucide-react";
 type Problem = {
   id: string;
   title: string;
@@ -39,49 +39,77 @@ const problems: Problem[] = [
 
 const badgeColor = (d: Problem["difficulty"]) =>
   d === "Easy"
-    ? "text-green-700 bg-green-50 border-green-200"
+    ? "text-white font-bold bg-green-800 "
     : d === "Medium"
-    ? "text-yellow-700 bg-yellow-50 border-yellow-200"
-    : "text-red-700 bg-red-50 border-red-200";
+    ? "text-white font-bold bg-yellow-800 "
+    : "text-white font-bold bg-red-800 ";
 
 export default function ProblemsTable() {
   return (
-    <section className="mt-6 px-12 pb-16 pt-6">
-      <div className="mb-3 flex items-end justify-between">
-        <h2 className="text-xl font-semibold">Problems</h2>
-        <input
-          placeholder="Search problems..."
-          className="w-64 rounded-md border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
-        />
+    <section className="mt-6 px-12 pb-16 pt-6 ">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
+        {/* 1. Phần Input Tìm kiếm (Chiếm phần lớn không gian) */}
+        <div className="relative flex-1 max-w-2xl ">
+          {/* Icon kính lúp (Position Absolute để đè lên input) */}
+          <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+
+          {/* Thẻ Input chính */}
+          <input
+            type="text"
+            placeholder="Tìm kiếm bài tập..."
+            className="w-full rounded-lg bg-slate-800 py-3 pl-10 pr-4 text-sm text-white placeholder-slate-400 outline-none focus:ring-2 focus:ring-blue-500 border border-transparent focus:border-blue-500 transition-all"
+          />
+        </div>
+
+        {/* 2. Phần các nút Bộ lọc (Filters) */}
+        <div className="flex gap-3 overflow-x-auto pb-2 md:pb-0">
+          {/* Nút: Độ khó */}
+          <button className="flex items-center gap-2 whitespace-nowrap rounded-lg bg-slate-800 px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition-colors hover:cursor-pointer">
+            Độ khó
+            <ChevronDown className="h-4 w-4" />
+          </button>
+
+          {/* Nút: Chủ đề */}
+          <button className="flex items-center gap-2 whitespace-nowrap rounded-lg bg-slate-800 px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition-colors hover:cursor-pointer">
+            Chủ đề
+            <ChevronDown className="h-4 w-4" />
+          </button>
+
+          {/* Nút: Độ phổ biến */}
+          <button className="flex items-center gap-2 whitespace-nowrap rounded-lg bg-slate-800 px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition-colors hover:cursor-pointer">
+            Độ phổ biến
+            <ChevronDown className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl border bg-white">
+      <div className="overflow-hidden rounded-xl border bg-slate-800 ">
         <table className="min-w-full table-fixed text-sm">
-          <thead className="bg-gray-50">
+          <thead className="bg-blue-950 text-white">
             <tr className="text-left">
               <th className="w-12 px-4 py-3">#</th>
-              <th className="px-4 py-3">Title</th>
-              <th className="w-28 px-4 py-3">Difficulty</th>
-              <th className="w-32 px-4 py-3">Acceptance</th>
-              <th className="px-4 py-3">Tags</th>
-              <th className="w-28 px-4 py-3">Status</th>
+              <th className="px-4 py-3">Đề bài</th>
+              <th className="w-28 px-4 py-3">Độ khó</th>
+              <th className="w-32 px-4 py-3">Hoàn thành</th>
+              <th className="px-4 py-3">Nhãn</th>
+              <th className="w-28 px-4 py-3">Trạng thái</th>
             </tr>
           </thead>
           <tbody>
             {problems.map((p, i) => (
-              <tr key={p.id} className="border-t hover:bg-gray-50">
+              <tr key={p.id} className=" hover:bg-slate-900 text-white">
                 <td className="px-4 py-3">{i + 1}</td>
                 <td className="px-4 py-3">
                   <Link
                     href={`/routes/problems/${p.id}`}
-                    className="font-medium hover:text-blue-600"
+                    className="font-bold hover:text-blue-600"
                   >
                     {p.title}
                   </Link>
                 </td>
                 <td className="px-4 py-3">
                   <span
-                    className={`inline-block rounded-full border px-2 py-0.5 text-xs ${badgeColor(
+                    className={`inline-block rounded-full px-2 py-0.5 text-xs ${badgeColor(
                       p.difficulty
                     )}`}
                   >
@@ -94,7 +122,7 @@ export default function ProblemsTable() {
                     {p.tags.map((t) => (
                       <span
                         key={t}
-                        className="rounded-md bg-gray-100 px-2 py-0.5 text-xs"
+                        className="rounded-md bg-blue px-2 py-0.5 text-xs"
                       >
                         {t}
                       </span>

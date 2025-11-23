@@ -10,10 +10,10 @@ import { useAuthContext } from "@/src/userHook/context/authContext";
 import UserMenu from "@/src/component/AvatarUser/AvatarUser";
 
 const links = [
-  { href: "/routes/problems", label: "Problems" },
-  { href: "/routes/explore", label: "Explore" },
-  { href: "/routes/discuss", label: "Discuss" },
-  { href: "/routes/contests", label: "Contests" },
+  { href: "/routes/problems", label: "Bài Tập" },
+  { href: "/routes/explore", label: "Khám Phá" },
+  { href: "/routes/discuss", label: "Thảo Luận" },
+  { href: "/routes/contests", label: "Cuộc thi" },
 ];
 
 export default function NavBar() {
@@ -39,11 +39,21 @@ export default function NavBar() {
         elevated ? "border-b shadow-sm" : "border-b"
       }`}
     >
-      <nav className="flex h-14 w-full items-center justify-between px-4 bg-white shadow">
+      <nav className="flex h-14 w-full items-center justify-between px-4 bg-blue-950 shadow ">
         {/* Left: Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <Image src="/codepro.png" alt="Logo" width={150} height={150} />
-          {/* <span className="text-lg font-semibold tracking-tight">CODE PRO</span> */}
+        <Link
+          href="/"
+          className="relative flex items-center justify-center h-full w-32 overflow-hidden"
+        >
+          <Image
+            src="/codepro.png"
+            alt="Logo"
+            width={150}
+            height={150}
+            // 3. max-w-none: Bắt buộc ảnh KHÔNG được co lại theo khung
+            // 4. object-center: Căn logo vào giữa khung
+            className="brightness-150 max-w-none object-center"
+          />
         </Link>
 
         {/* Desktop menu */}
@@ -58,7 +68,7 @@ export default function NavBar() {
                     : "text-gray-700 hover:text-blue-600"
                 }`}
               >
-                <button className=" hover:bg-blue-700 hover:text-white font-bold py-2 px-4 rounded-full hover:cursor-pointer transition-all duration-300 hover:duration-0">
+                <button className=" text-slate-300 hover:bg-blue-700 hover:text-white font-bold py-2 px-4 rounded-full hover:cursor-pointer transition-all duration-300 hover:duration-0">
                   {l.label}
                 </button>
               </Link>
@@ -68,8 +78,8 @@ export default function NavBar() {
         {/* Right: Auth placeholder */}
         {!user ? (
           <Link href="/routes/auth/login" className="hidden md:block">
-            <button className=" hover:bg-blue-700 hover:text-white font-bold py-2 px-4 rounded-full hover:cursor-pointer transition-all duration-300 hover:duration-0">
-              Sign In
+            <button className=" hover:bg-blue-700 hover:text-white font-bold py-2 px-4 rounded-full hover:cursor-pointer transition-all duration-300 hover:duration-0 text-white">
+              Đăng nhập
             </button>
           </Link>
         ) : (

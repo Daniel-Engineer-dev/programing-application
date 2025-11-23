@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Editor from "@monaco-editor/react";
+import ProblemDetails from "@/src/component/ProblemDetail/ProblemDetail";
 
 export default function ProblemPage() {
   // Mock data (sau này backend trả về)
@@ -44,86 +45,13 @@ export default function ProblemPage() {
   return (
     <div className="flex h-screen bg-white">
       {/* LEFT PANEL */}
-      <div className="w-[45%] border-r flex flex-col">
-        <div className="p-5 border-b">
-          <h1 className="text-2xl font-semibold">{problem.title}</h1>
-          <p
-            className={`text-sm mt-1 ${
-              problem.difficulty === "Easy"
-                ? "text-green-600"
-                : problem.difficulty === "Medium"
-                ? "text-yellow-600"
-                : "text-red-600"
-            }`}
-          >
-            {problem.difficulty}
-          </p>
-        </div>
-
-        {/* Tabs */}
-        <div className="flex border-b text-sm">
-          <button
-            className={`px-4 py-2 ${
-              tab === "description" && "border-b-2 border-blue-600 font-medium"
-            }`}
-            onClick={() => setTab("description")}
-          >
-            Description
-          </button>
-          <button
-            className={`px-4 py-2 ${
-              tab === "examples" && "border-b-2 border-blue-600 font-medium"
-            }`}
-            onClick={() => setTab("examples")}
-          >
-            Examples
-          </button>
-          <button
-            className={`px-4 py-2 ${
-              tab === "constraints" && "border-b-2 border-blue-600 font-medium"
-            }`}
-            onClick={() => setTab("constraints")}
-          >
-            Constraints
-          </button>
-        </div>
-
-        {/* Tab Content */}
-        <div className="p-5 overflow-y-auto">
-          {tab === "description" && (
-            <div
-              dangerouslySetInnerHTML={{ __html: problem.description }}
-              className="prose max-w-none"
-            />
-          )}
-
-          {tab === "examples" && (
-            <div>
-              {problem.examples.map((ex, idx) => (
-                <div
-                  key={idx}
-                  className="mb-4 rounded border bg-gray-50 p-3 text-sm"
-                >
-                  <p>
-                    <strong>Input:</strong> {ex.input}
-                  </p>
-                  <p>
-                    <strong>Output:</strong> {ex.output}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {tab === "constraints" && (
-            <ul className="list-disc pl-5 text-sm">
-              {problem.constraints.map((c, i) => (
-                <li key={i}>{c}</li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </div>
+      <ProblemDetails
+        title={problem.title}
+        difficulty={problem.difficulty}
+        description={problem.description}
+        examples={problem.examples}
+        constraints={problem.constraints}
+      />
 
       {/* RIGHT PANEL */}
       <div className="w-[55%] flex flex-col">

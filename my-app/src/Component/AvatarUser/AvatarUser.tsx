@@ -65,7 +65,7 @@ export default function UserMenu({
         aria-label="Open user menu"
       >
         <Image
-          className="hover:cursor-pointer"
+          className="hover:cursor-pointer border"
           src={avatarUrl}
           alt={name}
           width={40}
