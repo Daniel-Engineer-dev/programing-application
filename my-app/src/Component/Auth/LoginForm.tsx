@@ -23,6 +23,7 @@ const LoginForm = () => {
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage("");
+    setError("");
     try {
       let email = identifier;
 

@@ -83,16 +83,16 @@ export default function UserMenu({
             transition={{ duration: 0.16 }}
             className="absolute right-0 z-50 mt-1 w-[320px]"
           >
-            <div className="overflow-hidden rounded-2xl border bg-white shadow-xl ring-1 ring-black/5">
+            <div className="overflow-hidden rounded-2xl border bg-slate-700 shadow-xl ring-1 ring-black/5">
               {/* Header */}
-              <div className="flex items-center gap-3 px-4 py-4">
+              <div className="flex items-center gap-3 px-4 py-4 text-white">
                 <div className="h-12 w-12 overflow-hidden rounded-full ">
                   <Image src={avatarUrl} alt={name} width={52} height={52} />
                 </div>
                 <div className="min-w-0">
                   <div className="truncate text-base font-semibold">{name}</div>
                   {subtitle && (
-                    <div className="mt-0.5 text-[13px] text-yellow-700">
+                    <div className="mt-0.5 text-[13px] text-yellow-500">
                       {subtitle}
                     </div>
                   )}
@@ -102,25 +102,25 @@ export default function UserMenu({
               <hr />
 
               {/* 3 ô nhanh */}
-              <div className="grid grid-cols-3 gap-3 px-4 py-3">
+              <div className="grid grid-cols-3 gap-3 px-4 py-3 text-slate-300">
                 <QuickTile href="/lists" icon={ListTodo} label="My Lists" />
                 <QuickTile href="/notebook" icon={Notebook} label="Notebook" />
                 <QuickTile href="/progress" icon={Gauge} label="Progress" />
               </div>
 
               {/* Points */}
-              <div className="px-4 pb-1">
+              <div className="px-4 pb-1 text-slate-300">
                 <MenuItem
                   href="/points"
                   icon={Trophy}
                   label="Points"
-                  right={<span className="text-xs text-gray-500">New</span>}
+                  right={<span className="text-xs text-white">New</span>}
                 />
               </div>
 
               <hr />
 
-              <div className="px-4 py-2">
+              <div className="px-4 py-2 text-slate-300">
                 <MenuItem
                   href="/labs"
                   icon={FlaskConical}
@@ -141,7 +141,7 @@ export default function UserMenu({
                 {/* Appearance submenu */}
                 <button
                   onClick={() => setAppearanceOpen((s) => !s)}
-                  className="flex w-full items-center justify-between rounded-lg px-2 py-2.5 text-left text-[15px] hover:bg-gray-50 hover:cursor-pointer"
+                  className="flex w-full items-center justify-between rounded-lg px-2 py-2.5 text-left text-[15px] hover:bg-blue-700 hover:text-white hover:font-bold hover:cursor-pointer"
                 >
                   <span className="inline-flex items-center gap-2">
                     <SunMedium size={18} />
@@ -173,7 +173,7 @@ export default function UserMenu({
 
               <hr />
 
-              <div className="px-4 py-2 ">
+              <div className="px-4 py-2 text-slate-300">
                 <MenuItem
                   onClick={() => {
                     alert("Sign out");
@@ -202,7 +202,7 @@ function QuickTile({
   return (
     <Link
       href={href}
-      className="group flex flex-col items-center justify-center rounded-xl border px-4 py-3 hover:border-gray-300 hover:bg-gray-50"
+      className="group flex flex-col items-center justify-center rounded-xl border px-4 py-3 hover:border-gray-300 hover:bg-blue-700 hover:text-white hover:font-bold"
     >
       <Icon size={22} className="mb-1" />
       <span className="text-[13px]">{label}</span>
@@ -227,7 +227,7 @@ function MenuItem({
     return (
       <Link
         href={href}
-        className="flex w-full items-center justify-between rounded-lg px-2 py-2.5 text-[15px] hover:bg-gray-50"
+        className="flex w-full items-center justify-between rounded-lg px-2 py-2.5 text-[15px] hover:bg-blue-700 hover:text-white hover:font-bold"
       >
         <span className="inline-flex items-center gap-2">
           <Icon size={18} /> {label}
@@ -240,7 +240,7 @@ function MenuItem({
   return (
     <button
       onClick={onClick}
-      className="flex w-full items-center justify-between rounded-lg px-2 py-2.5 text-[15px] hover:bg-gray-50  hover:cursor-pointer"
+      className="flex w-full items-center justify-between rounded-lg px-2 py-2.5 text-[15px] hover:bg-blue-700 hover:text-white hover:font-bold   hover:cursor-pointer"
       type="button"
     >
       <span className="inline-flex items-center gap-2 hover:cursor-pointer">
@@ -254,7 +254,7 @@ function MenuItem({
 function AppearanceOption({ label }: { label: string }) {
   return (
     <button
-      className="w-full rounded-md px-2 py-2 text-left text-sm hover:bg-gray-50 hover:cursor-pointer"
+      className="w-full rounded-md px-2 py-2 text-left text-sm hover:bg-blue-700 hover:text-white hover:font-bold hover:cursor-pointer"
       type="button"
     >
       {label}

@@ -1,18 +1,30 @@
 "use client";
 import React from "react";
 import { useState } from "react";
-import { getAuth, sendPasswordResetEmail } from "firebase/auth";
+import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "@/src/api/firebase";
 import { Github } from "lucide-react";
-import Link from "next/link";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "@/src/api/firebase";
 const ForgotPasswordForm = () => {
   const [email, setEmail] = useState<string>("");
   const [message, setMessage] = useState<string>("");
 
+  //Hàm kiểm tra email có tồn tại trong csdl hay không
+  const emailExists = async (email: string) => {
+    const q = query(collection(db, "usernames"), where("email", "==", email));
+    const querySnapshot = await getDocs(q);
+    return !querySnapshot.empty; // true nếu email đã tồn tại
+  };
   const handleReset = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage("");
     try {
+      const existEmail = await emailExists(email);
+      if (!existEmail) {
+        setMessage("Email chưa được đăng ký!");
+        return;
+      }
       await sendPasswordResetEmail(auth, email);
       setMessage("Mật khẩu đã được gửi đến email của bạn!");
     } catch (err: any) {
@@ -51,10 +63,13 @@ const ForgotPasswordForm = () => {
             />
           </div>
           {/*Display error*/}
-          {message && message === "Firebase: Error (auth/invalid-email)." && (
+          {message === "Firebase: Error (auth/invalid-email)." && (
             <p className="text-red-500">Email không tồn tại!</p>
           )}
-          {message && message === "Mật khẩu đã được gửi đến email của bạn!" && (
+          {message === "Email chưa được đăng ký!" && (
+            <p className="text-red-500">{message}</p>
+          )}
+          {message === "Mật khẩu đã được gửi đến email của bạn!" && (
             <p className="text-green-500">{message}</p>
           )}
           {/* Submit Button */}

@@ -16,7 +16,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="vi " suppressHydrationWarning>
-      <body className="min-h-screen bg-slate-900 text-gray-900 antialiased ">
+      <body className="min-h-screen bg-slate-900 text-gray-900 antialiased">
         <AuthProvider>
           <NavBar />
           {children}

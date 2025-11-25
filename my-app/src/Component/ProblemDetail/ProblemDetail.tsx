@@ -25,9 +25,9 @@ export default function ProblemDetails({
   );
 
   return (
-    <div className="w-[45%] border-r flex flex-col">
+    <div className="rounded-2xl w-[45%] border flex flex-col text-white border-slate-700 mt-2 mr-1 mb-15 ml-5">
       {/* Header */}
-      <div className="p-5 border-b">
+      <div className="p-5">
         <h1 className="text-2xl font-semibold">{title}</h1>
         <p
           className={`text-sm mt-1 ${
@@ -43,14 +43,14 @@ export default function ProblemDetails({
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b text-sm">
+      <div className="flex border-t border-b border-slate-700 text-sm">
         <button
           className={`px-4 py-2 ${
             tab === "description" && "border-b-2 border-blue-600 font-medium"
           }`}
           onClick={() => setTab("description")}
         >
-          Description
+          Mô tả
         </button>
         <button
           className={`px-4 py-2 ${
@@ -58,7 +58,7 @@ export default function ProblemDetails({
           }`}
           onClick={() => setTab("examples")}
         >
-          Examples
+          Ví dụ
         </button>
         <button
           className={`px-4 py-2 ${
@@ -66,7 +66,7 @@ export default function ProblemDetails({
           }`}
           onClick={() => setTab("constraints")}
         >
-          Constraints
+          Ràng buộc
         </button>
       </div>
 
@@ -84,7 +84,7 @@ export default function ProblemDetails({
             {examples.map((ex, idx) => (
               <div
                 key={idx}
-                className="mb-4 rounded border bg-gray-50 p-3 text-sm"
+                className="mb-4 rounded border border-slate-700 bg-slate-800 p-3 text-sm"
               >
                 <p>
                   <strong>Input:</strong> {ex.input}

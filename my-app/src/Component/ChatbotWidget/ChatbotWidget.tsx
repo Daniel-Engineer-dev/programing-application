@@ -17,11 +17,11 @@ export default function ChatbotWidget() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 20 }}
             transition={{ duration: 0.2 }}
-            className="mb-3 w-80 bg-white shadow-lg rounded-2xl border border-gray-200"
+            className="mb-3 w-80 bg-slate-700 shadow-lg rounded-2xl border "
           >
-            <div className="mb-3 w-80 bg-white shadow-lg rounded-2xl border border-gray-200">
-              <div className="flex justify-between items-center p-3 border-b">
-                <h3 className="font-semibold text-gray-800">Chatbot</h3>
+            <div className="mb-3 w-80 bg-slate-800 shadow-lg rounded-2xl border-slate-700 border">
+              <div className="flex justify-between items-center p-3 border-b border-slate-700">
+                <h3 className="font-semibold text-white">Chatbot</h3>
                 <button
                   onClick={() => setIsOpen(false)}
                   className="text-gray-500 hover:text-gray-700 hover:cursor-pointer"
@@ -30,17 +30,17 @@ export default function ChatbotWidget() {
                 </button>
               </div>
 
-              <div className="p-3 h-64 overflow-y-auto text-sm text-gray-700">
+              <div className="p-3 h-64 overflow-y-auto text-sm text-white">
                 <p className="text-gray-500 italic text-center">
                   👋 Xin chào! Tôi có thể giúp gì cho bạn?
                 </p>
               </div>
 
-              <div className="p-3 border-t">
+              <div className="p-3 border-t border-slate-700">
                 <input
                   type="text"
                   placeholder="Nhập tin nhắn..."
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 text-white"
                 />
               </div>
             </div>

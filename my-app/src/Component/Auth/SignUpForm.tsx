@@ -15,9 +15,7 @@ const SignupForm = () => {
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [username, setUsername] = useState("");
-  const [message1, setMessage1] = useState("");
-  const [message2, setMessage2] = useState("");
-  const [message3, setMessage3] = useState("");
+  const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   //Hàm kiểm tra sự tồn tại của email trong firestore.
@@ -26,24 +24,55 @@ const SignupForm = () => {
     const querySnapshot = await getDocs(q);
     return !querySnapshot.empty; // true nếu email đã tồn tại
   };
+  //Kiểm tra email hợp lệ
+  const validEmail = async (email: string) => {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return regex.test(email);
+  };
+  //Kiểm tra mật khẩu mạnh
+  const validatePassword = async (password: string): Promise<boolean> => {
+    // Regex: Ít nhất 8 ký tự, 1 chữ thường, 1 chữ hoa, 1 số, 1 ký tự đặc biệt
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
+    // Vì là async function, giá trị trả về sẽ tự động được gói trong Promise
+    return regex.test(password);
+  };
+
   // Function to handle sign up
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
-    setMessage1("");
-    setMessage2("");
+    setMessage("");
     try {
+      const valid = await validEmail(email);
+      if (!valid) {
+        setMessage("Email này không hợp lệ!");
+        return;
+      }
       // 🔹 Kiểm tra email trước
       const exists = await emailExists(email);
       if (exists) {
-        setMessage1("❌ Email is already in use");
+        setMessage("❌ Email này đã được sử dụng");
         return;
       }
       // 🔹 Kiểm tra username sau
       const ref = doc(db, "usernames", username);
       const snap = await getDoc(ref);
       if (snap.exists()) {
-        setMessage2("⚠️ Username already taken");
+        setMessage("⚠️ Tên đăng nhập đã được sử dụng");
+        return;
+      }
+      //Kiểm tra mật khẩu mạnh:
+      const strongPassword = await validatePassword(password);
+      if (!strongPassword) {
+        setMessage(
+          "Mật khẩu có ít nhất 8 ký tự, 1 chữ thường, 1 chữ hoa, 1 số, 1 ký tự đặc biệt"
+        );
+        return;
+      }
+      //Kiểm tra password xác nhận:
+      if (confirmPassword != password) {
+        setMessage("Mật khẩu xác nhận không khớp");
         return;
       }
       // 🔹 Tạo user mới
@@ -56,14 +85,10 @@ const SignupForm = () => {
       const uid = userCredential.user.uid;
       await setDoc(ref, { email, uid, createdAt: new Date() });
 
-      alert("✅ Sign up successful!");
+      alert("✅ Đăng ký thành công!");
     } catch (err: any) {
       console.error(err);
       setError(err.message);
-      {
-        error === "Firebase: Error (auth/email-already-in-use)." &&
-          setMessage1("Email is used");
-      }
     }
   };
   return (
@@ -160,8 +185,8 @@ const SignupForm = () => {
               </button>
             </div>
           </div>
-          {message1 && <p className="text-red-500">{message1}</p>}
-          {!message1 && message2 && <p className="text-red-500">{message2}</p>}
+          {message && <p className="text-red-500">{message}</p>}
+          {error && <p className="text-red-500">{error}</p>}
           {/* Nút Đăng ký */}
           <button
             type="submit"

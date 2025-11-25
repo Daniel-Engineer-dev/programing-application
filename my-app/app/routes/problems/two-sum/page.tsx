@@ -30,10 +30,6 @@ export default function ProblemPage() {
     ],
   };
 
-  const [tab, setTab] = useState<"description" | "examples" | "constraints">(
-    "description"
-  );
-
   const [language, setLanguage] = useState("cpp");
   const [output, setOutput] = useState("");
 
@@ -43,7 +39,7 @@ export default function ProblemPage() {
   };
 
   return (
-    <div className="flex h-screen bg-white">
+    <div className="flex h-screen w-full bg-slate-950 fixed">
       {/* LEFT PANEL */}
       <ProblemDetails
         title={problem.title}
@@ -54,18 +50,19 @@ export default function ProblemPage() {
       />
 
       {/* RIGHT PANEL */}
-      <div className="w-[55%] flex flex-col">
+      <div className="w-[55%] flex flex-col mt-2 mr-5 mb-15 ml-1 rounded-2xl border-slate-700 border">
         {/* Header */}
-        <div className="border-b p-3 flex items-center justify-between bg-gray-50">
+        <div className="p-3 flex items-center justify-between bg-slate-950 rounded-2xl border">
           {/* Language */}
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
-            className="rounded border px-2 py-1 text-sm"
+            className="rounded border px-2 py-1 text-sm border-slate-700 bg-slate-800 text-white font-bold hover:cursor-pointer"
           >
             <option value="cpp">C++</option>
             <option value="python">Python</option>
             <option value="java">Java</option>
+            <option value="javascript">Javascript</option>
           </select>
 
           <div className="flex gap-2">
@@ -73,10 +70,10 @@ export default function ProblemPage() {
               onClick={handleRun}
               className="rounded bg-gray-300 px-3 py-1 text-sm hover:bg-gray-400"
             >
-              Run
+              Chạy
             </button>
             <button className="rounded bg-blue-600 text-white px-3 py-1 text-sm hover:bg-blue-700">
-              Submit
+              Nộp bài
             </button>
           </div>
         </div>
@@ -90,10 +87,10 @@ export default function ProblemPage() {
         />
 
         {/* Output panel */}
-        <div className="border-t h-[40%] bg-white p-3 text-sm">
-          <h3 className="text-sm font-medium mb-2">Output:</h3>
-          <pre className="h-full overflow-auto bg-gray-50 p-3 rounded">
-            {output}
+        <div className="rounded-2xl h-[40%] bg-slate-950 p-3 text-sm mt-2 border-t border-slate-700 flex flex-col">
+          <h3 className="text-sm font-medium mb-2 text-white">Output:</h3>
+          <pre className="overflow-auto bg-gray-900 text-white p-4 rounded-md whitespace-pre-wrap font-mono text-sm border border-gray-700 flex-1">
+            {output || "Kết quả sẽ hiện ở đây..."}
           </pre>
         </div>
       </div>
