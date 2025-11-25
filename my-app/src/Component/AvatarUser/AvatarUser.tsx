@@ -103,9 +103,17 @@ export default function UserMenu({
 
               {/* 3 ô nhanh */}
               <div className="grid grid-cols-3 gap-3 px-4 py-3 text-slate-300">
-                <QuickTile href="/lists" icon={ListTodo} label="My Lists" />
-                <QuickTile href="/notebook" icon={Notebook} label="Notebook" />
-                <QuickTile href="/progress" icon={Gauge} label="Progress" />
+                <QuickTile href="/lists" name="list.png" label="My Lists" />
+                <QuickTile
+                  href="/notebook"
+                  name="notebook.png"
+                  label="Notebook"
+                />
+                <QuickTile
+                  href="/progress"
+                  name="progress.png"
+                  label="Progress"
+                />
               </div>
 
               {/* Points */}
@@ -192,11 +200,11 @@ export default function UserMenu({
 }
 function QuickTile({
   href,
-  icon: Icon,
+  name,
   label,
 }: {
   href: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
+  name: string;
   label: string;
 }) {
   return (
@@ -204,7 +212,7 @@ function QuickTile({
       href={href}
       className="group flex flex-col items-center justify-center rounded-xl border px-4 py-3 hover:border-gray-300 hover:bg-blue-700 hover:text-white hover:font-bold"
     >
-      <Icon size={22} className="mb-1" />
+      <img src={name} className="mb-1" />
       <span className="text-[13px]">{label}</span>
     </Link>
   );
