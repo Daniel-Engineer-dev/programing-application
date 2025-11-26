@@ -5,10 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Notebook,
-  ListTodo,
   Trophy,
-  Gauge,
   FlaskConical,
   ShoppingBag,
   Gamepad2,
