@@ -8,12 +8,14 @@ export default function SettingsLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div style={{ display: "flex", width: "100%" }}>
-      <div style={{ width: "260px" }}>
+    <div className="flex w-full min-h-screen bg-slate-950 text-white">
+      {/* SIDEBAR TRÁI */}
+      <div className="w-[260px] bg-slate-800 border-r border-slate-700">
         <UserSidebar />
       </div>
 
-      <div style={{ flex: 1, padding: "20px" }}>{children}</div>
+      {/* NỘI DUNG BÊN PHẢI */}
+      <div className="flex-1 p-8 bg-slate-950">{children}</div>
     </div>
   );
 }

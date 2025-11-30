@@ -1,101 +1,90 @@
 "use client";
 
-import Image from "next/image";
-import UserSidebar from "@/src/Component/UserSidebar/UserSidebar";
-import { auth } from "@/src/api/firebase";
-
 export default function ProfilePage() {
-  const user = auth.currentUser;
-  const displayName = user?.displayName || "";
-  const email = user?.email || "";
-  const photoURL = user?.photoURL || "/avatar.png";
-
   return (
-    <div className="min-h-screen bg-[#0d1117] text-white flex">
-      <main className="flex-1 p-10">
-        <h1 className="text-3xl font-bold">Hồ sơ</h1>
-        <p className="text-gray-400 mt-2">Cập nhật thông tin cá nhân.</p>
+    <div className="text-white bg-slate-950 min-h-screen p-8">
+      {/* Title */}
+      <h1 className="text-3xl font-bold mb-2">Hồ sơ</h1>
+      <p className="text-slate-400 mb-8">
+        Cập nhật ảnh đại diện và thông tin cá nhân của bạn.
+      </p>
 
-        {/* Header */}
-        <div className="mt-8 flex items-center gap-6">
-          <Image
-            src={photoURL}
-            width={90}
-            height={90}
-            alt="avatar"
-            className="rounded-full"
-          />
-          <div>
-            <h2 className="text-xl font-semibold">{displayName}</h2>
-            <p className="text-gray-400">{email}</p>
-          </div>
-          <button className="ml-auto bg-gray-600 px-4 py-2 rounded-lg hover:bg-gray-500">
-            Tải ảnh mới
+      {/* Avatar + info */}
+      <div className="flex items-center mb-10">
+        <img
+          src="/avatar.png"
+          className="w-20 h-20 rounded-full border border-slate-700"
+        />
+        <div className="ml-4">
+          <h2 className="text-xl font-semibold">Tên người dùng</h2>
+          <p className="text-slate-400">email@gmail.com</p>
+        </div>
+        <button className="ml-auto bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">
+          Tải ảnh mới
+        </button>
+      </div>
+
+      {/* Display name + Username */}
+      <div className="grid grid-cols-2 gap-6 mb-8">
+        <div>
+          <label className="block mb-2 text-sm text-slate-400">
+            Tên hiển thị
+          </label>
+          <input className="bg-slate-900 border border-slate-700 w-full px-4 py-2 rounded" />
+        </div>
+
+        <div>
+          <label className="block mb-2 text-sm text-slate-400">
+            Tên người dùng
+          </label>
+          <input className="bg-slate-900 border border-slate-700 w-full px-4 py-2 rounded" />
+        </div>
+      </div>
+
+      {/* Email */}
+      <div className="mb-12">
+        <label className="block mb-2 text-sm text-slate-400">Email</label>
+        <div className="flex">
+          <input className="bg-slate-900 border border-slate-700 w-full px-4 py-2 rounded-l" />
+          <button className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-r">
+            Thay đổi
           </button>
         </div>
+      </div>
 
-        {/* Inputs */}
-        <div className="mt-10 grid grid-cols-2 gap-6">
-          <div>
-            <label className="text-sm text-gray-400">Tên hiển thị</label>
-            <input
-              className="mt-2 w-full bg-[#121a28] border border-gray-700 px-3 py-2 rounded-lg"
-              defaultValue={displayName}
-            />
-          </div>
+      {/* Change password */}
+      <h2 className="text-xl font-bold mb-4">Thay đổi mật khẩu</h2>
 
-          <div>
-            <label className="text-sm text-gray-400">Tên người dùng</label>
-            <input
-              className="mt-2 w-full bg-[#121a28] border border-gray-700 px-3 py-2 rounded-lg"
-              defaultValue={displayName}
-            />
-          </div>
-        </div>
-
-        {/* Email */}
-        <div className="mt-6">
-          <label className="text-sm text-gray-400">Email</label>
-          <input
-            className="mt-2 w-full bg-[#121a28] border border-gray-700 px-3 py-2 rounded-lg"
-            value={email}
-            disabled
-          />
-        </div>
-
-        {/* Password */}
-        <h3 className="text-xl font-semibold mt-10">Thay đổi mật khẩu</h3>
-
-        <div className="mt-6 grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-2 gap-6 mb-8">
+        <div>
+          <label className="block mb-2 text-sm text-slate-400">
+            Mật khẩu hiện tại
+          </label>
           <input
             type="password"
-            placeholder="Mật khẩu hiện tại"
-            className="bg-[#121a28] border border-gray-700 px-3 py-2 rounded-lg"
-          />
-          <input
-            type="password"
-            placeholder="Xác nhận mật khẩu mới"
-            className="bg-[#121a28] border border-gray-700 px-3 py-2 rounded-lg"
+            className="bg-slate-900 border border-slate-700 w-full px-4 py-2 rounded"
           />
         </div>
 
-        <div className="mt-6 w-1/2">
+        <div>
+          <label className="block mb-2 text-sm text-slate-400">
+            Xác nhận mật khẩu
+          </label>
           <input
             type="password"
-            placeholder="Mật khẩu mới"
-            className="bg-[#121a28] border border-gray-700 px-3 py-2 rounded-lg"
+            className="bg-slate-900 border border-slate-700 w-full px-4 py-2 rounded"
           />
         </div>
+      </div>
 
-        <div className="flex justify-end gap-4 mt-10">
-          <button className="px-5 py-2 border border-gray-600 rounded-lg hover:bg-gray-700">
-            Hủy
-          </button>
-          <button className="px-5 py-2 bg-blue-600 rounded-lg hover:bg-blue-500">
-            Lưu thay đổi
-          </button>
-        </div>
-      </main>
+      <div className="flex">
+        <button className="bg-slate-700 hover:bg-slate-600 px-6 py-2 rounded mr-3">
+          Hủy
+        </button>
+        <button className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded">
+          Lưu thay đổi
+        </button>
+      </div>
     </div>
   );
 }
