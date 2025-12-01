@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 //Sign out
 import { signOut } from "firebase/auth";
-import { auth } from "@/src/api/firebase";
+import { auth } from "@/src/api/firebase/firebase";
 import { useRouter } from "next/navigation";
 
 type UserMenuProps = {

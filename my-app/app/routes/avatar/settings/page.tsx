@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { updateProfile } from "firebase/auth";
-import { auth } from "@/src/api/firebase"; // nếu bạn dùng Firebase
+import { auth } from "@/src/api/firebase/firebase"; // nếu bạn dùng Firebase
 import { toast } from "react-hot-toast"; // tùy chọn để hiển thị thông báo
 
 export default function SettingsPage() {

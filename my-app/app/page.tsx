@@ -1,7 +1,6 @@
 // app/page.tsx
 "use client";
 import PageTransition from "@/src/pageTransition/pageTransition";
-import Image from "next/image";
 import Link from "next/link";
 import { useAuthContext } from "@/src/userHook/context/authContext";
 
