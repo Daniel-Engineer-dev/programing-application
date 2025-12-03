@@ -26,10 +26,11 @@ export default async function ProblemPage({
         description={problem.description}
         examples={problem.examples}
         constraints={problem.constraints}
+        tags={problem.tags}
       />
 
       {/* Editor component */}
-      <EditorPanel />
+      <EditorPanel problemId={(await params).id} />
     </div>
   );
 }
