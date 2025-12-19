@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { Search, ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
+// Import Auth từ Firebase
+import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import { db } from "@/src/api/firebase/firebase";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 
 type Problem = {
   id: string;
@@ -12,7 +14,6 @@ type Problem = {
   difficulty: "Easy" | "Medium" | "Hard";
   acceptance: number;
   tags: string[];
-  status?: "Solved" | "Attempted" | "Todo";
 };
 
 const badgeColor = (d: Problem["difficulty"]) =>
@@ -24,16 +25,58 @@ const badgeColor = (d: Problem["difficulty"]) =>
 
 export default function ProblemsTable() {
   const [problems, setProblems] = useState<Problem[]>([]);
+  const [user, setUser] = useState<User | null>(null);
 
+  // State lưu map trạng thái bài làm của user: { "two-sum": "accepted", ... }
+  const [userProblems, setUserProblems] = useState<Record<string, string>>({});
+
+  // 1. Lắng nghe trạng thái đăng nhập
   useEffect(() => {
-    // Lắng nghe realtime Firestore
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // 2. Lắng nghe dữ liệu danh sách bài tập (Problems)
+  useEffect(() => {
     const unsub = onSnapshot(collection(db, "problems"), (snapshot) => {
-      const list: Problem[] = snapshot.docs.map((doc) => doc.data() as Problem);
+      const list = snapshot.docs.map(
+        (doc) =>
+          ({
+            id: doc.id,
+            ...doc.data(),
+          } as Problem)
+      );
       setProblems(list);
     });
 
-    return () => unsub(); // cleanup
+    return () => unsub();
   }, []);
+
+  // 3. [MỚI] Lắng nghe dữ liệu người dùng (Usernames Collection)
+  useEffect(() => {
+    if (!user) {
+      setUserProblems({}); // Reset nếu chưa đăng nhập
+      return;
+    }
+
+    // Query vào collection 'usernames' tìm document có uid trùng với user hiện tại
+    const q = query(collection(db, "usernames"), where("uid", "==", user.uid));
+
+    const unsub = onSnapshot(q, (snapshot) => {
+      if (!snapshot.empty) {
+        const userDoc = snapshot.docs[0].data();
+        // Lưu map problems vào state (ví dụ: { "two-sum": "accepted" })
+        setUserProblems(userDoc.problems || {});
+      } else {
+        setUserProblems({});
+      }
+    });
+
+    return () => unsub();
+  }, [user]);
 
   return (
     <section className="mt-6 px-12 pb-16 pt-6">
@@ -77,59 +120,117 @@ export default function ProblemsTable() {
           </thead>
 
           <tbody>
-            {problems.map((p, i) => (
-              <tr key={p.id} className="hover:bg-slate-900 text-white">
-                <td className="px-4 py-3">{i + 1}</td>
+            {problems.map((p, i) => {
+              // LOGIC CHECK STATUS MỚI:
+              // 1. Lấy trạng thái từ map userProblems dựa vào ID bài toán (p.id)
+              const rawStatus = userProblems[p.id]; // "accepted", "attempt", hoặc undefined
 
-                <td className="px-4 py-3">
-                  <Link
-                    href={`/routes/problems/${p.id}`}
-                    className="font-bold hover:text-blue-600"
-                  >
-                    {p.title}
-                  </Link>
-                </td>
+              // 2. Map từ dữ liệu DB sang hiển thị UI
+              let displayStatus: "Solved" | "Attempted" | "Todo" = "Todo";
 
-                <td className="px-4 py-3">
-                  <span
-                    className={`inline-block rounded-full px-2 py-0.5 text-xs ${badgeColor(
-                      p.difficulty
-                    )}`}
-                  >
-                    {p.difficulty}
-                  </span>
-                </td>
+              if (rawStatus === "accepted") displayStatus = "Solved";
+              else if (rawStatus === "attempt" || rawStatus === "attempted")
+                displayStatus = "Attempted";
 
-                <td className="px-4 py-3">{Math.round(p.acceptance * 100)}%</td>
+              // 3. Nếu chưa đăng nhập thì luôn là Todo
+              if (!user) displayStatus = "Todo";
 
-                <td className="px-4 py-3">
-                  <div className="flex flex-wrap gap-2">
-                    {p.tags?.map((t) => (
-                      <span
-                        key={t}
-                        className="rounded-md bg-blue px-2 py-0.5 text-xs"
-                      >
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </td>
+              // Màu sắc cho status
+              const statusColor =
+                displayStatus === "Solved"
+                  ? "text-green-500 font-medium"
+                  : displayStatus === "Attempted"
+                  ? "text-yellow-500"
+                  : "text-gray-500";
 
-                <td className="px-4 py-3">
-                  <span
-                    className={`text-xs ${
-                      p.status === "Solved"
-                        ? "text-green-600"
-                        : p.status === "Attempted"
-                        ? "text-yellow-700"
-                        : "text-gray-500"
-                    }`}
-                  >
-                    {p.status ?? "-"}
-                  </span>
-                </td>
-              </tr>
-            ))}
+              return (
+                <tr
+                  key={p.id}
+                  className="hover:bg-slate-900 text-white transition-colors"
+                >
+                  <td className="px-4 py-3 text-slate-400">{i + 1}</td>
+
+                  <td className="px-4 py-3">
+                    <Link
+                      href={`/routes/problems/${p.id}`}
+                      className="font-bold hover:text-blue-500 transition-colors"
+                    >
+                      {p.title}
+                    </Link>
+                  </td>
+
+                  <td className="px-4 py-3">
+                    <span
+                      className={`inline-block rounded-full px-2.5 py-0.5 text-xs ${badgeColor(
+                        p.difficulty
+                      )}`}
+                    >
+                      {p.difficulty}
+                    </span>
+                  </td>
+
+                  <td className="px-4 py-3 text-slate-300">
+                    {Math.round(p.acceptance * 100)}%
+                  </td>
+
+                  <td className="px-4 py-3">
+                    <div className="flex flex-wrap gap-2">
+                      {p.tags?.map((t) => (
+                        <span
+                          key={t}
+                          className="rounded-md bg-slate-700 px-2 py-0.5 text-xs text-slate-300 border border-slate-600"
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  </td>
+
+                  <td className="px-4 py-3">
+                    {/* Hiển thị icon tương ứng với status */}
+                    <span
+                      className={`text-xs flex items-center gap-1.5 ${statusColor}`}
+                    >
+                      {displayStatus === "Solved" && (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      )}
+                      {displayStatus === "Attempted" && (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M18 6 6 18" />
+                          <path d="m6 6 12 12" />
+                        </svg>
+                      )}
+                      {displayStatus === "Todo" && (
+                        <span className="text-slate-600">-</span>
+                      )}
+                      {displayStatus !== "Todo" && displayStatus}
+                    </span>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
