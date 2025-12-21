@@ -1,7 +1,7 @@
 // app/api/explore/guides/route.ts
 
 import { NextResponse } from "next/server";
-import { db } from "@/src/api/firebase";
+import { db } from "@/src/api/firebase/firebase";
 import { collection, getDocs, query } from "firebase/firestore";
 
 export async function GET() {

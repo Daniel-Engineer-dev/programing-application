@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { db } from "@/src/api/firebase";
+import { db } from "@/src/api/firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { marked } from "marked"; // Thư viện xử lý Markdown (cần npm install marked)
 
