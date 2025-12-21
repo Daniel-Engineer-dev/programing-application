@@ -1,7 +1,7 @@
 // app/layout.tsx
 import "./globals.css";
-import NavBar from "@/src/component/NavBar/NavBar"; // CHÚ Ý: "Component" viết hoa
-import ChatbotWidget from "@/src/component/ChatbotWidget/ChatbotWidget";
+import NavBar from "@/src/Component/NavBar/NavBar"; // CHÚ Ý: "Component" viết hoa
+import ChatbotWidget from "@/src/Component/ChatbotWidget/ChatbotWidget";
 import { AuthProvider } from "@/src/userHook/context/authContext";
 
 export const metadata = {
