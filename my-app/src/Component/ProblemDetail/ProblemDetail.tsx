@@ -639,10 +639,24 @@ export default function ProblemDetails({
                 <div className="flex justify-between items-center border-b border-slate-800 pb-4">
                   <h2 className="text-xl font-bold">Community Solutions</h2>
                   <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all"
+                    onClick={() => {
+                      if (!user) {
+                        alert(
+                          "Vui lòng đăng nhập để chia sẻ bài giải của bạn!"
+                        );
+                        // Bạn có thể điều hướng người dùng đến trang login ở đây:
+                        // router.push("/login");
+                        return;
+                      }
+                      setIsModalOpen(true);
+                    }}
+                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+                      !user
+                        ? "bg-slate-800 text-slate-500 cursor-not-allowed"
+                        : "bg-blue-600 hover:bg-blue-700 text-white"
+                    }`}
                   >
-                    Viết bài giải
+                    {user ? "Viết bài giải" : "Đăng nhập để viết bài"}
                   </button>
                 </div>
 
@@ -676,7 +690,7 @@ export default function ProblemDetails({
           </div>
         )}
         {/* Modal Form */}
-        {isModalOpen && (
+        {isModalOpen && user && (
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-100 flex items-center justify-center p-4">
             <div className="bg-slate-950 border border-slate-800 w-full max-w-2xl rounded-2xl p-6 shadow-2xl space-y-4">
               <h2 className="text-xl font-bold text-white">
