@@ -17,16 +17,15 @@ import { CheckCircle2 } from "lucide-react";
 import RichTextEditor from "@/src/Component/Discussion/RichTextEditor";
 
 const DEFAULT_TOPICS: string[] = [
-  "Array (Mảng)",
-  "String (Chuỗi)",
-  "Hash Table (Bảng băm)",
-  "Dynamic Programming (Quy hoạch động)",
-  "Greedy (Tham lam)",
-  "Two Pointers (Hai con trỏ)",
-  "Binary Search (Tìm kiếm nhị phân)",
-  "Graph (Đồ thị)",
-  "Tree (Cây)",
-  "Backtracking",
+  "Mảng",
+  "Chuỗi",
+  "Bảng băm",
+  "Quy hoạch động",
+  "Tham lam",
+  "Hai con trỏ",
+  "Tìm kiếm nhị phân",
+  "Đồ thị",
+  "Cây",
 ];
 
 export default function EditDiscussionPage() {
@@ -198,7 +197,7 @@ export default function EditDiscussionPage() {
     <div className="min-h-screen bg-slate-900 text-slate-200">
       <main className="mx-auto max-w-3xl px-6 py-10">
         <h1 className="mb-6 text-3xl font-bold text-white">
-          Chỉnh sửa Chủ đề
+          Chỉnh sửa bài thảo luận
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -294,7 +293,7 @@ export default function EditDiscussionPage() {
             disabled={saving}
             className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:bg-blue-900"
           >
-            {saving ? "Đang cập nhật..." : "Cập nhật bài đăng"}
+            {saving ? "Đang cập nhật..." : "Cập nhật bài thảo luận"}
           </button>
         </form>
 

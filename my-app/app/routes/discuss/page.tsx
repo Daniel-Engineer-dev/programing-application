@@ -133,7 +133,7 @@ export default function DiscussionListPage() {
         <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-white">
-              Trang Thảo luận
+              Trang Thảo Luận
             </h1>
             <p className="text-sm text-slate-400">
               Khám phá chủ đề, đặt câu hỏi và chia sẻ kiến thức của bạn.
@@ -143,7 +143,7 @@ export default function DiscussionListPage() {
             onClick={() => router.push("/routes/discuss/new")}
             className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
           >
-            + Tạo Chủ đề Mới
+            + Tạo bài đăng mới 
           </button>
         </div>
 
