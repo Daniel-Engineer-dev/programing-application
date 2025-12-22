@@ -4,8 +4,15 @@ import Editor from "@monaco-editor/react";
 import axios from "axios";
 
 // 2. Import Firebase
-import { doc, getDoc, collection, getDocs } from "firebase/firestore";
-import { db } from "@/src/api/firebase/firebase";
+import {
+  doc,
+  getDoc,
+  collection,
+  getDocs,
+  addDoc,
+  serverTimestamp,
+} from "firebase/firestore";
+import { auth, db } from "@/src/api/firebase/firebase";
 
 // --- TYPE DEFINITIONS ---
 type TestCase = {
@@ -20,22 +27,40 @@ type RunResult = {
   actualOutput: string;
   stderr: string;
   status: "Pending" | "Accepted" | "Wrong Answer" | "Runtime Error";
+  runtime: string; // Thêm mới
+  memory: string; // Thêm mới
 };
 
 type SubmissionResult = {
   total: number;
   passed: number;
   status: "Accepted" | "Wrong Answer" | "Runtime Error" | "Pending";
+  runtime: string; // Thêm mới
+  memory: string; // Thêm mới
+};
+type EditorPanelProps = {
+  problemId: string;
+  initialCode: string; // Mã nguồn nhận từ page.tsx
+  currentLanguage: string; // Ngôn ngữ nhận từ page.tsx
+  onCodeChange: (code: string) => void; // Hàm báo cho page.tsx khi gõ code
+  onLanguageChange: (lang: string) => void; // Hàm báo cho page.tsx khi đổi ngôn ngữ
 };
 
-export default function EditorPanel({ problemId }: { problemId: string }) {
+export default function EditorPanel({
+  problemId,
+  initialCode,
+  currentLanguage,
+  onCodeChange,
+  onLanguageChange,
+}: EditorPanelProps) {
   // --- STATE QUẢN LÝ DỮ LIỆU ---
   const [templates, setTemplates] = useState<Record<string, string>>({});
   const [isPageLoading, setIsPageLoading] = useState(true);
 
   // --- STATE EDITOR ---
-  const [language, setLanguage] = useState("cpp");
-  const [code, setCode] = useState("");
+  // Ưu tiên sử dụng giá trị từ Props
+  const [language, setLanguage] = useState(currentLanguage || "cpp");
+  const [code, setCode] = useState(initialCode || "");
   const [codeMap, setCodeMap] = useState<Record<string, string>>({});
 
   // --- STATE TEST CASES ---
@@ -50,7 +75,63 @@ export default function EditorPanel({ problemId }: { problemId: string }) {
   const [isSubmitting, setIsSubmitting] = useState(false); // Loading cho nút Nộp bài
   const [submissionResult, setSubmissionResult] =
     useState<SubmissionResult | null>(null); // Kết quả nộp bài
+  // --- EFFECT: ĐỒNG BỘ KHI KHÔI PHỤC CODE TỪ LỊCH SỬ ---
+  useEffect(() => {
+    if (initialCode !== undefined) {
+      setCode(initialCode);
+    }
+  }, [initialCode]);
 
+  useEffect(() => {
+    if (currentLanguage) {
+      setLanguage(currentLanguage);
+    }
+  }, [currentLanguage]);
+
+  // --- EFFECT: LẤY DỮ LIỆU TỪ FIREBASE ---
+  useEffect(() => {
+    if (!problemId) return;
+
+    const fetchData = async () => {
+      setIsPageLoading(true);
+      try {
+        const problemRef = doc(db, "problems", problemId);
+        const problemSnap = await getDoc(problemRef);
+
+        if (problemSnap.exists()) {
+          const data = problemSnap.data();
+          const fetchedTemplates = data.defaultCode || {};
+          setTemplates(fetchedTemplates);
+          setCodeMap(fetchedTemplates);
+
+          // Chỉ đặt code mặc định nếu hiện tại Editor đang trống
+          if (!initialCode) {
+            const defaultLang = "cpp";
+            const defaultCode = fetchedTemplates[defaultLang] || "";
+            setLanguage(defaultLang);
+            setCode(defaultCode);
+            onLanguageChange(defaultLang);
+            onCodeChange(defaultCode);
+          }
+        }
+
+        // ... giữ nguyên logic lấy Test Cases ...
+      } catch (error) {
+        console.error("Lỗi tải dữ liệu:", error);
+      } finally {
+        setIsPageLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [problemId]);
+
+  // --- HANDLER: Thay đổi nội dung Editor ---
+  const handleEditorChange = (val: string | undefined) => {
+    const newCode = val || "";
+    setCode(newCode); // Cập nhật UI ngay lập tức
+    onCodeChange(newCode); // Báo lên Component cha
+  };
   // --- EFFECT: LẤY DỮ LIỆU TỪ FIREBASE ---
   useEffect(() => {
     if (!problemId) return;
@@ -113,6 +194,9 @@ export default function EditorPanel({ problemId }: { problemId: string }) {
     setLanguage(newLang);
     const nextCode = codeMap[newLang] || templates[newLang] || "";
     setCode(nextCode);
+    // Báo lên Component cha (page.tsx)
+    onLanguageChange(newLang);
+    onCodeChange(nextCode);
   };
 
   // --- HANDLER: Chạy Code (Chỉ chạy Public Test Cases) ---
@@ -125,6 +209,8 @@ export default function EditorPanel({ problemId }: { problemId: string }) {
         actualOutput: "",
         stderr: "",
         status: "Pending",
+        runtime: "",
+        memory: "",
       }))
     );
     setSubmissionResult(null); // Ẩn modal kết quả nộp bài nếu đang mở
@@ -156,6 +242,12 @@ export default function EditorPanel({ problemId }: { problemId: string }) {
           const expected = tc.expectedOutput.trim();
           const actual = resultData.stdout ? resultData.stdout.trim() : "";
           const stderr = resultData.stderr || "";
+          const runtime = resultData.time
+            ? `${(resultData.time * 1000).toFixed(0)} ms`
+            : "0 ms";
+          const memory = resultData.memory
+            ? `${(resultData.memory / 1024 / 1024).toFixed(2)} MB`
+            : "0 MB";
 
           let status: RunResult["status"] = "Accepted";
           let passed = true;
@@ -168,7 +260,14 @@ export default function EditorPanel({ problemId }: { problemId: string }) {
             passed = false;
           }
 
-          newResults[i] = { passed, actualOutput: actual, stderr, status };
+          newResults[i] = {
+            passed,
+            actualOutput: actual,
+            stderr,
+            status,
+            runtime,
+            memory,
+          };
           setRunResults([...newResults]);
         } catch (error) {
           console.error(`Lỗi test case ${i}`, error);
@@ -184,11 +283,12 @@ export default function EditorPanel({ problemId }: { problemId: string }) {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     setSubmissionResult(null); // Reset kết quả trước đó
-
     const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
     let passedCount = 0;
     let finalStatus: SubmissionResult["status"] = "Accepted";
+    let maxRuntime = 0;
+    let maxMemory = 0;
 
     try {
       // Chạy vòng lặp qua ALL test cases
@@ -207,6 +307,8 @@ export default function EditorPanel({ problemId }: { problemId: string }) {
           const expected = tc.expectedOutput.trim();
           const actual = resultData.stdout ? resultData.stdout.trim() : "";
           const stderr = resultData.stderr || "";
+          maxRuntime = Math.max(maxRuntime, resultData.time || 0);
+          maxMemory = Math.max(maxMemory, resultData.memory || 0);
 
           if (stderr) {
             finalStatus = "Runtime Error";
@@ -226,10 +328,26 @@ export default function EditorPanel({ problemId }: { problemId: string }) {
       }
 
       // Sau khi chạy xong hết
-      setSubmissionResult({
+      const result = {
         total: allTestCases.length,
         passed: passedCount,
         status: passedCount === allTestCases.length ? "Accepted" : finalStatus,
+        runtime: `${(maxRuntime * 1000).toFixed(0)} ms`,
+        memory: `${(maxMemory / 1024 / 1024).toFixed(2)} MB`,
+      };
+
+      setSubmissionResult(result);
+
+      // --- GỌI HÀM LƯU VÀO FIRESTORE TẠI ĐÂY ---
+      await saveSubmissionToFirestore({
+        problemId,
+        status: result.status,
+        passed: result.passed,
+        total: result.total,
+        runtime: result.runtime,
+        memory: result.memory,
+        language: language,
+        code: code, // Lưu lại code để người dùng xem lại sau này
       });
     } catch (err) {
       console.error(err);
@@ -245,7 +363,33 @@ export default function EditorPanel({ problemId }: { problemId: string }) {
       </div>
     );
   }
+  //hàm lưu lịch sử bài nộp
+  const saveSubmissionToFirestore = async (submissionData: {
+    problemId: string;
+    status: string;
+    passed: number;
+    total: number;
+    runtime: string;
+    memory: string;
+    language: string;
+    code: string;
+  }) => {
+    const user = auth.currentUser;
+    if (!user) return; // Nếu chưa đăng nhập thì không lưu
 
+    try {
+      // Tham chiếu đến: users/{uid}/submissions
+      const submissionsRef = collection(db, "users", user.uid, "submissions");
+
+      await addDoc(submissionsRef, {
+        ...submissionData,
+        timestamp: serverTimestamp(), // Thời gian nộp bài theo server
+      });
+      console.log("Lịch sử bài làm đã được lưu!");
+    } catch (error) {
+      console.error("Lỗi khi lưu lịch sử:", error);
+    }
+  };
   return (
     <div className="w-[55%] flex flex-col mt-2 mr-5 mb-15 ml-1 rounded-2xl border-slate-700 border h-[90vh] relative">
       {/* --- MODAL KẾT QUẢ NỘP BÀI (Overlay) --- */}
@@ -314,7 +458,21 @@ export default function EditorPanel({ problemId }: { problemId: string }) {
               </span>{" "}
               test cases.
             </div>
-
+            {/* Thêm vào bên trong Modal submissionResult */}
+            <div className="grid grid-cols-2 gap-4 w-full mb-6">
+              <div className="bg-slate-800/50 p-3 rounded-xl border border-slate-700 text-center">
+                <div className="text-xs text-gray-500 uppercase">Runtime</div>
+                <div className="text-white font-mono">
+                  {submissionResult.runtime}
+                </div>
+              </div>
+              <div className="bg-slate-800/50 p-3 rounded-xl border border-slate-700 text-center">
+                <div className="text-xs text-gray-500 uppercase">Memory</div>
+                <div className="text-white font-mono">
+                  {submissionResult.memory}
+                </div>
+              </div>
+            </div>
             <button
               onClick={() => setSubmissionResult(null)}
               className="bg-slate-800 hover:bg-slate-700 text-white px-6 py-2 rounded-lg font-medium transition-colors border border-slate-600"
@@ -401,10 +559,10 @@ export default function EditorPanel({ problemId }: { problemId: string }) {
       <div className="flex-1 overflow-hidden relative">
         <Editor
           height="100%"
-          language={language}
+          language={language === "cpp" ? "cpp" : language}
           theme="vs-dark"
-          value={code}
-          onChange={(val: string | undefined) => setCode(val || "")}
+          value={code} // Gán giá trị code từ state đã được đồng bộ
+          onChange={handleEditorChange}
           options={{
             minimap: { enabled: false },
             fontSize: 14,
@@ -457,14 +615,15 @@ export default function EditorPanel({ problemId }: { problemId: string }) {
               <div className="space-y-4 pb-4">
                 {runResults[activeTab] &&
                   runResults[activeTab].status !== "Pending" && (
-                    <div
-                      className={`text-xs font-bold mb-2 ${
-                        runResults[activeTab].passed
-                          ? "text-green-500"
-                          : "text-red-500"
-                      }`}
-                    >
-                      {runResults[activeTab].status}
+                    <div className="flex gap-4 mb-2">
+                      <div className="text-[10px] bg-slate-800 px-2 py-1 rounded border border-slate-700">
+                        <span className="text-white">Runtime:</span>{" "}
+                        {runResults[activeTab].runtime}
+                      </div>
+                      <div className="text-[10px] bg-slate-800 px-2 py-1 rounded border border-slate-700">
+                        <span className="text-white">Memory:</span>{" "}
+                        {runResults[activeTab].memory}
+                      </div>
                     </div>
                   )}
                 <div>
