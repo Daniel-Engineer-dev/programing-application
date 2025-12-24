@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 import { useAuthContext } from "@/src/userHook/context/authContext";
-import UserMenu from "@/src/component/AvatarUser/AvatarUser";
+import UserMenu from "@/src/Component/AvatarUser/AvatarUser";
 
 const links = [
   { href: "/routes/problems", label: "Bài Tập" },

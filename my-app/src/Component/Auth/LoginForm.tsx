@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Eye, EyeOff, Github } from "lucide-react";
 import Link from "next/link";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "@/src/api/firebase";
+import { auth, db } from "@/src/api/firebase/firebase";
 import {
   setPersistence,
   browserLocalPersistence,

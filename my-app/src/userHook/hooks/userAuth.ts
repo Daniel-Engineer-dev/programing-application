@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { auth } from "../../api/firebase";
+import { auth } from "../../api/firebase/firebase";
 import { setPersistence, browserSessionPersistence } from "firebase/auth";
 
 /**

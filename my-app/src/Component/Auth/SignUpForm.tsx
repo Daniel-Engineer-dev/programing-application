@@ -3,9 +3,9 @@ import React, { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { Eye, EyeOff, Github } from "lucide-react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/src/api/firebase";
+import { auth } from "@/src/api/firebase/firebase";
 import { doc, setDoc } from "firebase/firestore";
-import { db } from "@/src/api/firebase";
+import { db } from "@/src/api/firebase/firebase";
 import { getDoc } from "firebase/firestore";
 import { collection, query, where, getDocs } from "firebase/firestore";
 

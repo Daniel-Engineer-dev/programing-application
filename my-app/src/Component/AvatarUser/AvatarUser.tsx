@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 //Sign out
 import { signOut } from "firebase/auth";
-import { auth } from "@/src/api/firebase";
+import { auth } from "@/src/api/firebase/firebase";
 import { useRouter } from "next/navigation";
 
 type UserMenuProps = {
@@ -100,15 +100,19 @@ export default function UserMenu({
 
               {/* 3 ô nhanh */}
               <div className="grid grid-cols-3 gap-3 px-4 py-3 text-slate-300">
-                <QuickTile href="/lists" name="list.png" label="My Lists" />
                 <QuickTile
-                  href="/notebook"
-                  name="notebook.png"
+                  href="/routes/avatar/settings/saved"
+                  name="/list.png"
+                  label="My Lists"
+                />
+                <QuickTile
+                  href="/routes/avatar/settings/notes"
+                  name="/notebook.png"
                   label="Notebook"
                 />
                 <QuickTile
-                  href="/progress"
-                  name="progress.png"
+                  href="/routes/avatar/settings/history"
+                  name="/progress.png"
                   label="Progress"
                 />
               </div>
@@ -126,17 +130,21 @@ export default function UserMenu({
               <hr />
 
               <div className="px-4 py-2 text-slate-300">
-                <MenuItem
+                {/* <MenuItem
                   href="/labs"
                   icon={FlaskConical}
                   label="Try New Features"
-                />
-                <MenuItem href="/orders" icon={ShoppingBag} label="Orders" />
+                /> */}
                 <MenuItem
+                  href="/routes/avatar/settings/buy"
+                  icon={ShoppingBag}
+                  label="Orders"
+                />
+                {/* <MenuItem
                   href="/playgrounds"
                   icon={Gamepad2}
                   label="My Playgrounds"
-                />
+                /> */}
                 <MenuItem
                   href="/routes/avatar/settings"
                   icon={Settings}
@@ -144,7 +152,7 @@ export default function UserMenu({
                 />
 
                 {/* Appearance submenu */}
-                <button
+                {/* <button
                   onClick={() => setAppearanceOpen((s) => !s)}
                   className="flex w-full items-center justify-between rounded-lg px-2 py-2.5 text-left text-[15px] hover:bg-blue-700 hover:text-white hover:font-bold hover:cursor-pointer"
                 >
@@ -173,7 +181,7 @@ export default function UserMenu({
                       <AppearanceOption label="Dark" />
                     </motion.div>
                   )}
-                </AnimatePresence>
+                </AnimatePresence> */}
               </div>
 
               <hr />

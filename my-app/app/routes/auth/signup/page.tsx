@@ -1,5 +1,5 @@
 "use client";
-import SignupForm from "@/src/component/Auth/SignUpForm";
+import SignupForm from "@/src/Component/Auth/SignUpForm";
 import PageTransition from "@/src/pageTransition/pageTransition";
 import React, { useEffect } from "react";
 import { useAuthContext } from "@/src/userHook/context/authContext";

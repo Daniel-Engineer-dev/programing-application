@@ -2,10 +2,10 @@
 import React from "react";
 import { useState } from "react";
 import { sendPasswordResetEmail } from "firebase/auth";
-import { auth } from "@/src/api/firebase";
+import { auth } from "@/src/api/firebase/firebase";
 import { Github } from "lucide-react";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "@/src/api/firebase";
+import { db } from "@/src/api/firebase/firebase";
 const ForgotPasswordForm = () => {
   const [email, setEmail] = useState<string>("");
   const [message, setMessage] = useState<string>("");

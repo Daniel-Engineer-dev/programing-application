@@ -7,6 +7,9 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
+.sidebar-item {
+  @apply block px-3 py-2 rounded-md hover:bg-[#1b2331] hover:text-white;
+}
 
 body {
   color: var(--foreground);
