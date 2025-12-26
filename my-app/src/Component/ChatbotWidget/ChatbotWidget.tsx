@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Bot, X, Send, User, Copy, Check } from "lucide-react"; // Thêm icon cho Copy
+import { Bot, X, Send, User, Paperclip, FileText } from "lucide-react"; // Thêm icon Paperclip và FileText
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import ReactMarkdown from "react-markdown";
@@ -27,9 +27,16 @@ export default function ChatbotWidget() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const scrollRef = useRef<HTMLDivElement>(null);
+  // State quản lý file đang được đính kèm
+  const [attachedFile, setAttachedFile] = useState<{
+    name: string;
+    content: string;
+  } | null>(null);
 
-  // --- LOGIC KÉO GIÃN (RESIZE) - FIX LỖI ---
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // --- LOGIC KÉO GIÃN (RESIZE) ---
   const startResizing = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     setIsResizing(true);
@@ -74,17 +81,48 @@ export default function ChatbotWidget() {
     }
   }, [messages, isLoading]);
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+  // --- XỬ LÝ FILE ---
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    const userMsg: Message = { role: "user", content: input };
+    // Chỉ cho phép file văn bản hoặc code
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result as string;
+      setAttachedFile({
+        name: file.name,
+        content: content,
+      });
+    };
+    reader.readAsText(file);
+  };
+
+  const handleSend = async () => {
+    if ((!input.trim() && !attachedFile) || isLoading) return;
+
+    // Tạo nội dung tin nhắn bao gồm cả nội dung file nếu có
+    let fullContent = input;
+    if (attachedFile) {
+      fullContent = `Nội dung từ file "${attachedFile.name}":\n\`\`\`\n${
+        attachedFile.content
+      }\n\`\`\`\n\nCâu hỏi: ${input || "Hãy phân tích nội dung file này."}`;
+    }
+
+    const userMsg: Message = {
+      role: "user",
+      content: input || `Gửi file: ${attachedFile?.name}`,
+    };
+
+    // Lưu tin nhắn hiển thị ngắn gọn nhưng gửi đi nội dung đầy đủ
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
+    setAttachedFile(null); // Reset file sau khi gửi
     setIsLoading(true);
 
     try {
       const res = await axios.post("/api/chatbot", {
-        messages: [...messages, userMsg],
+        messages: [...messages, { role: "user", content: fullContent }],
       });
 
       setMessages((prev) => [
@@ -112,10 +150,10 @@ export default function ChatbotWidget() {
             initial={{ x: "100%", opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: "100%", opacity: 0 }}
-            style={{ width: `${width}px` }} // QUAN TRỌNG: Gán width động vào style
+            style={{ width: `${width}px` }}
             className="fixed top-0 right-0 z-50 h-full bg-slate-950 border-l border-slate-800 shadow-2xl flex flex-col font-sans"
           >
-            {/* THANH KÉO GIÃN - Handle to Resize */}
+            {/* Handle Resize */}
             <div
               onMouseDown={startResizing}
               className={`absolute left-0 top-0 w-1.5 h-full cursor-col-resize z-10 transition-colors ${
@@ -126,33 +164,22 @@ export default function ChatbotWidget() {
             {/* Header */}
             <div className="flex justify-between items-center p-4 border-b border-slate-800 bg-slate-900/80 backdrop-blur-md">
               <div className="flex items-center gap-3">
-                <div className="bg-linear-to-br from-blue-500 to-indigo-600 p-2 rounded-xl shadow-lg shadow-blue-500/20">
+                <div className="bg-linear-to-br from-blue-500 to-indigo-600 p-2 rounded-xl">
                   <Bot size={22} className="text-white" />
                 </div>
-                <div>
-                  <h3 className="font-bold text-white text-base tracking-tight">
-                    CodePro AI
-                  </h3>
-                  <div className="flex items-center gap-1.5 text-emerald-500">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative rounded-full h-2 w-2 bg-emerald-500"></span>
-                    </span>
-                    <span className="text-[10px] uppercase font-bold tracking-widest">
-                      Trực tuyến
-                    </span>
-                  </div>
-                </div>
+                <h3 className="font-bold text-white text-base tracking-tight">
+                  CodePro AI
+                </h3>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-2 text-slate-500 hover:text-white transition-all"
+                className="p-2 text-slate-500 hover:text-white"
               >
                 <X size={20} />
               </button>
             </div>
 
-            {/* CHAT CONTENT */}
+            {/* Chat Content */}
             <div
               ref={scrollRef}
               className="flex-1 overflow-y-auto p-4 space-y-6 overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-800"
@@ -206,14 +233,10 @@ export default function ChatbotWidget() {
                   </div>
                 </div>
               ))}
-
-              {/* LOADING INDICATOR */}
               {isLoading && (
-                <div className="flex gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-blue-600/10 flex items-center justify-center border border-blue-500/20">
-                    <Bot size={18} className="text-blue-500 animate-pulse" />
-                  </div>
-                  <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl rounded-tl-none flex gap-1.5 items-center">
+                <div className="flex gap-3 items-center">
+                  <Bot size={18} className="text-blue-500 animate-pulse" />
+                  <div className="flex gap-1">
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div>
@@ -224,7 +247,46 @@ export default function ChatbotWidget() {
 
             {/* Input Footer */}
             <div className="p-4 bg-slate-950 border-t border-slate-800">
+              {/* Preview file đang chờ gửi */}
+              {attachedFile && (
+                <div className="mb-2 flex items-center justify-between bg-slate-900 border border-blue-500/30 p-2 rounded-lg animate-in fade-in slide-in-from-bottom-2">
+                  <div className="flex items-center gap-2 overflow-hidden">
+                    <FileText size={16} className="text-blue-400" />
+                    <span className="text-xs text-slate-300 truncate">
+                      {attachedFile.name}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setAttachedFile(null)}
+                    className="text-slate-500 hover:text-red-400 p-1"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
+
               <div className="relative flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-2xl px-4 py-2 focus-within:border-blue-500/50 transition-all">
+                {/* Nút Upload Hidden */}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  className="hidden"
+                  accept=".txt,.js,.py,.cpp,.java,.c,.h,.ts,.tsx,.json,.md"
+                />
+
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`p-1.5 rounded-lg transition-colors ${
+                    attachedFile
+                      ? "text-blue-500"
+                      : "text-slate-500 hover:text-white"
+                  }`}
+                  title="Đính kèm file"
+                >
+                  <Paperclip size={20} />
+                </button>
+
                 <textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
@@ -233,16 +295,16 @@ export default function ChatbotWidget() {
                     !e.shiftKey &&
                     (e.preventDefault(), handleSend())
                   }
-                  placeholder="Hỏi tôi bất cứ điều gì..."
+                  placeholder="Hỏi tôi hoặc gửi code..."
                   className="w-full bg-transparent text-white text-sm resize-none focus:outline-none py-2 min-h-10 max-h-32"
                   rows={1}
                 />
                 <button
                   onClick={handleSend}
-                  disabled={isLoading || !input.trim()}
+                  disabled={isLoading || (!input.trim() && !attachedFile)}
                   className={`p-2 rounded-xl transition-all ${
-                    input.trim() && !isLoading
-                      ? "bg-blue-600 text-white shadow-lg"
+                    (input.trim() || attachedFile) && !isLoading
+                      ? "bg-blue-600 text-white"
                       : "bg-slate-800 text-slate-600"
                   }`}
                 >
