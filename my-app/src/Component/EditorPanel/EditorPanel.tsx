@@ -616,11 +616,11 @@ export default function EditorPanel({
                 {runResults[activeTab] &&
                   runResults[activeTab].status !== "Pending" && (
                     <div className="flex gap-4 mb-2">
-                      <div className="text-[10px] bg-slate-800 px-2 py-1 rounded border border-slate-700">
+                      <div className="text-[10px] bg-slate-800 px-2 py-1 rounded border border-slate-700 text-white">
                         <span className="text-white">Runtime:</span>{" "}
                         {runResults[activeTab].runtime}
                       </div>
-                      <div className="text-[10px] bg-slate-800 px-2 py-1 rounded border border-slate-700">
+                      <div className="text-[10px] bg-slate-800 px-2 py-1 rounded border border-slate-700 text-white">
                         <span className="text-white">Memory:</span>{" "}
                         {runResults[activeTab].memory}
                       </div>

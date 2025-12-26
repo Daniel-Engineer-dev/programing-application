@@ -1,79 +1,106 @@
 "use client";
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Eye, EyeOff, Github } from "lucide-react";
 import Link from "next/link";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "@/src/api/firebase/firebase";
 import {
+  signInWithEmailAndPassword,
   setPersistence,
   browserLocalPersistence,
   browserSessionPersistence,
 } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "@/src/api/firebase/firebase";
+import { collection, query, where, getDocs, limit } from "firebase/firestore";
 
 const LoginForm = () => {
-  // const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [isRememberMe, setIsRememberMe] = useState<boolean>(false);
   const [message, setMessage] = useState("");
   const [identifier, setIdentifier] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage("");
     setError("");
+
     try {
       let email = identifier;
 
-      // Nếu người dùng nhập username → tra Firestore
+      // 1. Kiểm tra nếu identifier là username (không chứa ký tự @)
       if (!identifier.includes("@")) {
-        const ref = doc(db, "usernames", identifier);
-        const snap = await getDoc(ref);
-        if (!snap.exists()) {
-          setMessage("❌Không tìm thấy tên người dùng");
+        // Truy vấn collection "users" để tìm tài liệu có field username khớp
+        const userQuery = query(
+          collection(db, "users"),
+          where("username", "==", identifier),
+          limit(1)
+        );
+
+        const querySnapshot = await getDocs(userQuery);
+
+        if (querySnapshot.empty) {
+          setMessage("❌ Không tìm thấy tên đăng nhập này");
           return;
         }
-        email = snap.data().email;
+
+        // Lấy email tương ứng từ dữ liệu người dùng
+        email = querySnapshot.docs[0].data().email;
       }
 
+      // 2. Thiết lập trạng thái lưu phiên đăng nhập
       const persistence = isRememberMe
         ? browserLocalPersistence
         : browserSessionPersistence;
 
       await setPersistence(auth, persistence);
+
+      // 3. Đăng nhập với Firebase Auth sử dụng Email
       await signInWithEmailAndPassword(auth, email, password);
-      alert("Logged in successfully!");
+
+      alert("Đăng nhập thành công!");
+      // Bạn có thể redirect người dùng tại đây, ví dụ: router.push("/")
     } catch (err: any) {
-      setError(err.message);
+      console.error(err);
+      // Xử lý các mã lỗi phổ biến từ Firebase Auth
+      if (
+        err.code === "auth/invalid-credential" ||
+        err.code === "auth/wrong-password" ||
+        err.code === "auth/user-not-found"
+      ) {
+        setError("Thông tin đăng nhập không chính xác. Vui lòng thử lại.");
+      } else {
+        setError("Đã xảy ra lỗi: " + err.message);
+      }
     }
   };
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-slate-950 px-4 font-sans text-slate-300">
-      {/* --- Login Card Container --- */}
       <div className="w-full max-w-[440px] space-y-8">
-        {/* 2. Main Form */}
         <form
           onSubmit={handleLogin}
           className="space-y-6 rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-xl"
         >
-          {/* 1. Header: Logo & Title */}
           <div className="flex flex-col items-center text-center">
             <h1 className="text-3xl font-bold text-white">Đăng nhập</h1>
           </div>
-          {/* Email Field */}
+
+          {/* Email / Username Field */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-white" htmlFor="email">
-              Email
+            <label
+              className="text-sm font-medium text-white"
+              htmlFor="identifier"
+            >
+              Email hoặc Tên đăng nhập
             </label>
             <input
+              id="identifier"
               type="text"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value.trim())}
-              placeholder="Nhập email hoặc tên tài khoản của bạn"
+              placeholder="Nhập email hoặc tên tài khoản"
               className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition-all focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              required
             />
           </div>
 
@@ -101,6 +128,7 @@ const LoginForm = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Nhập mật khẩu"
                 className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition-all focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                required
               />
               <button
                 type="button"
@@ -111,32 +139,34 @@ const LoginForm = () => {
               </button>
             </div>
           </div>
+
           <div className="flex items-center justify-between">
-            <label className="flex items-center ">
+            <label className="flex items-center hover:cursor-pointer">
               <input
                 type="checkbox"
-                className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 hover:cursor-pointer"
-                onChange={(e) => {
-                  setIsRememberMe(e.target.checked);
-                }}
+                checked={isRememberMe}
+                className="rounded border-slate-700 bg-slate-950 text-blue-600 focus:ring-blue-500 hover:cursor-pointer"
+                onChange={(e) => setIsRememberMe(e.target.checked)}
               />
-              <span className="ml-2 text-sm text-gray-600 ">
+              <span className="ml-2 text-sm text-slate-400">
                 Ghi nhớ phiên đăng nhập
               </span>
             </label>
           </div>
-          {/* Display error message if any */}
-          {error && <p className="text-red-500">Mật khẩu không hợp lệ</p>}
-          {message && <p className="text-red-500">{message}</p>}
-          {/* Submit Button */}
+
+          {/* Error messages */}
+          {error && <p className="text-sm text-red-500 font-medium">{error}</p>}
+          {message && (
+            <p className="text-sm text-red-500 font-medium">{message}</p>
+          )}
+
           <button
             type="submit"
-            className="w-full rounded-lg bg-blue-600 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-700 shadow-lg shadow-blue-600/20"
+            className="w-full rounded-lg bg-blue-600 py-3 text-sm font-bold text-white transition-all hover:bg-blue-700 active:scale-[0.98] shadow-lg shadow-blue-600/20"
           >
             Đăng nhập
           </button>
 
-          {/* Divider "Hoặc" */}
           <div className="relative flex items-center py-2">
             <div className="grow border-t border-slate-800"></div>
             <span className="mx-4 text-xs text-slate-500">
@@ -145,13 +175,11 @@ const LoginForm = () => {
             <div className="grow border-t border-slate-800"></div>
           </div>
 
-          {/* Social Buttons */}
           <div className="grid grid-cols-2 gap-4">
             <button
               type="button"
               className="flex items-center justify-center gap-2 rounded-lg border border-slate-700 bg-slate-950 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-800"
             >
-              {/* Google Icon SVG */}
               <svg className="h-5 w-5" viewBox="0 0 24 24">
                 <path
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -182,7 +210,6 @@ const LoginForm = () => {
           </div>
         </form>
 
-        {/* 3. Footer Link */}
         <p className="text-center text-sm text-slate-500">
           Chưa có tài khoản?{" "}
           <Link

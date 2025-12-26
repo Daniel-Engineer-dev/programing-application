@@ -43,26 +43,38 @@ const SignupForm = () => {
     e.preventDefault();
     setError("");
     setMessage("");
+
     try {
+      // 1. Kiểm tra định dạng Email
       const valid = await validEmail(email);
       if (!valid) {
         setMessage("Email này không hợp lệ!");
         return;
       }
-      // 🔹 Kiểm tra email trước
-      const exists = await emailExists(email);
-      if (exists) {
+
+      // 2. Kiểm tra Email đã tồn tại trong Firestore (collection users)
+      const emailQuery = query(
+        collection(db, "users"),
+        where("email", "==", email)
+      );
+      const emailSnap = await getDocs(emailQuery);
+      if (!emailSnap.empty) {
         setMessage("❌ Email này đã được sử dụng");
         return;
       }
-      // 🔹 Kiểm tra username sau
-      const ref = doc(db, "usernames", username);
-      const snap = await getDoc(ref);
-      if (snap.exists()) {
+
+      // 3. Kiểm tra Username đã tồn tại trong Firestore (collection users)
+      const usernameQuery = query(
+        collection(db, "users"),
+        where("username", "==", username)
+      );
+      const usernameSnap = await getDocs(usernameQuery);
+      if (!usernameSnap.empty) {
         setMessage("⚠️ Tên đăng nhập đã được sử dụng");
         return;
       }
-      //Kiểm tra mật khẩu mạnh:
+
+      // 4. Kiểm tra độ mạnh mật khẩu
       const strongPassword = await validatePassword(password);
       if (!strongPassword) {
         setMessage(
@@ -70,25 +82,40 @@ const SignupForm = () => {
         );
         return;
       }
-      //Kiểm tra password xác nhận:
-      if (confirmPassword != password) {
+
+      if (confirmPassword !== password) {
         setMessage("Mật khẩu xác nhận không khớp");
         return;
       }
-      // 🔹 Tạo user mới
+
+      // 5. Tạo user mới trong Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
-
       const uid = userCredential.user.uid;
-      await setDoc(ref, { email, uid, createdAt: new Date() });
+
+      // 6. Lưu thông tin vào collection "users" với ID là UID
+      // Điều này giúp bạn bỏ được collection "usernames" dư thừa
+      await setDoc(doc(db, "users", uid), {
+        username: username,
+        email: email,
+        uid: uid,
+        createdAt: new Date(),
+        // Bạn có thể thêm các field mặc định khác ở đây
+        role: "user",
+        avatar: "",
+      });
 
       alert("✅ Đăng ký thành công!");
     } catch (err: any) {
       console.error(err);
-      setError(err.message);
+      if (err.code === "auth/email-already-in-use") {
+        setError("Email này đã được đăng ký trong hệ thống Auth.");
+      } else {
+        setError(err.message);
+      }
     }
   };
   return (

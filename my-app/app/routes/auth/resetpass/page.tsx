@@ -1,4 +1,4 @@
-import ForgotPasswordForm from "@/src/component/Auth/ForgotPasswordForm";
+import ForgotPasswordForm from "@/src/Component/Auth/ForgotPasswordForm";
 import PageTransition from "@/src/pageTransition/pageTransition";
 import React from "react";
 

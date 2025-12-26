@@ -22,11 +22,16 @@ type Example = {
 type Approach = {
   name: string;
   description: string;
-  code: string;
+  // Sửa code từ string thành Record để chứa nhiều ngôn ngữ
+  code: {
+    cpp?: string;
+    java?: string;
+    javascript?: string;
+    python?: string;
+  };
   timeComplexity: string;
   spaceComplexity: string;
 };
-
 type Editorial = {
   content?: string;
   lastUpdated?: string; // Kiểu Timestamp của Firebase
@@ -64,6 +69,114 @@ const readFileContent = (file: File): Promise<string> => {
     reader.readAsText(file);
   });
 };
+function EditorialCodeSection({ codes }: { codes: Approach["code"] }) {
+  const availableLanguages = Object.keys(codes) as (keyof Approach["code"])[];
+  const [selectedLang, setSelectedLang] = useState<keyof Approach["code"]>(
+    availableLanguages[0] || "cpp"
+  );
+  const [copied, setCopied] = useState(false);
+
+  if (availableLanguages.length === 0) return null;
+
+  const langLabels: Record<string, string> = {
+    cpp: "C++",
+    java: "Java",
+    javascript: "JS",
+    python: "Python",
+  };
+
+  // Hàm xử lý copy
+  const handleCopy = async () => {
+    const codeToCopy = codes[selectedLang];
+    if (codeToCopy) {
+      try {
+        await navigator.clipboard.writeText(codeToCopy);
+        setCopied(true);
+        // Reset lại icon sau 2 giây
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {
+        console.error("Lỗi khi copy: ", err);
+      }
+    }
+  };
+
+  return (
+    <div className="mt-4 space-y-2">
+      {/* Header của block code: Nút chuyển đổi + Nút Copy */}
+      <div className="flex items-center justify-between">
+        {/* Nút chuyển đổi ngôn ngữ */}
+        <div className="flex gap-2 p-1 bg-slate-950 w-fit rounded-lg border border-slate-800">
+          {availableLanguages.map((lang) => (
+            <button
+              key={lang}
+              onClick={() => setSelectedLang(lang)}
+              className={`px-3 py-1 text-[11px] font-bold rounded-md transition-all ${
+                selectedLang === lang
+                  ? "bg-slate-800 text-blue-400 shadow-sm"
+                  : "text-slate-500 hover:text-slate-300"
+              }`}
+            >
+              {langLabels[lang]}
+            </button>
+          ))}
+        </div>
+
+        {/* Nút Copy */}
+        <button
+          onClick={handleCopy}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all border border-transparent hover:border-slate-700"
+          title="Copy to clipboard"
+        >
+          {copied ? (
+            <>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-green-500"
+              >
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span className="text-green-500">Copied!</span>
+            </>
+          ) : (
+            <>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span>Copy</span>
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* Hiển thị CodeBlock tương ứng */}
+      <div className="animate-in fade-in zoom-in-95 duration-200">
+        <CodeBlock
+          code={codes[selectedLang] || ""}
+          language={selectedLang === "cpp" ? "cpp" : selectedLang}
+        />
+      </div>
+    </div>
+  );
+}
 
 export default function ProblemDetails({
   title,
@@ -466,7 +579,7 @@ export default function ProblemDetails({
         {tab === "editorial" && (
           <div className="space-y-6 animate-in fade-in duration-300">
             <div className="flex flex-col gap-2">
-              <h2 className="text-xl font-bold">Editorial Solution</h2>
+              <h2 className="text-xl font-bold">Giải pháp biên tập</h2>
               {/* HIỂN THỊ NGÀY CẬP NHẬT */}
               {editorial?.lastUpdated && (
                 <div className="flex items-center gap-1.5 text-xs text-slate-500">
@@ -521,7 +634,7 @@ export default function ProblemDetails({
                   >
                     {/* Tên cách giải */}
                     <h3 className="text-lg font-semibold text-blue-400 mb-2">
-                      Approach {index + 1}: {app.name}
+                      Cách tiếp cận thứ {index + 1}: {app.name}
                     </h3>
 
                     {/* Mô tả cách giải */}
@@ -530,12 +643,7 @@ export default function ProblemDetails({
                     </p>
 
                     {/* Hiển thị Code Snippet nếu có */}
-                    {app.code && (
-                      <CodeBlock
-                        code={app.code}
-                        language="cpp" // Hoặc lấy từ một field language trong Firebase nếu có
-                      />
-                    )}
+                    <EditorialCodeSection codes={app.code} />
 
                     {/* Độ phức tạp */}
                     <div className="flex flex-wrap gap-4 mt-2">
