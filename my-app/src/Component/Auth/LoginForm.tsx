@@ -1,76 +1,107 @@
 "use client";
 import React, { useState } from "react";
-import { Eye, EyeOff, Github } from "lucide-react";
+import { Eye, EyeOff, Github, Loader2 } from "lucide-react"; // Thêm Loader2
 import Link from "next/link";
 import {
   signInWithEmailAndPassword,
   setPersistence,
   browserLocalPersistence,
   browserSessionPersistence,
+  fetchSignInMethodsForEmail,
 } from "firebase/auth";
 import { auth, db } from "@/src/api/firebase/firebase";
 import { collection, query, where, getDocs, limit } from "firebase/firestore";
+import { useAuthContext } from "@/src/userHook/context/authContext";
 
 const LoginForm = () => {
+  const { signInWithGoogle, signInWithGithub } = useAuthContext();
+
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [isRememberMe, setIsRememberMe] = useState<boolean>(false);
   const [message, setMessage] = useState("");
   const [identifier, setIdentifier] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false); // State quản lý loading
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage("");
     setError("");
+    setLoading(true); // Bắt đầu loading
 
     try {
       let email = identifier;
 
-      // 1. Kiểm tra nếu identifier là username (không chứa ký tự @)
+      // 1. Tìm email nếu người dùng nhập username
       if (!identifier.includes("@")) {
-        // Truy vấn collection "users" để tìm tài liệu có field username khớp
         const userQuery = query(
           collection(db, "users"),
           where("username", "==", identifier),
           limit(1)
         );
-
         const querySnapshot = await getDocs(userQuery);
 
         if (querySnapshot.empty) {
-          setMessage("❌ Không tìm thấy tên đăng nhập này");
+          setError("❌ Không tìm thấy tên đăng nhập này.");
+          setLoading(false);
           return;
         }
-
-        // Lấy email tương ứng từ dữ liệu người dùng
         email = querySnapshot.docs[0].data().email;
       }
 
-      // 2. Thiết lập trạng thái lưu phiên đăng nhập
+      // 2. Kiểm tra phương thức đăng nhập (Logic quan trọng bạn yêu cầu)
+      const methods = await fetchSignInMethodsForEmail(auth, email);
+
+      if (methods.length === 0) {
+        setError("❌ Tài khoản này chưa được đăng ký. Vui lòng đăng ký mới.");
+        setLoading(false);
+        return;
+      }
+
+      // Nếu người dùng nhập mật khẩu nhưng tài khoản chỉ có Google/Github
+      if (!methods.includes("password")) {
+        const provider = methods[0].includes("google") ? "Google" : "GitHub";
+        setError(
+          `⚠️ Tài khoản này được đăng ký bằng ${provider}. Vui lòng nhấn nút đăng nhập bằng ${provider} bên dưới.`
+        );
+        setLoading(false);
+        return;
+      }
+
+      // 3. Thực hiện đăng nhập email/password
       const persistence = isRememberMe
         ? browserLocalPersistence
         : browserSessionPersistence;
-
       await setPersistence(auth, persistence);
-
-      // 3. Đăng nhập với Firebase Auth sử dụng Email
       await signInWithEmailAndPassword(auth, email, password);
 
       alert("Đăng nhập thành công!");
-      // Bạn có thể redirect người dùng tại đây, ví dụ: router.push("/")
     } catch (err: any) {
       console.error(err);
-      // Xử lý các mã lỗi phổ biến từ Firebase Auth
       if (
-        err.code === "auth/invalid-credential" ||
         err.code === "auth/wrong-password" ||
-        err.code === "auth/user-not-found"
+        err.code === "auth/invalid-credential"
       ) {
-        setError("Thông tin đăng nhập không chính xác. Vui lòng thử lại.");
+        setError("Mật khẩu không chính xác. Vui lòng thử lại.");
       } else {
-        setError("Đã xảy ra lỗi: " + err.message);
+        setError("Lỗi: " + err.message);
       }
+    } finally {
+      setLoading(false); // Kết thúc loading dù thành công hay thất bại
+    }
+  };
+
+  const handleSocialLogin = async (type: "google" | "github") => {
+    setLoading(true);
+    try {
+      setError("");
+      if (type === "google") await signInWithGoogle();
+      else await signInWithGithub();
+    } catch (err: any) {
+      setError("Lỗi đăng nhập mạng xã hội: " + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -85,7 +116,6 @@ const LoginForm = () => {
             <h1 className="text-3xl font-bold text-white">Đăng nhập</h1>
           </div>
 
-          {/* Email / Username Field */}
           <div className="space-y-2">
             <label
               className="text-sm font-medium text-white"
@@ -99,12 +129,12 @@ const LoginForm = () => {
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value.trim())}
               placeholder="Nhập email hoặc tên tài khoản"
-              className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition-all focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              disabled={loading}
+              className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition-all focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
               required
             />
           </div>
 
-          {/* Password Field */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label
@@ -127,7 +157,8 @@ const LoginForm = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Nhập mật khẩu"
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition-all focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                disabled={loading}
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition-all focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
                 required
               />
               <button
@@ -145,6 +176,7 @@ const LoginForm = () => {
               <input
                 type="checkbox"
                 checked={isRememberMe}
+                disabled={loading}
                 className="rounded border-slate-700 bg-slate-950 text-blue-600 focus:ring-blue-500 hover:cursor-pointer"
                 onChange={(e) => setIsRememberMe(e.target.checked)}
               />
@@ -154,22 +186,28 @@ const LoginForm = () => {
             </label>
           </div>
 
-          {/* Error messages */}
-          {error && <p className="text-sm text-red-500 font-medium">{error}</p>}
-          {message && (
-            <p className="text-sm text-red-500 font-medium">{message}</p>
+          {/* Hiển thị lỗi rõ ràng hơn */}
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-3 rounded-lg text-sm font-medium">
+              {error}
+            </div>
           )}
 
           <button
             type="submit"
-            className="w-full rounded-lg bg-blue-600 py-3 text-sm font-bold text-white transition-all hover:bg-blue-700 active:scale-[0.98] shadow-lg shadow-blue-600/20"
+            disabled={loading}
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-3 text-sm font-bold text-white transition-all hover:bg-blue-700 active:scale-[0.98] shadow-lg shadow-blue-600/20 disabled:bg-slate-800 disabled:text-slate-500 disabled:cursor-not-allowed"
           >
-            Đăng nhập
+            {loading ? (
+              <Loader2 className="animate-spin" size={20} />
+            ) : (
+              "Đăng nhập"
+            )}
           </button>
 
           <div className="relative flex items-center py-2">
             <div className="grow border-t border-slate-800"></div>
-            <span className="mx-4 text-xs text-slate-500">
+            <span className="mx-4 text-xs text-slate-500 text-nowrap">
               Hoặc tiếp tục với
             </span>
             <div className="grow border-t border-slate-800"></div>
@@ -178,7 +216,9 @@ const LoginForm = () => {
           <div className="grid grid-cols-2 gap-4">
             <button
               type="button"
-              className="flex items-center justify-center gap-2 rounded-lg border border-slate-700 bg-slate-950 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-800"
+              disabled={loading}
+              onClick={() => handleSocialLogin("google")}
+              className="flex items-center justify-center gap-2 rounded-lg border border-slate-700 bg-slate-950 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-800 disabled:opacity-50"
             >
               <svg className="h-5 w-5" viewBox="0 0 24 24">
                 <path
@@ -202,7 +242,9 @@ const LoginForm = () => {
             </button>
             <button
               type="button"
-              className="flex items-center justify-center gap-2 rounded-lg border border-slate-700 bg-slate-950 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-800"
+              disabled={loading}
+              onClick={() => handleSocialLogin("github")}
+              className="flex items-center justify-center gap-2 rounded-lg border border-slate-700 bg-slate-950 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-800 disabled:opacity-50"
             >
               <Github size={20} />
               GitHub

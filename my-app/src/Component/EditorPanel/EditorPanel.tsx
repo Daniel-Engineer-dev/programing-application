@@ -53,6 +53,8 @@ export default function EditorPanel({
   onCodeChange,
   onLanguageChange,
 }: EditorPanelProps) {
+  // Thêm vào cùng các state khác ở đầu component
+  const [problemTitle, setProblemTitle] = useState("");
   // --- STATE QUẢN LÝ DỮ LIỆU ---
   const [templates, setTemplates] = useState<Record<string, string>>({});
   const [isPageLoading, setIsPageLoading] = useState(true);
@@ -100,6 +102,7 @@ export default function EditorPanel({
 
         if (problemSnap.exists()) {
           const data = problemSnap.data();
+          setProblemTitle(data.title || "");
           const fetchedTemplates = data.defaultCode || {};
           setTemplates(fetchedTemplates);
           setCodeMap(fetchedTemplates);
@@ -341,6 +344,7 @@ export default function EditorPanel({
       // --- GỌI HÀM LƯU VÀO FIRESTORE TẠI ĐÂY ---
       await saveSubmissionToFirestore({
         problemId,
+        problemTitle,
         status: result.status,
         passed: result.passed,
         total: result.total,
@@ -366,6 +370,7 @@ export default function EditorPanel({
   //hàm lưu lịch sử bài nộp
   const saveSubmissionToFirestore = async (submissionData: {
     problemId: string;
+    problemTitle: string;
     status: string;
     passed: number;
     total: number;

@@ -1,4 +1,4 @@
-import NotesPage from "@/src/Component/Node/Node";
+import NotesPage from "@/src/Component/Notes/Notes";
 
 export default function Page() {
   return <NotesPage />;

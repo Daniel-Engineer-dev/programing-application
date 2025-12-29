@@ -1,0 +1,66 @@
+{
+  "id": "3-longest-substring-without-repeating-characters",
+  "title": "Longest Substring Without Repeating Characters",
+  "difficulty": "Medium",
+  "acceptance": 0.34,
+  "tags": ["hash-table", "string", "sliding-window"],
+  "constraints": [
+    "0 <= s.length <= 5 * 10^4",
+    "s bao gồm các chữ cái tiếng Anh, chữ số, biểu tượng và khoảng trắng."
+  ],
+  "description": "Cho một chuỗi s, hãy tìm độ dài của chuỗi con dài nhất mà không chứa các ký tự lặp lại.",
+  "defaultCode": {
+    "cpp": "class Solution {\npublic:\n    int lengthOfLongestSubstring(string s) {\n        \n    }\n};",
+    "java": "class Solution {\n    public int lengthOfLongestSubstring(String s) {\n        \n    }\n}",
+    "python": "class Solution:\n    def lengthOfLongestSubstring(self, s: str) -> int:\n        ",
+    "javascript": "/**\n * @param {string} s\n * @return {number}\n */\nvar lengthOfLongestSubstring = function(s) {\n    \n};"
+  },
+  "driverCodes": {
+    "cpp": "#include <iostream>\n#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\n// __USER_CODE_HERE__\n\nint main() {\n    string line;\n    if (!getline(cin, line)) {\n        Solution sol;\n        cout << sol.lengthOfLongestSubstring(\"\");\n        return 0;\n    }\n    Solution sol;\n    cout << sol.lengthOfLongestSubstring(line);\n    return 0;\n}",
+    "python": "import sys\nfrom typing import List\n\n# __USER_CODE_HERE__\n\nif __name__ == \"__main__\":\n    # Đọc toàn bộ input từ stdin\n    input_data = sys.stdin.read().splitlines()\n    line = input_data[0] if input_data else \"\"\n    sol = Solution()\n    print(sol.lengthOfLongestSubstring(line))",
+    "java": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = \"\";\n        if (sc.hasNextLine()) s = sc.nextLine();\n        \n        Solution sol = new Solution();\n        System.out.print(sol.lengthOfLongestSubstring(s));\n    }\n}\n\n// __USER_CODE_HERE__",
+    "javascript": "const fs = require('fs');\nclass Solution {}\n\n// __USER_CODE_HERE__\n\ntry {\n    const input = fs.readFileSync(0, 'utf8').replace(/[\\r\\n]/g, '');\n    const sol = new Solution();\n    const fn = (typeof lengthOfLongestSubstring === 'function') ? lengthOfLongestSubstring : (sol.lengthOfLongestSubstring ? sol.lengthOfLongestSubstring.bind(sol) : null);\n\n    if (typeof fn === 'function') {\n        console.log(fn(input));\n    } else {\n        console.error(\"Error: function lengthOfLongestSubstring not found.\");\n    }\n} catch (e) {\n    console.error(e);\n}"
+  },
+  "testCases": [
+    { "input": "abcabcbb", "expected": "3", "isHidden": false },
+    { "input": "bbbbb", "expected": "1", "isHidden": false },
+    { "input": "pwwkew", "expected": "3", "isHidden": false },
+    { "input": " ", "expected": "1", "isHidden": true },
+    { "input": "dvdf", "expected": "3", "isHidden": true }
+  ],
+  "examples": [
+    {
+      "input": "s = \"abcabcbb\"",
+      "output": "3",
+      "explanation": "Đáp án là \"abc\", với độ dài bằng 3."
+    },
+    {
+      "input": "s = \"bbbbb\"",
+      "output": "1",
+      "explanation": "Đáp án là \"b\", với độ dài bằng 1."
+    },
+    {
+      "input": "s = \"pwwkew\"",
+      "output": "3",
+      "explanation": "Đáp án là \"wke\", với độ dài bằng 3. Lưu ý rằng đáp án phải là một chuỗi con, \"pwke\" là một dãy con (subsequence) chứ không phải chuỗi con (substring)."
+    }
+  ],
+  "editorial": {
+    "approaches": [
+      {
+        "name": "Sliding Window (Cửa sổ trượt tối ưu)",
+        "description": "Sử dụng hai con trỏ để đại diện cho một cửa sổ trượt. Chúng ta dùng một Map để lưu trữ vị trí cuối cùng của mỗi ký tự. Khi gặp một ký tự lặp lại, chúng ta nhảy con trỏ bên trái (left) đến vị trí kế tiếp của ký tự lặp lại đó để đảm bảo tính duy nhất trong cửa sổ.",
+        "timeComplexity": "O(n) - n là độ dài chuỗi s, mỗi ký tự được duyệt qua tối đa 1 lần.",
+        "spaceComplexity": "O(min(m, n)) - m là kích thước của bảng chữ cái/tập ký tự.",
+        "code": {
+          "cpp": "class Solution {\npublic:\n    int lengthOfLongestSubstring(string s) {\n        vector<int> m(128, -1);\n        int left = 0, res = 0;\n        for (int i = 0; i < s.length(); i++) {\n            left = max(left, m[s[i]] + 1);\n            res = max(res, i - left + 1);\n            m[s[i]] = i;\n        }\n        return res;\n    }\n};",
+          "python": "class Solution:\n    def lengthOfLongestSubstring(self, s: str) -> int:\n        charMap = {}\n        left = 0\n        res = 0\n        for r in range(len(s)):\n            if s[r] in charMap:\n                left = max(left, charMap[s[r]] + 1)\n            charMap[s[r]] = r\n            res = max(res, r - left + 1)\n        return res",
+          "java": "class Solution {\n    public int lengthOfLongestSubstring(String s) {\n        Map<Character, Integer> map = new HashMap<>();\n        int left = 0, res = 0;\n        for (int i = 0; i < s.length(); i++) {\n            char c = s.charAt(i);\n            if (map.containsKey(c)) {\n                left = Math.max(left, map.get(c) + 1);\n            }\n            map.put(c, i);\n            res = Math.max(res, i - left + 1);\n        }\n        return res;\n    }\n}",
+          "javascript": "var lengthOfLongestSubstring = function(s) {\n    let map = new Map();\n    let left = 0, res = 0;\n    for (let i = 0; i < s.length; i++) {\n        if (map.has(s[i])) {\n            left = Math.max(left, map.get(s[i]) + 1);\n        }\n        map.set(s[i], i);\n        res = Math.max(res, i - left + 1);\n    }\n    return res;\n};"
+        }
+      }
+    ],
+    "videoUrl": "https://www.youtube.com/watch?v=wiGpQwVHdE0",
+    "content": "Kỹ thuật Sliding Window kết hợp Hash Map là cách hiệu quả nhất để giải bài toán này trong một lần duyệt duy nhất."
+  }
+}

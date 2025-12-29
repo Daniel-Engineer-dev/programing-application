@@ -745,7 +745,7 @@ export default function ProblemDetails({
               /* TRƯỜNG HỢP 2: HIỂN THỊ DANH SÁCH (Code cũ của bạn nhưng thêm onClick) */
               <>
                 <div className="flex justify-between items-center border-b border-slate-800 pb-4">
-                  <h2 className="text-xl font-bold">Community Solutions</h2>
+                  <h2 className="text-xl font-bold">Giải pháp cộng đồng</h2>
                   <button
                     onClick={() => {
                       if (!user) {
@@ -949,7 +949,7 @@ export default function ProblemDetails({
         {/* --- TAB 4: SUBMISSIONS (Lịch sử) --- */}
         {tab === "submissions" && (
           <div className="space-y-4 animate-in fade-in duration-300">
-            <h2 className="text-xl font-bold">My Submissions</h2>
+            <h2 className="text-xl font-bold">Lịch sử bài nộp</h2>
 
             {!user ? (
               /* --- Chưa đăng nhập (Giữ nguyên code của bạn) --- */

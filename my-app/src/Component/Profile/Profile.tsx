@@ -3,7 +3,15 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuthContext } from "@/src/userHook/context/authContext";
 import { db, storage, auth } from "@/src/api/firebase/firebase";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import {
   updatePassword,
@@ -11,7 +19,8 @@ import {
   reauthenticateWithCredential,
   EmailAuthProvider,
 } from "firebase/auth";
-
+import { getCroppedImg } from "@/src/utils/cropImage";
+import Cropper from "react-easy-crop";
 export default function ProfilePage() {
   const { user } = useAuthContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -22,27 +31,32 @@ export default function ProfilePage() {
     avatar: "",
   });
 
+  // State hỗ trợ thay đổi
+  const [initialUsername, setInitialUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  // 1. Lấy dữ liệu từ collection 'users' dùng UID trực tiếp
+  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   useEffect(() => {
     const fetchUserData = async () => {
       if (!user?.uid) return;
-
       try {
         const userDocRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userDocRef);
-
         if (userSnap.exists()) {
           const data = userSnap.data();
-          setProfileData({
-            username: data.username || "Chưa thiết lập",
+          const fetchedData = {
+            username: data.username || "",
             email: data.email || user.email || "",
             avatar: data.avatar || user.photoURL || "/avatar.png",
-          });
+          };
+          setProfileData(fetchedData);
+          setInitialUsername(data.username || ""); // Lưu để kiểm tra trùng
         }
       } catch (error) {
         console.error("Lỗi khi lấy thông tin:", error);
@@ -50,36 +64,68 @@ export default function ProfilePage() {
         setLoading(false);
       }
     };
-
     fetchUserData();
   }, [user]);
-
-  // 2. Xử lý tải ảnh lên máy local
-  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // 1. Khi chọn file, chỉ đọc file để hiện lên khung cắt, chưa upload
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !user) return;
+    if (file) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        setImageToCrop(reader.result as string);
+      };
+    }
+  };
 
+  const onCropComplete = (activeArea: any, completedAreaPixels: any) => {
+    setCroppedAreaPixels(completedAreaPixels);
+  };
+
+  // 2. Hàm thực hiện cắt và gửi lên Cloudinary
+  const handleUploadCroppedImage = async () => {
+    if (!imageToCrop || !croppedAreaPixels) return;
+    if (!user || !user.uid) return;
     setIsUpdating(true);
     try {
-      const storageRef = ref(storage, `avatars/${user.uid}`);
-      await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(storageRef);
+      // Cắt ảnh
+      const croppedBlob = await getCroppedImg(imageToCrop, croppedAreaPixels);
+      const croppedFile = new File([croppedBlob], "avatar.jpg", {
+        type: "image/jpeg",
+      });
+
+      // Upload lên Cloudinary
+      const formData = new FormData();
+      formData.append("file", croppedFile);
+      formData.append("upload_preset", "wg9hpbkk");
+      formData.append("cloud_name", "dztiz0hpe");
+
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/dztiz0hpe/image/upload`,
+        { method: "POST", body: formData }
+      );
+
+      const data = await response.json();
+      const downloadURL = data.secure_url;
 
       // Cập nhật Firestore
       await updateDoc(doc(db, "users", user.uid), { avatar: downloadURL });
 
       setProfileData((prev) => ({ ...prev, avatar: downloadURL }));
+      setImageToCrop(null); // Đóng khung cắt
       alert("Cập nhật ảnh đại diện thành công!");
     } catch (error) {
-      alert("Lỗi khi tải ảnh lên!");
+      console.error(error);
+      alert("Lỗi khi xử lý ảnh!");
     } finally {
       setIsUpdating(false);
     }
   };
 
-  // 3. Xử lý Lưu thay đổi (Mật khẩu & Email)
   const handleSaveChanges = async () => {
     if (!user) return;
+
+    // Validate mật khẩu
     if (newPassword && newPassword !== confirmPassword) {
       alert("Mật khẩu xác nhận không khớp!");
       return;
@@ -87,18 +133,46 @@ export default function ProfilePage() {
 
     setIsUpdating(true);
     try {
-      // Cập nhật mật khẩu nếu có nhập
-      if (newPassword) {
-        await updatePassword(user, newPassword);
-        alert("Đã cập nhật mật khẩu mới!");
+      // 1. Kiểm tra và cập nhật Username (Firestore)
+      if (profileData.username !== initialUsername) {
+        // Kiểm tra xem username mới có bị trùng không
+        const q = query(
+          collection(db, "users"),
+          where("username", "==", profileData.username)
+        );
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          alert("Tên đăng nhập này đã có người sử dụng!");
+          setIsUpdating(false);
+          return;
+        }
+        await updateDoc(doc(db, "users", user.uid), {
+          username: profileData.username,
+        });
+        setInitialUsername(profileData.username);
       }
 
-      alert("Cập nhật thông tin thành công!");
-      setNewPassword("");
-      setConfirmPassword("");
+      // 2. Cập nhật Email (Firebase Auth & Firestore)
+      if (profileData.email !== user.email) {
+        await updateEmail(user, profileData.email);
+        await updateDoc(doc(db, "users", user.uid), {
+          email: profileData.email,
+        });
+      }
+
+      // 3. Cập nhật Mật khẩu
+      if (newPassword) {
+        await updatePassword(user, newPassword);
+        setNewPassword("");
+        setConfirmPassword("");
+      }
+
+      alert("Cập nhật tất cả thông tin thành công!");
     } catch (error: any) {
       if (error.code === "auth/requires-recent-login") {
-        alert("Hành động này yêu cầu bạn phải đăng nhập lại gần đây.");
+        alert(
+          "Hành động bảo mật cao: Vui lòng đăng xuất và đăng nhập lại để thực hiện thay đổi này."
+        );
       } else {
         alert("Lỗi: " + error.message);
       }
@@ -109,6 +183,61 @@ export default function ProfilePage() {
 
   return (
     <div className="text-white bg-slate-950 min-h-screen p-8 flex justify-center">
+      {/* --- MODAL CẮT ẢNH --- */}
+      {imageToCrop && (
+        <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/90 p-4">
+          <div className="relative w-full max-w-xl bg-slate-900 rounded-2xl overflow-hidden p-6">
+            <h3 className="text-xl font-bold mb-4">Cắt ảnh đại diện</h3>
+
+            <div className="relative h-80 w-full bg-slate-800 rounded-lg overflow-hidden">
+              <Cropper
+                image={imageToCrop}
+                crop={crop}
+                zoom={zoom}
+                aspect={1} // Tỉ lệ 1:1 cho hình vuông/tròn
+                cropShape="round" // Hiển thị khung tròn
+                showGrid={false}
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onCropComplete={onCropComplete}
+              />
+            </div>
+
+            <div className="mt-6 flex flex-col gap-4">
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-slate-400 text-nowrap">
+                  Phóng to
+                </span>
+                <input
+                  type="range"
+                  min={1}
+                  max={3}
+                  step={0.1}
+                  value={zoom}
+                  onChange={(e) => setZoom(Number(e.target.value))}
+                  className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setImageToCrop(null)}
+                  className="px-6 py-2 rounded-xl text-slate-400 hover:bg-slate-800 transition-all"
+                >
+                  Hủy
+                </button>
+                <button
+                  onClick={handleUploadCroppedImage}
+                  disabled={isUpdating}
+                  className="px-6 py-2 rounded-xl bg-blue-600 font-bold hover:bg-blue-500 transition-all disabled:opacity-50"
+                >
+                  {isUpdating ? "Đang xử lý..." : "Cắt & Lưu"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="max-w-2xl w-full">
         <h1 className="text-3xl font-bold mb-2">Hồ sơ</h1>
         <p className="text-slate-400 mb-8">
@@ -117,13 +246,11 @@ export default function ProfilePage() {
 
         {/* Avatar Section */}
         <div className="flex items-center p-6 rounded-2xl bg-slate-900/50 border border-slate-800 mb-10">
-          <div className="relative group">
-            <img
-              src={profileData.avatar}
-              className="w-24 h-24 rounded-full border-2 border-blue-500/50 object-cover p-1"
-              alt="Avatar"
-            />
-          </div>
+          <img
+            src={profileData.avatar}
+            className="w-24 h-24 rounded-full border-2 border-blue-500/50 object-cover p-1"
+            alt="Avatar"
+          />
           <div className="ml-6">
             <h2 className="text-2xl font-bold text-white">
               {loading ? "Đang tải..." : profileData.username}
@@ -132,7 +259,6 @@ export default function ProfilePage() {
               {loading ? "..." : profileData.email}
             </p>
           </div>
-
           <input
             type="file"
             ref={fileInputRef}
@@ -150,30 +276,31 @@ export default function ProfilePage() {
         </div>
 
         <div className="space-y-6">
-          {/* Tên đăng nhập (Read Only) */}
+          {/* Tên đăng nhập (Editable) */}
           <div>
             <label className="block mb-2 text-sm font-medium text-slate-400 uppercase tracking-wider">
               Tên đăng nhập
             </label>
             <input
-              className="bg-slate-900/80 border border-slate-800 w-full px-4 py-3 rounded-xl text-slate-400 cursor-not-allowed outline-none"
+              className="bg-slate-900/80 border border-slate-800 w-full px-4 py-3 rounded-xl text-white outline-none focus:border-blue-500 transition-all"
               value={profileData.username}
-              readOnly
+              onChange={(e) =>
+                setProfileData({ ...profileData, username: e.target.value })
+              }
             />
-            <p className="mt-2 text-xs text-slate-500 italic">
-              Tên đăng nhập được liên kết cố định với tài khoản.
-            </p>
           </div>
 
-          {/* Email (Read Only) */}
+          {/* Email (Editable) */}
           <div>
             <label className="block mb-2 text-sm font-medium text-slate-400 uppercase tracking-wider">
               Địa chỉ Email
             </label>
             <input
-              className="bg-slate-900/80 border border-slate-800 w-full px-4 py-3 rounded-xl text-slate-400 cursor-not-allowed outline-none"
+              className="bg-slate-900/80 border border-slate-800 w-full px-4 py-3 rounded-xl text-white outline-none focus:border-blue-500 transition-all"
               value={profileData.email}
-              readOnly
+              onChange={(e) =>
+                setProfileData({ ...profileData, email: e.target.value })
+              }
             />
           </div>
 
