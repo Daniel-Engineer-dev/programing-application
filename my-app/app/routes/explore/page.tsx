@@ -2,16 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import {
-  Search,
-  ChevronDown,
-  X,
-  Database,
-  Code2,
-  Terminal,
-} from "lucide-react";
+import { Search, Database, Code2, Terminal } from "lucide-react";
 
-// Định nghĩa Interface (giúp TypeScript an toàn hơn)
+// --- Interfaces ---
 interface Topic {
   id: string;
   title: string;
@@ -22,7 +15,6 @@ interface Path {
   id: string;
   title: string;
   desc: string;
-  progress: number;
 }
 interface Guide {
   id: string;
@@ -39,36 +31,31 @@ interface MergedItem {
 }
 
 export default function ExplorePage() {
-  // Sửa lỗi TypeScript: Dùng các Interface đã định nghĩa
   const [topics, setTopics] = useState<Topic[]>([]);
   const [paths, setPaths] = useState<Path[]>([]);
   const [guides, setGuides] = useState<Guide[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // SEARCH
+  // SEARCH STATES
   const [keyword, setKeyword] = useState("");
   const [results, setResults] = useState<MergedItem[]>([]);
-  const [allData, setAllData] = useState<any[]>([]); // Dùng any[] cho dữ liệu thô để dễ merge
+  const [allData, setAllData] = useState<MergedItem[]>([]);
 
-  // TẢI TẤT CẢ DỮ LIỆU (topic + path + guide)
+  // 1. TẢI DỮ LIỆU
   useEffect(() => {
     async function load() {
       try {
-        // 1. Fetch Topics + Paths
-        const res1 = await fetch("/api/explore");
+        const res1 = await fetch("/routes/explore/api/explore");
         const data1 = await res1.json();
+
         setTopics(data1.topics || []);
         setPaths(data1.learningPaths || []);
 
-        // 2. Fetch Guides
-        const res2 = await fetch("/api/explore/guides");
+        const res2 = await fetch("/routes/explore/api/explore/guides");
         const data2 = await res2.json();
-
-        // FIX LỖI: Kiểm tra nếu data2 trả về mảng trực tiếp HOẶC đối tượng chứa key 'guides'
         const fetchedGuides = Array.isArray(data2) ? data2 : data2.guides || [];
         setGuides(fetchedGuides);
 
-        // 3. Tạo list tổng hợp để search
         const merged: MergedItem[] = [
           ...(data1.topics || []).map((t: any) => ({
             id: t.id,
@@ -80,7 +67,6 @@ export default function ExplorePage() {
             title: p.title,
             type: "path" as const,
           })),
-          // FIX: Dùng fetchedGuides để đảm bảo dữ liệu guides được thêm vào
           ...(fetchedGuides || []).map((g: any) => ({
             id: g.id,
             title: g.title,
@@ -90,81 +76,79 @@ export default function ExplorePage() {
 
         setAllData(merged);
       } catch (err) {
-        console.error("Error loading explore page:", err);
+        console.error("Lỗi khi tải dữ liệu Explore:", err);
       } finally {
         setLoading(false);
       }
     }
-
     load();
   }, []);
 
-  // SEARCH FILTER (Giữ nguyên logic của bạn)
+  // 2. SEARCH FILTER
   useEffect(() => {
     if (!keyword.trim()) {
       setResults([]);
       return;
     }
-
     const lower = keyword.toLowerCase();
-
     const filtered = allData.filter((item) =>
       item.title.toLowerCase().includes(lower)
     );
-
     setResults(filtered);
   }, [keyword, allData]);
 
-  // ICON RENDER (Giữ nguyên logic của bạn)
   const renderIcon = (icon: string) => {
-    if (icon === "database") return <Database />;
-    if (icon === "terminal") return <Terminal />;
-    return <Code2 />;
+    if (icon === "database") return <Database size={20} />;
+    if (icon === "terminal") return <Terminal size={20} />;
+    return <Code2 size={20} />;
   };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center">
-        Đang tải dữ liệu...
+        Đang tải dữ liệu hệ thống...
       </div>
     );
   }
 
+  const baseUrl = "/routes/explore/explorePage";
+
   return (
     <div className="min-h-screen bg-slate-900 text-slate-200">
-      {/* HERO / SEARCH BOX (Giữ nguyên) */}
+      {/* HEADER & SEARCH */}
       <div className="text-center pt-16 pb-10">
         <h1 className="text-4xl font-bold mb-4 text-white">
-          Khám phá các chủ đề lập trình
+          Khám phá lập trình
         </h1>
-        <p className="text-slate-400 max-w-2xl mx-auto mb-10">
-          Đi sâu vào bộ sưu tập toàn diện các hướng dẫn, bài toán và lộ trình
-          học tập để trau dồi kỹ năng lập trình của bạn.
+        <p className="text-slate-400 max-w-2xl mx-auto mb-10 px-4">
+          Học tập thông qua các lộ trình và hướng dẫn thực tế.
         </p>
 
-        {/* SEARCH BOX */}
-        <div className="relative mx-auto max-w-xl mb-6">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+        <div className="relative mx-auto max-w-xl px-4">
+          <div className="relative">
+            <Search
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
+              size={18}
+            />
+            <input
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              placeholder="Tìm kiếm chủ đề, lộ trình..."
+              className="w-full rounded-xl bg-slate-800 py-3.5 pl-12 pr-4 text-sm outline-none text-white focus:ring-2 focus:ring-blue-600 border border-slate-700"
+            />
+          </div>
 
-          <input
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            placeholder="Tìm kiếm chủ đề, lộ trình, hướng dẫn..."
-            className="w-full rounded-xl bg-slate-800 py-3.5 pl-12 pr-4 text-sm outline-none text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-600"
-          />
-
-          {/* SEARCH RESULT DROPDOWN */}
           {results.length > 0 && (
-            <div className="absolute z-30 mt-2 w-full bg-slate-800 rounded-xl border border-slate-700 shadow-xl">
+            <div className="absolute z-30 mt-2 w-[calc(100%-2rem)] bg-slate-800 rounded-xl border border-slate-700 shadow-2xl overflow-hidden">
               {results.map((item) => (
                 <Link
                   key={item.id}
-                  href={`/explore/${item.type}/${item.id}`}
-                  className="block px-4 py-3 hover:bg-slate-700 transition rounded-xl"
+                  href={`${baseUrl}/${item.type}/${item.id}`}
+                  className="block px-4 py-3 hover:bg-slate-700 text-left border-b border-slate-700 last:border-0"
                   onClick={() => setKeyword("")}
                 >
-                  <p className="text-white font-semibold">{item.title}</p>
-                  <p className="text-xs text-slate-400 capitalize">
+                  <p className="text-white font-medium">{item.title}</p>
+                  <p className="text-[10px] text-blue-400 uppercase tracking-wider">
                     {item.type}
                   </p>
                 </Link>
@@ -174,29 +158,28 @@ export default function ExplorePage() {
         </div>
       </div>
 
-      {/* MAIN */}
-      <main className="max-w-5xl mx-auto px-6">
-        {/* TOPICS (Giữ nguyên) */}
+      <main className="max-w-5xl mx-auto px-6 pb-20">
+        {/* TOPICS */}
         <section className="mb-16">
-          <h2 className="text-xl font-bold text-white mb-6">Chủ đề nổi bật</h2>
-          <div className="grid gap-6 md:grid-cols-3">
+          <h2 className="text-xl font-bold text-white mb-6">Chủ đề phổ biến</h2>
+          <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
             {topics.map((t) => (
               <Link
                 key={t.id}
-                href={`/explore/topic/${t.id}`}
-                className="group block rounded-2xl border border-slate-700 bg-slate-800 p-6 hover:bg-slate-750 transition"
+                href={`${baseUrl}/topic/${t.id}`}
+                className="group block rounded-2xl border border-slate-700 bg-slate-800 p-6 hover:border-blue-500/50 transition-all"
               >
-                <div className="h-10 w-10 mb-4 flex items-center justify-center rounded-lg bg-blue-600/10 text-blue-500 group-hover:bg-blue-600 group-hover:text-white">
+                <div className="h-10 w-10 mb-4 flex items-center justify-center rounded-lg bg-blue-600/10 text-blue-500 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                   {renderIcon(t.icon)}
                 </div>
                 <h3 className="font-bold text-white mb-2">{t.title}</h3>
-                <p className="text-sm text-slate-400">{t.desc}</p>
+                <p className="text-sm text-slate-400 line-clamp-2">{t.desc}</p>
               </Link>
             ))}
           </div>
         </section>
 
-        {/* LEARNING PATHS (Giữ nguyên) */}
+        {/* PATHS - Đã lược bỏ thanh tiến độ */}
         <section className="mb-16">
           <h2 className="text-xl font-bold text-white mb-6">
             Lộ trình học tập
@@ -205,54 +188,42 @@ export default function ExplorePage() {
             {paths.map((p) => (
               <Link
                 key={p.id}
-                href={`/explore/path/${p.id}`}
-                className="block rounded-2xl border border-slate-700 bg-slate-800 p-6 hover:bg-slate-750 transition"
+                href={`${baseUrl}/path/${p.id}`}
+                className="block rounded-2xl border border-slate-700 bg-slate-800 p-6 hover:bg-slate-750/50 transition shadow-sm"
               >
-                <h3 className="font-bold text-white">{p.title}</h3>
+                <h3 className="font-bold text-white text-lg">{p.title}</h3>
                 <p className="text-sm text-slate-400 mt-2">{p.desc}</p>
-                <div className="mt-4">
-                  <div className="h-2 bg-slate-700 rounded-full">
-                    <div
-                      className="h-2 bg-blue-500 rounded-full"
-                      style={{ width: `${p.progress}%` }}
-                    />
-                  </div>
-                  <p className="text-xs mt-2 text-slate-500">
-                    Hoàn thành {p.progress}%
-                  </p>
-                </div>
               </Link>
             ))}
           </div>
         </section>
 
-        {/* GUIDES (Hướng dẫn mới) */}
-        <section className="mb-24">
-          <h2 className="text-xl font-bold text-white mb-6">Hướng dẫn mới</h2>
-
-          {/* FIX LỖI: Kiểm tra guides.length trước khi render */}
-          {guides && guides.length > 0 ? (
-            <div className="grid gap-6 md:grid-cols-2">
+        {/* GUIDES */}
+        <section>
+          <h2 className="text-xl font-bold text-white mb-6">
+            Hướng dẫn mới nhất
+          </h2>
+          {guides.length > 0 ? (
+            <div className="grid gap-4 md:grid-cols-2">
               {guides.map((g) => (
                 <Link
                   key={g.id}
-                  href={`/explore/guide/${g.id}`}
-                  className="flex gap-4 rounded-2xl border border-slate-700 bg-slate-800 p-4 hover:bg-slate-750 transition"
+                  href={`${baseUrl}/guide/${g.id}`}
+                  className="flex items-center gap-4 rounded-xl border border-slate-700 bg-slate-800 p-3 hover:bg-slate-750 transition"
                 >
-                  <div className="h-24 w-36 rounded-lg bg-gradient-to-br from-blue-900 to-slate-800" />
-                  <div className="flex flex-col justify-between">
-                    <div>
-                      <h3 className="font-bold text-white">{g.title}</h3>
-                      <p className="text-xs text-slate-500 mt-1">
-                        Bởi {g.author}
-                      </p>
-                    </div>
+                  <div className="h-20 w-28 flex-shrink-0 rounded-lg bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center text-slate-600">
+                    <Database size={24} />
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="font-bold text-white text-sm truncate">
+                      {g.title}
+                    </h3>
+                    <p className="text-[11px] text-slate-500 mb-2">
+                      Tác giả: {g.author}
+                    </p>
                     <div className="flex gap-2">
-                      <span className="rounded bg-blue-900/50 px-2 py-0.5 text-[10px] font-medium text-blue-400">
+                      <span className="px-1.5 py-0.5 rounded bg-blue-900/30 text-blue-400 text-[9px] font-bold uppercase">
                         {g.level}
-                      </span>
-                      <span className="rounded bg-slate-700 px-2 py-0.5 text-[10px]">
-                        {g.type}
                       </span>
                     </div>
                   </div>
@@ -260,17 +231,15 @@ export default function ExplorePage() {
               ))}
             </div>
           ) : (
-            // Hiển thị thông báo nếu không có hướng dẫn
-            <div className="text-slate-500">
-              Hiện chưa có hướng dẫn mới nào.
+            <div className="py-10 text-center border border-dashed border-slate-700 rounded-xl text-slate-500">
+              Chưa có dữ liệu hướng dẫn.
             </div>
           )}
         </section>
       </main>
 
-      {/* FOOTER (Giữ nguyên) */}
-      <footer className="border-t border-slate-800 text-center text-xs text-slate-500 py-8">
-        <p>© 2024 Code Pro. Bảo lưu mọi quyền.</p>
+      <footer className="border-t border-slate-800 py-10 text-center text-xs text-slate-600">
+        © 2025 Programming App.
       </footer>
     </div>
   );
