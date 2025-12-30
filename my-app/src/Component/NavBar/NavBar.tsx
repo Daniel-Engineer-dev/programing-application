@@ -7,7 +7,8 @@ import { usePathname } from "next/navigation";
 
 import { useAuthContext } from "@/src/userHook/context/authContext";
 import UserMenu from "@/src/Component/AvatarUser/AvatarUser";
-
+import { MessageSquare } from "lucide-react";
+import ChatUI from "../ChatUI/ChatUI";
 const links = [
   { href: "/routes/problems", label: "Bài Tập" },
   { href: "/routes/explore", label: "Khám Phá" },
@@ -82,6 +83,18 @@ export default function NavBar() {
 
         {/* Right: User Menu / Auth */}
         <div className="flex items-center gap-4">
+          {user && (
+            <button
+              className="p-2 text-slate-300 hover:text-blue-400 hover:bg-white/10 rounded-full transition-all"
+              title="Thảo luận"
+              // Bạn có thể dùng một Global State (Zustand/Context) để toggle ChatUI tại đây
+              onClick={() =>
+                window.dispatchEvent(new CustomEvent("toggle-chat"))
+              }
+            >
+              <MessageSquare size={20} />
+            </button>
+          )}
           {!user ? (
             <Link href="/routes/auth/login" className="hidden md:block">
               <button className="text-white hover:bg-blue-700 font-bold py-2 px-6 rounded-full transition-all border border-blue-700/50">
