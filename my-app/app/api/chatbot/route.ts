@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     const userMessage = messages[messages.length - 1].content;
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
+      model: "gemini-2.5-flash-lite",
     });
 
     // Bạn có thể thêm System Instruction để AI biết nó là trợ lý lập trình

@@ -1,0 +1,76 @@
+{
+  "id": "29-divide-two-integers",
+  "title": "Divide Two Integers",
+  "difficulty": "Medium",
+  "acceptance": 0.42,
+  "tags": [
+    "math",
+    "bit-manipulation"
+  ],
+  "constraints": [
+    "-2^31 <= dividend <= 2^31 - 1",
+    "-2^31 <= divisor <= 2^31 - 1",
+    "divisor != 0"
+  ],
+  "description": "Cho hai số nguyên dividend và divisor, hãy trả về kết quả chia của dividend cho divisor mà không sử dụng các phép toán chia, nhân, hoặc modulo. Phép chia được thực hiện theo nguyên tắc truncate toward zero.",
+  "defaultCode": {
+    "cpp": "class Solution {\npublic:\n    int divide(int dividend, int divisor) {\n        \n    }\n};",
+    "java": "public class Solution {\n    public int divide(int dividend, int divisor) {\n        \n    }\n}",
+    "python": "class Solution:\n    def divide(self, dividend: int, divisor: int) -> int:\n        ",
+    "javascript": "/**\n * @param {number} dividend\n * @param {number} divisor\n * @return {number}\n */\nvar divide = function(dividend, divisor) {\n    \n};"
+  },
+  "driverCodes": {
+    "cpp": "#include <iostream>\n#include <climits>\nusing namespace std;\n\n// __USER_CODE_HERE__\n\nint main() {\n    int dividend, divisor;\n    cin >> dividend >> divisor;\n    Solution sol;\n    cout << sol.divide(dividend, divisor);\n    return 0;\n}",
+    "python": "import sys\n\nclass Solution:\n    # __USER_CODE_HERE__\n\nif __name__ == \"__main__\":\n    input_data = sys.stdin.read().splitlines()\n    if len(input_data) < 1: sys.exit(0)\n    dividend, divisor = map(int, input_data[0].split())\n    sol = Solution()\n    res = sol.divide(dividend, divisor)\n    print(res)",
+    "java": "import java.util.Scanner;\nimport java.io.IOException;\n\nclass Main {\n    public static void main(String[] args) throws IOException {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextLine()) return;\n        String[] parts = sc.nextLine().split(\" \");\n        int dividend = Integer.parseInt(parts[0]);\n        int divisor = Integer.parseInt(parts[1]);\n        \n        Solution sol = new Solution();\n        int res = sol.divide(dividend, divisor);\n        System.out.print(res);\n    }\n}\n// __USER_CODE_HERE__",
+    "javascript": "const fs = require('fs');\n\n// Định nghĩa một class rỗng để tránh lỗi ReferenceError nếu người dùng không dùng class\nclass Solution {}\n\n// __USER_CODE_HERE__\n\ntry {\n    const input = fs.readFileSync(0, 'utf8').split(' ');\n    if (input.length < 2) process.exit(0);\n    const dividend = parseInt(input[0]);\n    const divisor = parseInt(input[1]);\n    \n    const sol = new Solution();\n    // Kiểm tra xem hàm divide nằm ở global (var/function) hay nằm trong class Solution\n    const fn = (typeof divide === 'function') ? divide : (sol.divide ? sol.divide.bind(sol) : null);\n    \n    if (typeof fn === 'function') {\n        const res = fn(dividend, divisor);\n        process.stdout.write(res.toString());\n    } else {\n        console.error(\"Error: function divide not found.\");\n    }\n} catch (e) {\n    console.error(e);\n}"
+  },
+  "testCases": [
+    {
+      "input": "10 2",
+      "expected": "5",
+      "isHidden": false
+    },
+    {
+      "input": "7 -3",
+      "expected": "-2",
+      "isHidden": false
+    },
+    {
+      "input": "-4 2",
+      "expected": "-2",
+      "isHidden": true
+    }
+  ],
+  "examples": [
+    {
+      "input": "dividend = 10, divisor = 3",
+      "output": "3",
+      "explanation": "Vì 10 chia cho 3 bằng 3.333..., và chúng ta truncate toward zero, nên kết quả là 3."
+    },
+    {
+      "input": "dividend = 7, divisor = -3",
+      "output": "-2",
+      "explanation": "Vì 7 chia cho -3 bằng -2.333..., và chúng ta truncate toward zero, nên kết quả là -2."
+    }
+  ],
+  "editorial": {
+    "approaches": [
+      {
+        "name": "Bit Manipulation",
+        "description": "Sử dụng các phép toán bit để thực hiện chia.",
+        "timeComplexity": "$O(log N)$",
+        "spaceComplexity": "$O(1)$",
+        "code": {
+          "cpp": "class Solution {\npublic:\n    int divide(int dividend, int divisor) {\n        // Xử lý các trường hợp đặc biệt\n        if (dividend == INT_MIN && divisor == -1) return INT_MAX;\n        int sign = (dividend < 0) ^ (divisor < 0) ? -1 : 1;\n        long long absDividend = labs(dividend);\n        long long absDivisor = labs(divisor);\n        int result = 0;\n        while (absDividend >= absDivisor) {\n            int shift = 0;\n            while ((absDivisor << shift) <= absDividend) {\n                shift++;\n            }\n            result += (1 << (shift - 1));\n            absDividend -= (absDivisor << (shift - 1));\n        }\n        return sign * result;\n    }\n};",
+          "python": "class Solution:\n    def divide(self, dividend: int, divisor: int) -> int:\n        # Xử lý các trường hợp đặc biệt\n        if dividend == -2**31 and divisor == -1:\n            return 2**31 - 1\n        sign = -1 if (dividend < 0) ^ (divisor < 0) else 1\n        absDividend, absDivisor = abs(dividend), abs(divisor)\n        result = 0\n        while absDividend >= absDivisor:\n            shift = 0\n            while (absDivisor << shift) <= absDividend:\n                shift += 1\n            result += 1 << (shift - 1)\n            absDividend -= absDivisor << (shift - 1)\n        return sign * result",
+          "javascript": "/**\n * @param {number} dividend\n * @param {number} divisor\n * @return {number}\n */\nvar divide = function(dividend, divisor) {\n    // Xử lý các trường hợp đặc biệt\n    if (dividend === -Math.pow(2, 31) && divisor === -1) return Math.pow(2, 31) - 1;\n    let sign = (dividend < 0) ^ (divisor < 0) ? -1 : 1;\n    let absDividend = Math.abs(dividend);\n    let absDivisor = Math.abs(divisor);\n    let result = 0;\n    while (absDividend >= absDivisor) {\n        let shift = 0;\n        while ((absDivisor << shift) <= absDividend) {\n            shift++;\n        }\n        result += (1 << (shift - 1));\n        absDividend -= (absDivisor << (shift - 1));\n    }\n    return sign * result;\n};",
+          "java": "class Solution {\n    public int divide(int dividend, int divisor) {\n        // Xử lý các trường hợp đặc biệt\n        if (dividend == Integer.MIN_VALUE && divisor == -1) return Integer.MAX_VALUE;\n        int sign = (dividend < 0) ^ (divisor < 0) ? -1 : 1;\n        long absDividend = Math.abs((long) dividend);\n        long absDivisor = Math.abs((long) divisor);\n        int result = 0;\n        while (absDividend >= absDivisor) {\n            int shift = 0;\n            while ((absDivisor << shift) <= absDividend) {\n                shift++;\n            }\n            result += (1 << (shift - 1));\n            absDividend -= (absDivisor << (shift - 1));\n        }\n        return sign * result;\n    }\n}"
+        }
+      }
+    ],
+    "videoUrl": "https://youtube.com/watch?v=pBD4B1tzgVc"
+  },
+  "videoUrl": "https://www.youtube.com/watch?v=5Lu34WI94cU",
+  "content": "Bài toán chia hai số nguyên mà không sử dụng phép chia, nhân, hoặc modulo. Sử dụng bit manipulation để đạt được hiệu suất cao."
+}

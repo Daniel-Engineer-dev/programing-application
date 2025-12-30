@@ -1,0 +1,82 @@
+{
+  "id": "34-find-first-and-last-position-of-element-in-sorted-array",
+  "title": "Find First and Last Position of Element in Sorted Array",
+  "difficulty": "Medium",
+  "acceptance": 0.43,
+  "tags": [
+    "array",
+    "binary-search"
+  ],
+  "constraints": [
+    "0 <= nums.length <= 10^5",
+    "-10^9 <= nums[i] <= 10^9",
+    "nums chứa các số nguyên đã được sắp xếp theo thứ tự không giảm.",
+    "Nếu target không tồn tại trong mảng, trả về [-1, -1]."
+  ],
+  "description": "Cho một mảng số nguyên đã được sắp xếp theo thứ tự không giảm và một số nguyên target, hãy tìm và trả về chỉ số đầu tiên và cuối cùng của target trong mảng. Nếu target không tồn tại trong mảng, trả về [-1, -1].",
+  "defaultCode": {
+    "cpp": "class Solution {\npublic:\n    vector<int> searchRange(vector<int>& nums, int target) {\n        \n    }\n};",
+    "java": "import java.util.*;\n\nclass Solution {\n    public int[] searchRange(int[] nums, int target) {\n        \n    }\n}",
+    "python": "from typing import List\n\nclass Solution:\n    def searchRange(self, nums: List[int], target: int) -> List[int]:\n        ",
+    "javascript": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number[]}\n */\nvar searchRange = function(nums, target) {\n    \n};"
+  },
+  "driverCodes": {
+    "cpp": "#include <iostream>\n#include <vector>\n#include <string>\n#include <sstream>\n#include <algorithm>\nusing namespace std;\n\n// __USER_CODE_HERE__\n\nint main() {\n    string line;\n    if (!getline(cin, line)) return 0;\n    stringstream ss(line);\n    vector<int> nums;\n    int n;\n    while (ss >> n) nums.push_back(n);\n    if (!(cin >> n)) return 0;\n    int target = n;\n    Solution sol;\n    vector<int> res = sol.searchRange(nums, target);\n    cout << res[0] << \" \" << res[1];\n    return 0;\n}",
+    "python": "import sys\nfrom typing import List\n\n# # __USER_CODE_HERE__\n\nif __name__ == \"__main__\":\n    input_data = sys.stdin.read().splitlines()\n    if len(input_data) < 2: sys.exit(0)\n    nums = list(map(int, input_data[0].split()))\n    target = int(input_data[1])\n    sol = Solution()\n    res = sol.searchRange(nums, target)\n    print(f\"{res[0]} {res[1]}\")",
+    "java": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextLine()) return;\n        String[] parts = sc.nextLine().split(\"\\\\s+\");\n        int[] nums = new int[parts.length];\n        for (int i = 0; i < parts.length; i++) nums[i] = Integer.parseInt(parts[i]);\n        if (!sc.hasNextInt()) return;\n        int target = sc.nextInt();\n        \n        Solution sol = new Solution();\n        int[] res = sol.searchRange(nums, target);\n        System.out.print(res[0] + \" \" + res[1]);\n    }\n}\n\n// __USER_CODE_HERE__",
+    "javascript": "const fs = require('fs');\n\n// Định nghĩa một class rỗng để tránh lỗi ReferenceError nếu người dùng không dùng class\nconst Solution = {};\n\n// __USER_CODE_HERE__\n\ntry {\n    const input = fs.readFileSync(0, 'utf8').split('\\n');\n    if (input.length < 2) process.exit(0);\n\n    const nums = input[0].trim().split(/\\s+/).map(Number);\n    const target = parseInt(input[1]);\n\n    const sol = new Solution();\n    // Kiểm tra xem hàm searchRange nằm ở global (var/function) hay nằm trong class Solution\n    const fn = (typeof searchRange === 'function') ? searchRange : (sol.searchRange ? sol.searchRange.bind(sol) : null);\n\n    if (typeof fn === 'function') {\n        const res = fn(nums, target);\n        if (Array.isArray(res)) {\n            process.stdout.write(res[0] + \" \" + res[1]);\n        }\n    } else {\n        console.error(\"Error: function searchRange not found.\");\n    }\n} catch (e) {\n    console.error(e);\n}"
+  },
+  "testCases": [
+    {
+      "input": "5 7 7 8 8 10\n8",
+      "expected": "3 4",
+      "isHidden": false
+    },
+    {
+      "input": "5 7 7 8 8 10\n6",
+      "expected": "-1 -1",
+      "isHidden": false
+    },
+    {
+      "input": "",
+      "expected": "-1 -1",
+      "isHidden": true
+    }
+  ],
+  "examples": [
+    {
+      "input": "nums = [5,7,7,8,8,10], target = 8",
+      "output": "[3,4]",
+      "explanation": "Vì nums[3] và nums[4] đều bằng 8, nên trả về [3, 4]."
+    },
+    {
+      "input": "nums = [5,7,7,8,8,10], target = 6",
+      "output": "[-1,-1]",
+      "explanation": "Vì không có số 6 trong mảng, nên trả về [-1, -1]."
+    },
+    {
+      "input": "nums = [], target = 0",
+      "output": "[-1,-1]",
+      "explanation": "Vì mảng rỗng không chứa target, nên trả về [-1, -1]."
+    }
+  ],
+  "editorial": {
+    "approaches": [
+      {
+        "name": "Binary Search (Tìm kiếm nhị phân)",
+        "description": "Sử dụng tìm kiếm nhị phân để tìm chỉ số đầu tiên và cuối cùng của target trong mảng đã được sắp xếp.",
+        "timeComplexity": "$O(log n)$ - Độ phức tạp thời gian của tìm kiếm nhị phân.",
+        "spaceComplexity": "$O(1)$ - Không cần sử dụng không gian phụ trợ.",
+        "code": {
+          "cpp": "class Solution {\npublic:\n    vector<int> searchRange(vector<int>& nums, int target) {\n        auto findFirst = [&nums, &target]() {\n            int left = 0, right = nums.size() - 1;\n            int ans = -1;\n            while (left <= right) {\n                int mid = left + (right - left) / 2;\n                if (nums[mid] == target) {\n                    ans = mid;\n                    right = mid - 1;\n                } else if (nums[mid] < target) {\n                    left = mid + 1;\n                } else {\n                    right = mid - 1;\n                }\n            }\n            return ans;\n        };\n        auto findLast = [&nums, &target]() {\n            int left = 0, right = nums.size() - 1;\n            int ans = -1;\n            while (left <= right) {\n                int mid = left + (right - left) / 2;\n                if (nums[mid] == target) {\n                    ans = mid;\n                    left = mid + 1;\n                } else if (nums[mid] < target) {\n                    left = mid + 1;\n                } else {\n                    right = mid - 1;\n                }\n            }\n            return ans;\n        };\n        return {findFirst(), findLast()};\n    }\n};",
+          "python": "class Solution:\n    def searchRange(self, nums: List[int], target: int) -> List[int]:\n        def find_first() -> int:\n            left, right = 0, len(nums) - 1\n            ans = -1\n            while left <= right:\n                mid = (left + right) // 2\n                if nums[mid] == target:\n                    ans = mid\n                    right = mid - 1\n                elif nums[mid] < target:\n                    left = mid + 1\n                else:\n                    right = mid - 1\n            return ans\n        def find_last() -> int:\n            left, right = 0, len(nums) - 1\n            ans = -1\n            while left <= right:\n                mid = (left + right) // 2\n                if nums[mid] == target:\n                    ans = mid\n                    left = mid + 1\n                elif nums[mid] < target:\n                    left = mid + 1\n                else:\n                    right = mid - 1\n            return ans\n        return [find_first(), find_last()]",
+          "javascript": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number[]}\n */\nvar searchRange = function(nums, target) {\n    const findFirst = () => {\n        let left = 0, right = nums.length - 1;\n        let ans = -1;\n        while (left <= right) {\n            let mid = left + Math.floor((right - left) / 2);\n            if (nums[mid] === target) {\n                ans = mid;\n                right = mid - 1;\n            } else if (nums[mid] < target) {\n                left = mid + 1;\n            } else {\n                right = mid - 1;\n            }\n        }\n        return ans;\n    };\n    const findLast = () => {\n        let left = 0, right = nums.length - 1;\n        let ans = -1;\n        while (left <= right) {\n            let mid = left + Math.floor((right - left) / 2);\n            if (nums[mid] === target) {\n                ans = mid;\n                left = mid + 1;\n            } else if (nums[mid] < target) {\n                left = mid + 1;\n            } else {\n                right = mid - 1;\n            }\n        }\n        return ans;\n    };\n    return [findFirst(), findLast()];\n};",
+          "java": "class Solution {\n    public int[] searchRange(int[] nums, int target) {\n        int findFirst = findFirst(nums, target);\n        int findLast = findLast(nums, target);\n        return new int[] {findFirst, findLast};\n    }\n    private int findFirst(int[] nums, int target) {\n        int left = 0, right = nums.length - 1;\n        int ans = -1;\n        while (left <= right) {\n            int mid = left + (right - left) / 2;\n            if (nums[mid] == target) {\n                ans = mid;\n                right = mid - 1;\n            } else if (nums[mid] < target) {\n                left = mid + 1;\n            } else {\n                right = mid - 1;\n            }\n        }\n        return ans;\n    }\n    private int findLast(int[] nums, int target) {\n        int left = 0, right = nums.length - 1;\n        int ans = -1;\n        while (left <= right) {\n            int mid = left + (right - left) / 2;\n            if (nums[mid] == target) {\n                ans = mid;\n                left = mid + 1;\n            } else if (nums[mid] < target) {\n                left = mid + 1;\n            } else {\n                right = mid - 1;\n            }\n        }\n        return ans;\n    }\n}"
+        }
+      }
+    ],
+    "videoUrl": "https://youtube.com/watch?v=bU-q1OJ0KWw"
+  },
+  "videoUrl": "https://www.youtube.com/watch?v=4tYoV6Y7Qz8",
+  "content": "Bài toán này có thể được giải quyết bằng cách sử dụng tìm kiếm nhị phân để tìm chỉ số đầu tiên và cuối cùng của target trong mảng đã được sắp xếp."
+}
