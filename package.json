@@ -1,8 +1,13 @@
 {
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
+    "axios": "^1.13.2",
+    "framer-motion": "^12.23.26",
     "marked": "^17.0.1",
     "react-hot-toast": "^2.6.0",
-    "recoil": "^0.7.7"
+    "react-markdown": "^10.1.0",
+    "react-syntax-highlighter": "^16.1.0",
+    "recoil": "^0.7.7",
+    "remark-gfm": "^4.0.1"
   }
 }
