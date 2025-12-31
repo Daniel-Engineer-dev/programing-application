@@ -1,83 +1,140 @@
 "use client";
-import React from "react";
-import { useState } from "react";
-import { Eye, EyeOff, Github } from "lucide-react";
+import React, { useState } from "react";
+import { Eye, EyeOff, Github, Loader2 } from "lucide-react"; // Thêm Loader2
 import Link from "next/link";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "@/src/api/firebase/firebase";
 import {
+  signInWithEmailAndPassword,
   setPersistence,
   browserLocalPersistence,
   browserSessionPersistence,
+  fetchSignInMethodsForEmail,
 } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "@/src/api/firebase/firebase";
+import { collection, query, where, getDocs, limit } from "firebase/firestore";
+import { useAuthContext } from "@/src/userHook/context/authContext";
 
 const LoginForm = () => {
-  // const [email, setEmail] = useState<string>("");
+  const { signInWithGoogle, signInWithGithub } = useAuthContext();
+
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [isRememberMe, setIsRememberMe] = useState<boolean>(false);
   const [message, setMessage] = useState("");
   const [identifier, setIdentifier] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false); // State quản lý loading
+
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage("");
     setError("");
+    setLoading(true); // Bắt đầu loading
+
     try {
       let email = identifier;
 
-      // Nếu người dùng nhập username → tra Firestore
+      // 1. Tìm email nếu người dùng nhập username
       if (!identifier.includes("@")) {
-        const ref = doc(db, "usernames", identifier);
-        const snap = await getDoc(ref);
-        if (!snap.exists()) {
-          setMessage("❌Không tìm thấy tên người dùng");
+        const userQuery = query(
+          collection(db, "users"),
+          where("username", "==", identifier),
+          limit(1)
+        );
+        const querySnapshot = await getDocs(userQuery);
+
+        if (querySnapshot.empty) {
+          setError("❌ Không tìm thấy tên đăng nhập này.");
+          setLoading(false);
           return;
         }
-        email = snap.data().email;
+        email = querySnapshot.docs[0].data().email;
       }
 
+      // 2. Kiểm tra phương thức đăng nhập (Logic quan trọng bạn yêu cầu)
+      const methods = await fetchSignInMethodsForEmail(auth, email);
+
+      if (methods.length === 0) {
+        setError("❌ Tài khoản này chưa được đăng ký. Vui lòng đăng ký mới.");
+        setLoading(false);
+        return;
+      }
+
+      // Nếu người dùng nhập mật khẩu nhưng tài khoản chỉ có Google/Github
+      if (!methods.includes("password")) {
+        const provider = methods[0].includes("google") ? "Google" : "GitHub";
+        setError(
+          `⚠️ Tài khoản này được đăng ký bằng ${provider}. Vui lòng nhấn nút đăng nhập bằng ${provider} bên dưới.`
+        );
+        setLoading(false);
+        return;
+      }
+
+      // 3. Thực hiện đăng nhập email/password
       const persistence = isRememberMe
         ? browserLocalPersistence
         : browserSessionPersistence;
-
       await setPersistence(auth, persistence);
       await signInWithEmailAndPassword(auth, email, password);
-      alert("Logged in successfully!");
+
+      alert("Đăng nhập thành công!");
     } catch (err: any) {
-      setError(err.message);
+      console.error(err);
+      if (
+        err.code === "auth/wrong-password" ||
+        err.code === "auth/invalid-credential"
+      ) {
+        setError("Mật khẩu không chính xác. Vui lòng thử lại.");
+      } else {
+        setError("Lỗi: " + err.message);
+      }
+    } finally {
+      setLoading(false); // Kết thúc loading dù thành công hay thất bại
+    }
+  };
+
+  const handleSocialLogin = async (type: "google" | "github") => {
+    setLoading(true);
+    try {
+      setError("");
+      if (type === "google") await signInWithGoogle();
+      else await signInWithGithub();
+    } catch (err: any) {
+      setError("Lỗi đăng nhập mạng xã hội: " + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-slate-950 px-4 font-sans text-slate-300">
-      {/* --- Login Card Container --- */}
       <div className="w-full max-w-[440px] space-y-8">
-        {/* 2. Main Form */}
         <form
           onSubmit={handleLogin}
           className="space-y-6 rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-xl"
         >
-          {/* 1. Header: Logo & Title */}
           <div className="flex flex-col items-center text-center">
             <h1 className="text-3xl font-bold text-white">Đăng nhập</h1>
           </div>
-          {/* Email Field */}
+
           <div className="space-y-2">
-            <label className="text-sm font-medium text-white" htmlFor="email">
-              Email
+            <label
+              className="text-sm font-medium text-white"
+              htmlFor="identifier"
+            >
+              Email hoặc Tên đăng nhập
             </label>
             <input
+              id="identifier"
               type="text"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value.trim())}
-              placeholder="Nhập email hoặc tên tài khoản của bạn"
-              className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition-all focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              placeholder="Nhập email hoặc tên tài khoản"
+              disabled={loading}
+              className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition-all focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+              required
             />
           </div>
 
-          {/* Password Field */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label
@@ -100,7 +157,9 @@ const LoginForm = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Nhập mật khẩu"
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition-all focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                disabled={loading}
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition-all focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+                required
               />
               <button
                 type="button"
@@ -111,47 +170,56 @@ const LoginForm = () => {
               </button>
             </div>
           </div>
+
           <div className="flex items-center justify-between">
-            <label className="flex items-center ">
+            <label className="flex items-center hover:cursor-pointer">
               <input
                 type="checkbox"
-                className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 hover:cursor-pointer"
-                onChange={(e) => {
-                  setIsRememberMe(e.target.checked);
-                }}
+                checked={isRememberMe}
+                disabled={loading}
+                className="rounded border-slate-700 bg-slate-950 text-blue-600 focus:ring-blue-500 hover:cursor-pointer"
+                onChange={(e) => setIsRememberMe(e.target.checked)}
               />
-              <span className="ml-2 text-sm text-gray-600 ">
+              <span className="ml-2 text-sm text-slate-400">
                 Ghi nhớ phiên đăng nhập
               </span>
             </label>
           </div>
-          {/* Display error message if any */}
-          {error && <p className="text-red-500">Mật khẩu không hợp lệ</p>}
-          {message && <p className="text-red-500">{message}</p>}
-          {/* Submit Button */}
+
+          {/* Hiển thị lỗi rõ ràng hơn */}
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-3 rounded-lg text-sm font-medium">
+              {error}
+            </div>
+          )}
+
           <button
             type="submit"
-            className="w-full rounded-lg bg-blue-600 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-700 shadow-lg shadow-blue-600/20"
+            disabled={loading}
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-3 text-sm font-bold text-white transition-all hover:bg-blue-700 active:scale-[0.98] shadow-lg shadow-blue-600/20 disabled:bg-slate-800 disabled:text-slate-500 disabled:cursor-not-allowed"
           >
-            Đăng nhập
+            {loading ? (
+              <Loader2 className="animate-spin" size={20} />
+            ) : (
+              "Đăng nhập"
+            )}
           </button>
 
-          {/* Divider "Hoặc" */}
           <div className="relative flex items-center py-2">
             <div className="grow border-t border-slate-800"></div>
-            <span className="mx-4 text-xs text-slate-500">
+            <span className="mx-4 text-xs text-slate-500 text-nowrap">
               Hoặc tiếp tục với
             </span>
             <div className="grow border-t border-slate-800"></div>
           </div>
 
-          {/* Social Buttons */}
           <div className="grid grid-cols-2 gap-4">
             <button
               type="button"
-              className="flex items-center justify-center gap-2 rounded-lg border border-slate-700 bg-slate-950 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-800"
+              disabled={loading}
+              onClick={() => handleSocialLogin("google")}
+              className="flex items-center justify-center gap-2 rounded-lg border border-slate-700 bg-slate-950 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-800 disabled:opacity-50"
             >
-              {/* Google Icon SVG */}
               <svg className="h-5 w-5" viewBox="0 0 24 24">
                 <path
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -174,7 +242,9 @@ const LoginForm = () => {
             </button>
             <button
               type="button"
-              className="flex items-center justify-center gap-2 rounded-lg border border-slate-700 bg-slate-950 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-800"
+              disabled={loading}
+              onClick={() => handleSocialLogin("github")}
+              className="flex items-center justify-center gap-2 rounded-lg border border-slate-700 bg-slate-950 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-800 disabled:opacity-50"
             >
               <Github size={20} />
               GitHub
@@ -182,7 +252,6 @@ const LoginForm = () => {
           </div>
         </form>
 
-        {/* 3. Footer Link */}
         <p className="text-center text-sm text-slate-500">
           Chưa có tài khoản?{" "}
           <Link

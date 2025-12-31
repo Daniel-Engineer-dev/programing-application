@@ -3,33 +3,62 @@
 import PageTransition from "@/src/pageTransition/pageTransition";
 import Link from "next/link";
 import { useAuthContext } from "@/src/userHook/context/authContext";
-
+import { useState } from "react";
+import Image from "next/image";
 export default function HomePage() {
   const { user } = useAuthContext();
+  const [selectedUrl, setSelectedUrl] = useState<string | null>(null);
   const problems = [
     {
       id: 1,
       title: "AI ảnh hưởng đến thị trường IT như thế nào?",
       description:
-        "Trong một buổi phỏng vấn trực tuyến trên nền tảng X vào tháng một, tỷ phú công nghệ Elon Musk đã chia sẻ rằng Trí tuệ nhân tạo (AI) đã học tất cả những kiến thức do nhân loại tạo ra và bắt đầu chuyển sang học những thông tin do chính AI tạo sinh. Điều này đã xảy ra vào khoảng năm 2024. Hình thức AI tự học kiến thức do chính mình tạo ra đã bắt đầu được áp dụng trong việc huấn luyện các mô hình AI ở các gã khổng lồ công nghệ như Microsoft, Google và Meta.",
-      slug: "Tin1",
+        "Trong một buổi phỏng vấn trực tuyến trên nền tảng X vào tháng một, tỷ phú công nghệ Elon Musk đã chia sẻ rằng Trí tuệ nhân tạo (AI) đã học tất cả những kiến thức do nhân loại tạo ra...",
+      url: "https://vnexpress.net/ai-anh-huong-the-nao-den-thi-truong-tuyen-dung-it-4867758.html", // Link thật
     },
     {
       id: 2,
       title: "Cơ hội kết nối nhân lực IT ngành tài chính ngân hàng",
       description:
-        "Nền tảng tuyển dụng ITviec.com ra mắt chuyên trang việc làm IT ngành tài chính - ngân hàng, mở ra cơ hội kết nối nguồn nhân lực, hôm 18/6.Chuyên trang mới ra mắt được ITviec.com kỳ vọng mở ra cơ hội kết nối các doanh nghiệp hàng đầu với các chuyên gia IT trong lĩnh vực tài chính, ngân hàng. Chuyên trang tuyển dụng mới này kết hợp nhiều nội dung tiêu điểm, giới thiệu các gương mặt lãnh đạo và hiển thị cơ hội việc làm trong ngành IT.",
-      slug: "Tin2",
+        "Nền tảng tuyển dụng ITviec.com ra mắt chuyên trang việc làm IT ngành tài chính - ngân hàng, mở ra cơ hội kết nối nguồn nhân lực, hôm 18/6...",
+      url: "https://vnexpress.net/co-hoi-ket-noi-nhan-luc-it-nganh-tai-chinh-ngan-hang-4756867.html", // Link thật
     },
     {
       id: 3,
       title: "Cơ hội săn nhân sự IT trẻ cho doanh nghiệp",
       description:
-        'Trường Đại học Công nghệ TP HCM (HUTECH) tổ chức chuỗi "Ngày hội Tuyển dụng và Triển lãm Công nghệ thông tin" trong tháng 3, nhằm kết nối sinh viên với doanh nghiệp.',
-      slug: "Tin3",
+        'Trường Đại học Công nghệ TP HCM (HUTECH) tổ chức chuỗi "Ngày hội Tuyển dụng và Triển lãm Công nghệ thông tin" trong tháng 3...',
+      url: "https://vnexpress.net/co-hoi-san-nhan-su-it-tre-cho-doanh-nghiep-4713739.html", // Link thật
     },
   ];
-
+  const companies = [
+    {
+      name: "Meta",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg",
+      color: "group-hover:border-blue-500/50",
+    },
+    {
+      name: "Apple",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg",
+      color: "group-hover:border-white/50",
+    },
+    {
+      name: "Amazon",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
+      color: "group-hover:border-orange-500/50",
+    },
+    {
+      name: "Netflix",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg",
+      color: "group-hover:border-red-600/50",
+    },
+    {
+      name: "Google",
+      // Sử dụng link logo Google đầy đủ màu sắc
+      logo: "https://www.gstatic.com/images/branding/googlelogo/svg/googlelogo_clr_74x24px.svg",
+      color: "group-hover:border-green-500/50",
+    },
+  ];
   return (
     <PageTransition>
       {/* Hero Section */}
@@ -75,21 +104,29 @@ export default function HomePage() {
                   The Most Effective Way to Get Into
                 </p>
 
-                {/* Danh sách Logo (Mô phỏng các công ty FAANG) */}
-                <div className="flex flex-wrap gap-3">
-                  {/* Bạn có thể thay thế các thẻ div này bằng thẻ <Image> logo thật */}
-                  {["Meta", "Apple", "Amazon", "Netflix", "Google"].map(
-                    (company, index) => (
-                      <div
-                        key={index}
-                        className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-700/50 border border-slate-600 text-xs font-bold text-slate-400 hover:border-slate-500 hover:bg-slate-700 cursor-default transition-all"
-                        title={company}
-                      >
-                        {/* Placeholder icon (chữ cái đầu) */}
-                        {company[0]}
+                {/* Danh sách Logo (Phiên bản màu sắc & hiệu ứng mới) */}
+                <div className="flex flex-wrap gap-4">
+                  {companies.map((company, index) => (
+                    <div
+                      key={index}
+                      className={`flex h-12 w-20 items-center justify-center rounded-xl bg-white p-2.5 
+      border border-transparent transition-all duration-300 
+      hover:scale-110 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] 
+      group cursor-pointer ${company.color}`}
+                      title={company.name}
+                    >
+                      <div className="relative h-full w-full">
+                        <Image
+                          src={company.logo}
+                          alt={company.name}
+                          fill
+                          // Bỏ grayscale để hiện màu gốc, object-contain để không bị méo ảnh
+                          className="object-contain transition-transform duration-300"
+                          unoptimized // Thêm thuộc tính này nếu bạn dùng link SVG trực tiếp từ bên ngoài để tránh lỗi render
+                        />
                       </div>
-                    )
-                  )}
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -123,33 +160,32 @@ export default function HomePage() {
           {/* --- Phần Danh sách thẻ (Grid) --- */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {problems.map((problem) => (
-              <Link
+              <a
                 key={problem.id}
-                href={`/problems/${problem.slug}`}
-                className="group relative flex flex-col justify-between rounded-2xl border border-slate-700 bg-slate-800 p-6 transition-all hover:border-slate-600 hover:bg-slate-750 hover:shadow-lg hover:shadow-blue-900/10"
+                href={problem.url} // Sử dụng link VnExpress đã thêm ở trên
+                target="_blank" // Mở bài báo ở tab mới (khuyên dùng cho link ngoài)
+                rel="noopener noreferrer" // Bảo mật khi mở tab mới
+                className="group relative flex flex-col justify-between rounded-2xl border border-slate-700 bg-slate-800 p-6 transition-all hover:border-slate-600 hover:bg-slate-750 hover:shadow-lg hover:shadow-blue-900/10 cursor-pointer"
               >
                 <div>
                   <div className="flex items-start justify-between mb-4">
-                    {/* Tên bài tập */}
                     <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors">
                       {problem.title}
                     </h3>
                   </div>
 
-                  {/* Mô tả ngắn */}
                   <p className="text-sm leading-relaxed text-slate-400 line-clamp-3">
                     {problem.description}
                   </p>
                 </div>
 
-                {/* Nút giả "Giải ngay" hoặc icon mũi tên (Optional - trang trí thêm) */}
                 <div className="mt-6 flex items-center text-sm font-medium text-blue-500 opacity-0 transition-opacity group-hover:opacity-100">
-                  Xem chi tiết
+                  Đọc bài báo gốc
                   <span className="ml-1 transition-transform group-hover:translate-x-1">
                     →
                   </span>
                 </div>
-              </Link>
+              </a>
             ))}
           </div>
         </div>

@@ -1,0 +1,78 @@
+{
+  "id": "7-reverse-integer",
+  "title": "Reverse Integer",
+  "difficulty": "Medium",
+  "acceptance": 0.55,
+  "tags": ["math"],
+  "constraints": ["-2^31 <= x <= 2^31 - 1", "Phải xử lý trường hợp tràn số"],
+  "description": "Cho một số nguyên x, hãy đảo ngược thứ tự của các chữ số và trả về số nguyên đảo ngược. Nếu kết quả vượt quá giới hạn của số nguyên 32 bit, hãy trả về 0.",
+  "defaultCode": {
+    "cpp": "class Solution {\npublic:\n    int reverse(int x) {\n        \n    }\n};",
+    "java": "public class Solution {\n    public int reverse(int x) {\n        \n    }\n}",
+    "python": "class Solution:\n    def reverse(self, x: int) -> int:\n        ",
+    "javascript": "/**\n * @param {number} x\n * @return {number}\n */\nvar reverse = function(x) {\n    \n};"
+  },
+  "driverCodes": {
+    "cpp": "#include <iostream>\n#include <climits>\nusing namespace std;\n\n// __USER_CODE_HERE__\n\nint main() {\n    int x;\n    cin >> x;\n    Solution sol;\n    cout << sol.reverse(x);\n    return 0;\n}",
+    "python": "import sys\n\nclass Solution:\n    # __USER_CODE_HERE__\n\nif __name__ == \"__main__\":\n    input_data = sys.stdin.read().strip()\n    x = int(input_data)\n    sol = Solution()\n    print(sol.reverse(x))",
+    "java": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int x = sc.nextInt();\n        \n        Solution sol = new Solution();\n        System.out.println(sol.reverse(x));\n    }\n}\n\n// __USER_CODE_HERE__",
+    "javascript": "const readline = require('readline');\n\nconst rl = readline.createInterface({\n    input: process.stdin,\n    output: process.stdout\n});\n\nrl.on('line', (input) => {\n    const x = parseInt(input);\n    \n    const sol = new Solution();\n    console.log(sol.reverse(x));\n});\n\n// __USER_CODE_HERE__"
+  },
+  "testCases": [
+    {
+      "input": "123",
+      "expected": "321",
+      "isHidden": false
+    },
+    {
+      "input": "-123",
+      "expected": "-321",
+      "isHidden": false
+    },
+    {
+      "input": "120",
+      "expected": "21",
+      "isHidden": false
+    },
+    {
+      "input": "1534236469",
+      "expected": "0",
+      "isHidden": true
+    }
+  ],
+  "examples": [
+    {
+      "input": "x = 123",
+      "output": "321",
+      "explanation": "Đảo ngược thứ tự các chữ số của 123 cho ta 321."
+    },
+    {
+      "input": "x = -123",
+      "output": "-321",
+      "explanation": "Đảo ngược thứ tự các chữ số của -123 cho ta -321."
+    },
+    {
+      "input": "x = 120",
+      "output": "21",
+      "explanation": "Đảo ngược thứ tự các chữ số của 120 cho ta 21."
+    }
+  ],
+  "editorial": {
+    "approaches": [
+      {
+        "name": "Duyệt và xây dựng số đảo ngược",
+        "description": "Duyệt từng chữ số từ phải sang trái, xây dựng số đảo ngược bằng cách nhân số hiện tại với 10 và cộng thêm chữ số mới.",
+        "timeComplexity": "$O(log|x|)$",
+        "spaceComplexity": "$O(1)$",
+        "code": {
+          "cpp": "class Solution {\npublic:\n    int reverse(int x) {\n        long long res = 0;\n        while(x) {\n            res = res * 10 + x % 10;\n            x /= 10;\n            if (res > INT_MAX || res < INT_MIN) return 0;\n        }\n        return res;\n    }\n};",
+          "python": "class Solution:\n    def reverse(self, x: int) -> int:\n        sign = -1 if x < 0 else 1\n        x *= sign\n        res = 0\n        while x > 0:\n            res = res * 10 + x % 10\n            x //= 10\n        if res > 2**31 - 1: return 0\n        return sign * res",
+          "javascript": "/**\n * @param {number} x\n * @return {number}\n */\nvar reverse = function(x) {\n    const max = Math.pow(2, 31) - 1;\n    const min = -Math.pow(2, 31);\n    let res = 0;\n    let sign = x < 0 ? -1 : 1;\n    x = Math.abs(x);\n    while (x) {\n        res = res * 10 + x % 10;\n        x = Math.floor(x / 10);\n        if (res > max || res < min) return 0;\n    }\n    return sign * res;\n};",
+          "java": "public class Solution {\n    public int reverse(int x) {\n        long res = 0;\n        while (x != 0) {\n            res = res * 10 + x % 10;\n            x /= 10;\n            if (res > Integer.MAX_VALUE || res < Integer.MIN_VALUE) return 0;\n        }\n        return (int) res;\n    }\n}"
+        }
+      }
+    ],
+    "videoUrl": "https://youtube.com/watch?v=CRgXG1vK-wg",
+    "content": "Bài toán yêu cầu đảo ngược một số nguyên. Để giải quyết, ta có thể sử dụng vòng lặp để lấy từng chữ số của số nguyên, sau đó kiểm tra xem kết quả có vượt quá giới hạn của số nguyên 32 bit không."
+  }
+}

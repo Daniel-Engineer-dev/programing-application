@@ -1,0 +1,72 @@
+{
+  "id": "1-two-sum",
+  "title": "Two Sum",
+  "difficulty": "Easy",
+  "acceptance": 0.52,
+  "tags": ["array", "hash-table"],
+  "constraints": [
+    "2 <= nums.length <= 10^4",
+    "-10^9 <= nums[i] <= 10^9",
+    "-10^9 <= target <= 10^9",
+    "Chỉ tồn tại duy nhất một đáp án hợp lệ."
+  ],
+  "description": "Cho một mảng số nguyên nums và một số nguyên target, hãy trả về chỉ số của hai số sao cho tổng của chúng bằng target.",
+  "defaultCode": {
+    "cpp": "class Solution {\npublic:\n    vector<int> twoSum(vector<int>& nums, int target) {\n        \n    }\n};",
+
+    "java": "import java.util.*;\n\nclass Solution {\n    public int[] twoSum(int[] nums, int target) {\n        \n    }\n}",
+
+    "python": "from typing import List\n\nclass Solution:\n    def twoSum(self, nums: List[int], target: int) -> List[int]:\n        ",
+
+    "javascript": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number[]}\n */\nvar twoSum = function(nums, target) {\n    \n};"
+  },
+  "driverCodes": {
+    "cpp": "#include <iostream>\n#include <vector>\n#include <string>\n#include <sstream>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\n// __USER_CODE_HERE__\n\nint main() {\n    string line;\n    if (!getline(cin, line)) return 0;\n    stringstream ss(line);\n    int n, target;\n    vector<int> nums;\n    while (ss >> n) nums.push_back(n);\n    if (!(cin >> target)) return 0;\n    Solution sol;\n    vector<int> res = sol.twoSum(nums, target);\n    if(res.size() >= 2) cout << res[0] << \" \" << res[1];\n    return 0;\n}",
+
+    "python": "import sys\nfrom typing import List, Optional, Dict\n\n# # __USER_CODE_HERE__\n\nif __name__ == \"__main__\":\n    input_data = sys.stdin.read().splitlines()\n    if len(input_data) < 2: sys.exit(0)\n    nums = list(map(int, input_data[0].split()))\n    target = int(input_data[1])\n    sol = Solution()\n    res = sol.twoSum(nums, target)\n    print(f\"{res[0]} {res[1]}\")",
+
+    "java": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextLine()) return;\n        String[] parts = sc.nextLine().split(\"\\\\s+\");\n        int[] nums = new int[parts.length];\n        for (int i = 0; i < parts.length; i++) nums[i] = Integer.parseInt(parts[i]);\n        if (!sc.hasNextInt()) return;\n        int target = sc.nextInt();\n        \n        Solution sol = new Solution();\n        int[] res = sol.twoSum(nums, target);\n        System.out.print(res[0] + \" \" + res[1]);\n    }\n}\n\n// __USER_CODE_HERE__",
+
+    "javascript": "const fs = require('fs');\n\n// Định nghĩa một class rỗng để tránh lỗi ReferenceError nếu người dùng không dùng class\nclass Solution {}\n\n// __USER_CODE_HERE__\n\ntry {\n    const input = fs.readFileSync(0, 'utf8').split('\\n');\n    if (input.length < 2) process.exit(0);\n\n    const nums = input[0].trim().split(/\\s+/).map(Number);\n    const target = parseInt(input[1]);\n\n    const sol = new Solution();\n    // Kiểm tra xem hàm twoSum nằm ở global (var/function) hay nằm trong class Solution\n    const fn = (typeof twoSum === 'function') ? twoSum : (sol.twoSum ? sol.twoSum.bind(sol) : null);\n\n    if (typeof fn === 'function') {\n        const res = fn(nums, target);\n        if (Array.isArray(res)) {\n            process.stdout.write(res[0] + \" \" + res[1]);\n        }\n    } else {\n        console.error(\"Error: function twoSum not found.\");\n    }\n} catch (e) {\n    console.error(e);\n}"
+  },
+  "testCases": [
+    { "input": "2 7 11 15\n9", "expected": "0 1", "isHidden": false },
+    { "input": "3 2 4\n6", "expected": "1 2", "isHidden": false },
+    { "input": "3 3\n6", "expected": "0 1", "isHidden": true }
+  ],
+  "examples": [
+    {
+      "input": "nums = [2,7,11,15], target = 9",
+      "output": "[0,1]",
+      "explanation": "Vì nums[0] + nums[1] == 9, chúng ta trả về [0, 1]."
+    },
+    {
+      "input": "nums = [3,2,4], target = 6",
+      "output": "[1,2]",
+      "explanation": "Vì nums[1] + nums[2] == 6, chúng ta trả về [1, 2]."
+    },
+    {
+      "input": "nums = [3,3], target = 6",
+      "output": "[0,1]",
+      "explanation": "Vì nums[0] + nums[1] == 6, chúng ta trả về [0, 1]."
+    }
+  ],
+  "editorial": {
+    "approaches": [
+      {
+        "name": "One-pass Hash Table (Bảng băm một lần duyệt)",
+        "description": "Trong khi duyệt qua mảng, chúng ta kiểm tra xem phần tử bù (target - nums[i]) đã tồn tại trong bảng băm chưa. Nếu có, trả về chỉ số của phần tử bù và chỉ số hiện tại. Nếu chưa, lưu giá trị hiện tại vào bảng băm.",
+        "timeComplexity": "O(n) - Duyệt qua mảng một lần, mỗi lần tra cứu bảng băm mất O(1).",
+        "spaceComplexity": "O(n) - Trường hợp xấu nhất lưu trữ toàn bộ n phần tử vào bảng băm.",
+        "code": {
+          "cpp": "class Solution {\npublic:\n    vector<int> twoSum(vector<int>& nums, int target) {\n        unordered_map<int, int> hash;\n        for (int i = 0; i < nums.size(); i++) {\n            int complement = target - nums[i];\n            if (hash.find(complement) != hash.end()) {\n                return {hash[complement], i};\n            }\n            hash[nums[i]] = i;\n        }\n        return {};\n    }\n};",
+          "python": "class Solution:\n    def twoSum(self, nums: List[int], target: int) -> List[int]:\n        prevMap = {}  # val : index\n        for i, n in enumerate(nums):\n            diff = target - n\n            if diff in prevMap:\n                return [prevMap[diff], i]\n            prevMap[n] = i",
+          "javascript": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number[]}\n */\nvar twoSum = function(nums, target) {\n    const map = new Map();\n    for (let i = 0; i < nums.length; i++) {\n        const complement = target - nums[i];\n        if (map.has(complement)) {\n            return [map.get(complement), i];\n        }\n        map.set(nums[i], i);\n    }\n};",
+          "java": "class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        Map<Integer, Integer> map = new HashMap<>();\n        for (int i = 0; i < nums.length; i++) {\n            int complement = target - nums[i];\n            if (map.containsKey(complement)) {\n                return new int[] { map.get(complement), i };\n            }\n            map.put(nums[i], i);\n        }\n        // Trả về mảng rỗng nếu không tìm thấy, dù đề bài đảm bảo luôn có 1 đáp án\n        return new int[] {};\n    }\n}"
+        }
+      }
+    ],
+    "videoUrl": "https://www.youtube.com/watch?v=KLlXCFG5TnA",
+    "content": "Sử dụng Hash Map là cách tối ưu nhất để giải quyết bài toán này với độ phức tạp thời gian tuyến tính O(n)."
+  }
+}

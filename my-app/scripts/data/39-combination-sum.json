@@ -1,0 +1,81 @@
+{
+  "id": "39-combination-sum",
+  "title": "Combination Sum",
+  "difficulty": "Medium",
+  "acceptance": 0.42,
+  "tags": [
+    "array",
+    "backtracking"
+  ],
+  "constraints": [
+    "1 <= candidates.length <= 30",
+    "1 <= candidates[i] <= 200",
+    "candidate là một mảng số nguyên không giảm",
+    "target sẽ nằm trong khoảng từ 1 đến 10^6"
+  ],
+  "description": "Cho một mảng số nguyên không giảm candidates và một số nguyên target, hãy tìm tất cả các tổ hợp trong candidates mà tổng của chúng bằng target. Mỗi số trong candidates có thể được sử dụng nhiều lần.",
+  "defaultCode": {
+    "cpp": "class Solution {\npublic:\n    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {\n        \n    }\n};",
+    "java": "import java.util.*;\n\nclass Solution {\n    public List<List<Integer>> combinationSum(int[] candidates, int target) {\n        \n    }\n}",
+    "python": "from typing import List\n\nclass Solution:\n    def combinationSum(self, candidates: List[int], target: int) -> List[List[int]]:\n        ",
+    "javascript": "/**\n * @param {number[]} candidates\n * @param {number} target\n * @return {number[][]}\n */\nvar combinationSum = function(candidates, target) {\n    \n};"
+  },
+  "driverCodes": {
+    "cpp": "#include <iostream>\n#include <vector>\n#include <string>\n#include <sstream>\n#include <algorithm>\nusing namespace std;\n\n// __USER_CODE_HERE__\n\nint main() {\n    string line;\n    if (!getline(cin, line)) return 0;\n    stringstream ss(line);\n    vector<int> candidates;\n    int n;\n    while (ss >> n) candidates.push_back(n);\n    if (!(cin >> n)) return 0;\n    int target = n;\n    Solution sol;\n    vector<vector<int>> res = sol.combinationSum(candidates, target);\n    for (const auto& vec : res) {\n        for (int num : vec) cout << num << \" \";\n        cout << endl;\n    }\n    return 0;\n}",
+    "python": "import sys\nfrom typing import List\n\n# # __USER_CODE_HERE__\n\nif __name__ == \"__main__\":\n    input_data = sys.stdin.read().splitlines()\n    if len(input_data) < 2: sys.exit(0)\n    candidates = list(map(int, input_data[0].split()))\n    target = int(input_data[1])\n    sol = Solution()\n    res = sol.combinationSum(candidates, target)\n    for vec in res:\n        print(' '.join(map(str, vec)))",
+    "java": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextLine()) return;\n        String[] parts = sc.nextLine().split(\"\\\\s+\");\n        int[] candidates = new int[parts.length];\n        for (int i = 0; i < parts.length; i++) candidates[i] = Integer.parseInt(parts[i]);\n        if (!sc.hasNextInt()) return;\n        int target = sc.nextInt();\n        \n        Solution sol = new Solution();\n        List<List<Integer>> res = sol.combinationSum(candidates, target);\n        for (List<Integer> vec : res) {\n            for (Integer num : vec) System.out.print(num + \" \");\n            System.out.println();\n        }\n    }\n}\n\n// __USER_CODE_HERE__",
+    "javascript": "const fs = require('fs');\n\n// Định nghĩa một class rỗng để tránh lỗi ReferenceError nếu người dùng không dùng class\nconst Solution = {};\n\n// __USER_CODE_HERE__\n\ntry {\n    const input = fs.readFileSync(0, 'utf8').split('\\n');\n    if (input.length < 2) process.exit(0);\n\n    const candidates = input[0].trim().split(/\\s+/).map(Number);\n    const target = parseInt(input[1]);\n\n    const sol = new Solution();\n    // Kiểm tra xem hàm combinationSum nằm ở global (var/function) hay nằm trong class Solution\n    const fn = (typeof combinationSum === 'function') ? combinationSum : (sol.combinationSum ? sol.combinationSum.bind(sol) : null);\n\n    if (typeof fn === 'function') {\n        const res = fn(candidates, target);\n        if (Array.isArray(res)) {\n            res.forEach(vec => console.log(vec.join(' ')));\n        }\n    } else {\n        console.error(\"Error: function combinationSum not found.\");\n    }\n} catch (e) {\n    console.error(e);\n}"
+  },
+  "testCases": [
+    {
+      "input": "2 3 5\n8",
+      "expected": "[[2, 2, 2, 2], [2, 3, 3], [3, 5]]",
+      "isHidden": false
+    },
+    {
+      "input": "2 3 5\n8",
+      "expected": "[[2, 2, 2, 2], [2, 3, 3], [3, 5]]",
+      "isHidden": false
+    },
+    {
+      "input": "7 3 2\n18",
+      "expected": "[[2, 2, 2, 2, 2, 2, 2, 2, 2], [2, 2, 2, 2, 2, 2, 3, 3], [2, 2, 2, 2, 7], [2, 2, 7, 7], [3, 3, 3, 3, 3, 3], [3, 3, 3, 7, 2], [7, 7, 2, 2]]",
+      "isHidden": true
+    }
+  ],
+  "examples": [
+    {
+      "input": "candidates = [2,3,5], target = 8",
+      "output": "[[2,2,2,2],[2,3,3],[3,5]]",
+      "explanation": "Tất cả các tổ hợp có tổng bằng 8 là [2,2,2,2], [2,3,3], và [3,5]."
+    },
+    {
+      "input": "candidates = [2,3,5], target = 8",
+      "output": "[[2,2,2,2],[2,3,3],[3,5]]",
+      "explanation": "Tất cả các tổ hợp có tổng bằng 8 là [2,2,2,2], [2,3,3], và [3,5]."
+    },
+    {
+      "input": "candidates = [7,3,2], target = 18",
+      "output": "[[2,2,2,2,2,2,2,2,2],[2,2,2,2,2,2,3,3],[2,2,2,2,2,2,3,3],[2,2,2,2,7],[2,2,7,7],[3,3,3,3,3,3],[3,3,3,7,2],[7,7,2,2]]",
+      "explanation": "Tất cả các tổ hợp có tổng bằng 18 là [2,2,2,2,2,2,2,2,2], [2,2,2,2,2,2,3,3], [2,2,2,2,7], [2,2,7,7], [3,3,3,3,3,3], [3,3,3,7,2], và [7,7,2,2]."
+    }
+  ],
+  "editorial": {
+    "approaches": [
+      {
+        "name": "Backtracking",
+        "description": "Sử dụng kỹ thuật backtracking để tìm tất cả các tổ hợp có tổng bằng target.",
+        "timeComplexity": "$O(N^{(T/M)+1})$",
+        "spaceComplexity": "$O(T/M)$",
+        "code": {
+          "cpp": "class Solution {\npublic:\n    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {\n        vector<vector<int>> result;\n        vector<int> path;\n        backtrack(result, path, candidates, target, 0);\n        return result;\n    }\n\n    void backtrack(vector<vector<int>>& result, vector<int>& path, vector<int>& candidates, int target, int start) {\n        if (target < 0) return;\n        if (target == 0) {\n            result.push_back(path);\n            return;\n        }\n        for (int i = start; i < candidates.size(); i++) {\n            path.push_back(candidates[i]);\n            backtrack(result, path, candidates, target - candidates[i], i);\n            path.pop_back();\n        }\n    }\n};",
+          "python": "from typing import List\n\nclass Solution:\n    def combinationSum(self, candidates: List[int], target: int) -> List[List[int]]:\n        def backtrack(remain, comb, start):\n            if remain == 0:\n                result.append(list(comb))\n                return\n            elif remain < 0:\n                return\n            for i in range(start, len(candidates)):\n                comb.append(candidates[i])\n                backtrack(remain - candidates[i], comb, i)\n                comb.pop()\n\n        result = []\n        backtrack(target, [], 0)\n        return result",
+          "javascript": "/**\n * @param {number[]} candidates\n * @param {number} target\n * @return {number[][]}\n */\nvar combinationSum = function(candidates, target) {\n    const result = [];\n    const path = [];\n    backtrack(result, path, candidates, target, 0);\n    return result;\n};\n\nfunction backtrack(result, path, candidates, target, start) {\n    if (target < 0) return;\n    if (target === 0) {\n        result.push([...path]);\n        return;\n    }\n    for (let i = start; i < candidates.length; i++) {\n        path.push(candidates[i]);\n        backtrack(result, path, candidates, target - candidates[i], i);\n        path.pop();\n    }\n}",
+          "java": "class Solution {\n    public List<List<Integer>> combinationSum(int[] candidates, int target) {\n        List<List<Integer>> result = new ArrayList<>();\n        List<Integer> path = new ArrayList<>();\n        backtrack(result, path, candidates, target, 0);\n        return result;\n    }\n\n    private void backtrack(List<List<Integer>> result, List<Integer> path, int[] candidates, int target, int start) {\n        if (target < 0) return;\n        if (target == 0) {\n            result.add(new ArrayList<>(path));\n            return;\n        }\n        for (int i = start; i < candidates.length; i++) {\n            path.add(candidates[i]);\n            backtrack(result, path, candidates, target - candidates[i], i);\n            path.remove(path.size() - 1);\n        }\n    }\n}"
+        }
+      }
+    ],
+    "videoUrl": "https://youtube.com/watch?v=GBKI9VSKdGg",
+    "content": "Bài toán này có thể được giải quyết bằng cách sử dụng kỹ thuật backtracking. Ý tưởng là thử tất cả các tổ hợp có thể và kiểm tra xem tổng của chúng có bằng target hay không."
+  }
+}

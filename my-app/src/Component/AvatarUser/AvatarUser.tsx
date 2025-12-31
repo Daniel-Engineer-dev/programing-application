@@ -4,36 +4,44 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  Trophy,
-  FlaskConical,
-  ShoppingBag,
-  Gamepad2,
-  Settings,
-  SunMedium,
-  ChevronRight,
-  LogOut,
-} from "lucide-react";
-//Sign out
+import { Trophy, ShoppingBag, Settings, LogOut } from "lucide-react";
+// Sign out
 import { signOut } from "firebase/auth";
-import { auth } from "@/src/api/firebase/firebase";
+import { auth, db } from "@/src/api/firebase/firebase";
 import { useRouter } from "next/navigation";
+import { doc, onSnapshot } from "firebase/firestore";
+import { useAuthContext } from "@/src/userHook/context/authContext";
 
 type UserMenuProps = {
-  name: string;
-  subtitle?: string;
-  avatarUrl?: string;
+  name: string; // Tên mặc định truyền từ Props
 };
 
-export default function UserMenu({
-  name,
-  subtitle = "Access all features with our Premium subscription!",
-  avatarUrl = "/avatar.png",
-}: UserMenuProps) {
+export default function UserMenu({ name }: UserMenuProps) {
   const [open, setOpen] = useState(false);
-  const [appearanceOpen, setAppearanceOpen] = useState(false);
+  const { user } = useAuthContext();
+  const [userData, setUserData] = useState<{
+    username?: string;
+    email?: string;
+    avatar?: string;
+  }>({});
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  // Lắng nghe dữ liệu người dùng thời gian thực từ collection "users"
+  useEffect(() => {
+    if (!user?.uid) return;
+
+    // Truy cập trực tiếp vào document có ID là UID (theo cấu trúc mới)
+    const userRef = doc(db, "users", user.uid);
+    const unsubscribe = onSnapshot(userRef, (doc) => {
+      if (doc.exists()) {
+        setUserData(doc.data());
+      }
+    });
+
+    return () => unsubscribe();
+  }, [user]);
+
   useEffect(() => {
     const onEsc = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
     const onClick = (e: MouseEvent) => {
@@ -46,152 +54,116 @@ export default function UserMenu({
       document.removeEventListener("mousedown", onClick);
     };
   }, []);
+
   const handleLogout = async () => {
-    router.push("/");
-    await signOut(auth);
+    try {
+      await signOut(auth);
+      router.push("/");
+    } catch (error) {
+      console.error("Lỗi đăng xuất:", error);
+    }
   };
+
+  // Ưu tiên lấy username từ Firestore, nếu chưa có thì dùng props name
+  const displayName = userData.username || name || "User";
+  const avatarUrl = userData.avatar || user?.photoURL || "/avatar.png";
 
   return (
     <div className="relative" ref={ref}>
-      {/* Nút avatar */}
+      {/* Nút avatar trên NavBar */}
       <button
         onClick={() => setOpen((s) => !s)}
-        className="inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border bg-white"
+        className="inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-blue-500 bg-white transition-transform active:scale-90"
         aria-haspopup="menu"
         aria-expanded={open}
-        aria-label="Open user menu"
       >
         <Image
-          className="hover:cursor-pointer border"
+          className="object-cover"
           src={avatarUrl}
-          alt={name}
+          alt={displayName}
           width={40}
           height={40}
         />
       </button>
 
-      {/* Dropdown */}
+      {/* Dropdown Menu */}
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.98, y: 4 }}
+            initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 8 }}
-            exit={{ opacity: 0, scale: 0.98, y: 4 }}
-            transition={{ duration: 0.16 }}
-            className="absolute right-0 z-50 mt-1 w-[320px]"
+            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            transition={{ duration: 0.15 }}
+            className="absolute right-0 z-50 mt-1 w-[300px]"
           >
-            <div className="overflow-hidden rounded-2xl border bg-slate-700 shadow-xl ring-1 ring-black/5">
-              {/* Header */}
-              <div className="flex items-center gap-3 px-4 py-4 text-white">
-                <div className="h-12 w-12 overflow-hidden rounded-full ">
-                  <Image src={avatarUrl} alt={name} width={52} height={52} />
+            <div className="overflow-hidden rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl ring-1 ring-black/10">
+              {/* Header Profile */}
+              <div className="flex items-center gap-3 px-4 py-5 text-white bg-slate-800/50">
+                <div className="h-12 w-12 overflow-hidden rounded-full border-2 border-blue-500">
+                  <Image
+                    src={avatarUrl}
+                    alt={displayName}
+                    width={48}
+                    height={48}
+                    className="object-cover"
+                  />
                 </div>
                 <div className="min-w-0">
-                  <div className="truncate text-base font-semibold">{name}</div>
-                  {subtitle && (
-                    <div className="mt-0.5 text-[13px] text-yellow-500">
-                      {subtitle}
-                    </div>
-                  )}
+                  <div className="truncate text-base font-bold">
+                    {displayName}
+                  </div>
+                  <div className="truncate text-xs text-slate-400">
+                    {userData.email || user?.email}
+                  </div>
                 </div>
               </div>
 
-              <hr />
-
-              {/* 3 ô nhanh */}
-              <div className="grid grid-cols-3 gap-3 px-4 py-3 text-slate-300">
+              {/* 3 Quick Tiles (Sửa đường dẫn phù hợp với hệ thống setting mới) */}
+              <div className="grid grid-cols-3 gap-2 px-3 py-3 border-t border-slate-800">
                 <QuickTile
                   href="/routes/avatar/settings/saved"
-                  name="/list.png"
-                  label="My Lists"
+                  iconPath="/list.png"
+                  label="Lists"
                 />
                 <QuickTile
                   href="/routes/avatar/settings/notes"
-                  name="/notebook.png"
-                  label="Notebook"
+                  iconPath="/notebook.png"
+                  label="Notes"
                 />
                 <QuickTile
                   href="/routes/avatar/settings/history"
-                  name="/progress.png"
-                  label="Progress"
+                  iconPath="/progress.png"
+                  label="Stats"
                 />
               </div>
 
-              {/* Points */}
-              <div className="px-4 pb-1 text-slate-300">
+              <div className="px-3 py-2 border-t border-slate-800 space-y-1">
                 <MenuItem
-                  href="/points"
+                  href="/routes/avatar/points"
                   icon={Trophy}
-                  label="Points"
-                  right={<span className="text-xs text-white">New</span>}
+                  label="Reward Points"
+                  right={
+                    <span className="bg-yellow-600 text-[10px] px-1.5 py-0.5 rounded-full text-white font-bold">
+                      New
+                    </span>
+                  }
                 />
-              </div>
-
-              <hr />
-
-              <div className="px-4 py-2 text-slate-300">
-                {/* <MenuItem
-                  href="/labs"
-                  icon={FlaskConical}
-                  label="Try New Features"
-                /> */}
                 <MenuItem
                   href="/routes/avatar/settings/buy"
                   icon={ShoppingBag}
-                  label="Orders"
+                  label="Orders & Billing"
                 />
-                {/* <MenuItem
-                  href="/playgrounds"
-                  icon={Gamepad2}
-                  label="My Playgrounds"
-                /> */}
                 <MenuItem
                   href="/routes/avatar/settings"
                   icon={Settings}
-                  label="Settings"
+                  label="Account Settings"
                 />
-
-                {/* Appearance submenu */}
-                {/* <button
-                  onClick={() => setAppearanceOpen((s) => !s)}
-                  className="flex w-full items-center justify-between rounded-lg px-2 py-2.5 text-left text-[15px] hover:bg-blue-700 hover:text-white hover:font-bold hover:cursor-pointer"
-                >
-                  <span className="inline-flex items-center gap-2">
-                    <SunMedium size={18} />
-                    Appearance
-                  </span>
-                  <ChevronRight
-                    size={18}
-                    className={`transition-transform ${
-                      appearanceOpen ? "rotate-90" : ""
-                    }`}
-                  />
-                </button>
-
-                <AnimatePresence>
-                  {appearanceOpen && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="ml-8 mt-1 flex flex-col gap-1 overflow-hidden pb-1"
-                    >
-                      <AppearanceOption label="System" />
-                      <AppearanceOption label="Light" />
-                      <AppearanceOption label="Dark" />
-                    </motion.div>
-                  )}
-                </AnimatePresence> */}
               </div>
 
-              <hr />
-
-              <div className="px-4 py-2 text-slate-300">
+              {/* Sign Out Button */}
+              <div className="px-3 py-2 border-t border-slate-800 bg-slate-950/30">
                 <MenuItem
-                  onClick={() => {
-                    alert("Sign out");
-                    handleLogout();
-                  }}
+                  onClick={handleLogout}
                   icon={LogOut}
                   label="Sign Out"
                 />
@@ -203,22 +175,31 @@ export default function UserMenu({
     </div>
   );
 }
+
+// --- Sub Components ---
+
 function QuickTile({
   href,
-  name,
+  iconPath,
   label,
 }: {
   href: string;
-  name: string;
+  iconPath: string;
   label: string;
 }) {
   return (
     <Link
       href={href}
-      className="group flex flex-col items-center justify-center rounded-xl border px-4 py-3 hover:border-gray-300 hover:bg-blue-700 hover:text-white hover:font-bold"
+      className="flex flex-col items-center justify-center rounded-xl py-3 transition-colors hover:bg-blue-600/20 group"
     >
-      <img src={name} className="mb-1" />
-      <span className="text-[13px]">{label}</span>
+      <img
+        src={iconPath}
+        className="w-6 h-6 mb-1 opacity-80 group-hover:opacity-100 transition-opacity"
+        alt={label}
+      />
+      <span className="text-[11px] text-slate-400 group-hover:text-white transition-colors">
+        {label}
+      </span>
     </Link>
   );
 }
@@ -236,41 +217,28 @@ function MenuItem({
   label: string;
   right?: React.ReactNode;
 }) {
-  if (href) {
-    return (
-      <Link
-        href={href}
-        className="flex w-full items-center justify-between rounded-lg px-2 py-2.5 text-[15px] hover:bg-blue-700 hover:text-white hover:font-bold"
-      >
-        <span className="inline-flex items-center gap-2">
-          <Icon size={18} /> {label}
+  const content = (
+    <>
+      <span className="inline-flex items-center gap-3">
+        <Icon size={18} className="text-slate-400 group-hover:text-blue-400" />
+        <span className="text-slate-200 group-hover:text-white transition-colors">
+          {label}
         </span>
-        {right}
-      </Link>
-    );
-  }
-
-  return (
-    <button
-      onClick={onClick}
-      className="flex w-full items-center justify-between rounded-lg px-2 py-2.5 text-[15px] hover:bg-blue-700 hover:text-white hover:font-bold   hover:cursor-pointer"
-      type="button"
-    >
-      <span className="inline-flex items-center gap-2 hover:cursor-pointer">
-        <Icon size={18} /> {label}
       </span>
       {right}
-    </button>
+    </>
   );
-}
 
-function AppearanceOption({ label }: { label: string }) {
-  return (
-    <button
-      className="w-full rounded-md px-2 py-2 text-left text-sm hover:bg-blue-700 hover:text-white hover:font-bold hover:cursor-pointer"
-      type="button"
-    >
-      {label}
+  const className =
+    "flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-[14px] transition-all hover:bg-slate-800 group cursor-pointer font-medium";
+
+  return href ? (
+    <Link href={href} className={className}>
+      {content}
+    </Link>
+  ) : (
+    <button onClick={onClick} className={className} type="button">
+      {content}
     </button>
   );
 }

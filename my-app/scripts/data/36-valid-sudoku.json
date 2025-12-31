@@ -1,0 +1,71 @@
+{
+  "id": "36-valid-sudoku",
+  "title": "Valid Sudoku",
+  "difficulty": "Medium",
+  "acceptance": 0.45,
+  "tags": [
+    "array",
+    "matrix"
+  ],
+  "constraints": [
+    "board.length == 9",
+    "board[i].length == 9",
+    "board[i][j] là một chữ số từ '1' đến '9' hoặc '.'"
+  ],
+  "description": "Xác định xem một bảng Sudoku đã cho có hợp lệ hay không. Một bảng Sudoku hợp lệ phải thỏa mãn hai điều kiện: mỗi hàng và mỗi cột chứa các chữ số từ 1 đến 9 không lặp lại, và mỗi ô 3x3 cũng chứa các chữ số từ 1 đến 9 không lặp lại.",
+  "defaultCode": {
+    "cpp": "class Solution {\npublic:\n    bool isValidSudoku(vector<vector<char>>& board) {\n        \n    }\n};",
+    "java": "class Solution {\n    public boolean isValidSudoku(char[][] board) {\n        \n    }\n}",
+    "python": "class Solution:\n    def isValidSudoku(self, board: List[List[str]]) -> bool:",
+    "javascript": "/**\n * @param {character[][]} board\n * @return {boolean}\n */\nvar isValidSudoku = function(board) {\n    \n};"
+  },
+  "driverCodes": {
+    "cpp": "#include <iostream>\n#include <vector>\nusing namespace std;\n\n// __USER_CODE_HERE__\n\nint main() {\n    vector<vector<char>> board(9, vector<char>(9));\n    for (int i = 0; i < 9; i++) {\n        for (int j = 0; j < 9; j++) {\n            cin >> board[i][j];\n        }\n    }\n    Solution sol;\n    bool res = sol.isValidSudoku(board);\n    cout << (res ? \"true\" : \"false\");\n    return 0;\n}",
+    "python": "import sys\nfrom typing import List\n\n# __USER_CODE_HERE__\n\nif __name__ == \"__main__\":\n    input_data = sys.stdin.read().splitlines()\n    board = [list(line) for line in input_data]\n    sol = Solution()\n    res = sol.isValidSudoku(board)\n    print(res)",
+    "java": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        char[][] board = new char[9][9];\n        for (int i = 0; i < 9; i++) {\n            String line = sc.nextLine();\n            for (int j = 0; j < 9; j++) {\n                board[i][j] = line.charAt(j);\n            }\n        }\n        Solution sol = new Solution();\n        boolean res = sol.isValidSudoku(board);\n        System.out.println(res);\n    }\n}\n\n// __USER_CODE_HERE__",
+    "javascript": "const fs = require('fs');\n\n// Định nghĩa một class rỗng để tránh lỗi ReferenceError nếu người dùng không dùng class\nclass Solution {}\n\n// __USER_CODE_HERE__\n\ntry {\n    const input = fs.readFileSync(0, 'utf8').split('\\n');\n    const board = input.map(line => line.trim().split(''));\n    const sol = new Solution();\n    // Kiểm tra xem hàm isValidSudoku nằm ở global (var/function) hay nằm trong class Solution\n    const fn = (typeof isValidSudoku === 'function') ? isValidSudoku : (sol.isValidSudoku ? sol.isValidSudoku.bind(sol) : null);\n    if (typeof fn === 'function') {\n        const res = fn(board);\n        console.log(res);\n    } else {\n        console.error(\"Error: function isValidSudoku not found.\");\n    }\n} catch (e) {\n    console.error(e);\n}"
+  },
+  "testCases": [
+    {
+      "input": "[[\"5\",\"3\",\".\",\".\",\"7\",\".\",\".\",\".\",\".\"]\n,[\"6\",\".\",\".\",\"1\",\"9\",\"5\",\".\",\".\",\".\"]\n,[\".\",\"9\",\"8\",\".\",\".\",\".\",\".\",\"6\",\".\"]\n,[\"8\",\".\",\".\",\".\",\"6\",\".\",\".\",\".\",\"3\"]\n,[\"4\",\".\",\".\",\"8\",\".\",\"3\",\".\",\".\",\"1\"]\n,[\"7\",\".\",\".\",\".\",\"2\",\".\",\".\",\".\",\"6\"]\n,[\".\",\"6\",\".\",\".\",\".\",\".\",\"2\",\"8\",\".\"]\n,[\".\",\".\",\".\",\"4\",\"1\",\"9\",\".\",\".\",\"5\"]\n,[\".\",\".\",\".\",\".\",\"8\",\".\",\".\",\"7\",\"9\"]]",
+      "expected": "true",
+      "isHidden": false
+    },
+    {
+      "input": "[[\"8\",\"3\",\".\",\".\",\"7\",\".\",\".\",\".\",\".\"]\n,[\"6\",\".\",\".\",\"1\",\"9\",\"5\",\".\",\".\",\".\"]\n,[\".\",\"9\",\"7\",\".\",\".\",\".\",\".\",\"6\",\".\"]\n,[\"8\",\".\",\".\",\".\",\"6\",\".\",\".\",\".\",\"3\"]\n,[\"4\",\".\",\".\",\"8\",\".\",\"3\",\".\",\".\",\"1\"]\n,[\"7\",\".\",\".\",\".\",\"2\",\".\",\".\",\".\",\"6\"]\n,[\".\",\"6\",\".\",\".\",\".\",\".\",\"2\",\"8\",\".\"]\n,[\".\",\".\",\".\",\"4\",\"1\",\"9\",\".\",\".\",\"5\"]\n,[\".\",\".\",\".\",\".\",\"8\",\".\",\".\",\"7\",\"9\"]]",
+      "expected": "false",
+      "isHidden": false
+    }
+  ],
+  "examples": [
+    {
+      "input": "board = \n[\n    [\"5\",\"3\",\".\",\".\",\"7\",\".\",\".\",\".\",\".\"]\n    , [\"6\",\".\",\".\",\"1\",\"9\",\"5\",\".\",\".\",\".\"]\n    , [\".\",\"9\",\"8\",\".\",\".\",\".\",\".\",\"6\",\".\"]\n    , [\"8\",\".\",\".\",\".\",\"6\",\".\",\".\",\".\",\"3\"]\n    , [\"4\",\".\",\".\",\"8\",\".\",\"3\",\".\",\".\",\"1\"]\n    , [\"7\",\".\",\".\",\".\",\"2\",\".\",\".\",\".\",\"6\"]\n    , [\".\",\"6\",\".\",\".\",\".\",\".\",\"2\",\"8\",\".\"]\n    , [\".\",\".\",\".\",\"4\",\"1\",\"9\",\".\",\".\",\"5\"]\n    , [\".\",\".\",\".\",\".\",\"8\",\".\",\".\",\"7\",\"9\"]\n]\n",
+      "output": "true",
+      "explanation": "Bảng Sudoku này hợp lệ vì mỗi hàng, cột và ô 3x3 đều chứa các chữ số từ 1 đến 9 không lặp lại."
+    },
+    {
+      "input": "board = \n[\n    [\"8\",\"3\",\".\",\".\",\"7\",\".\",\".\",\".\",\".\"]\n    , [\"6\",\".\",\".\",\"1\",\"9\",\"5\",\".\",\".\",\".\"]\n    , [\".\",\"9\",\"7\",\".\",\".\",\".\",\".\",\"6\",\".\"]\n    , [\"8\",\".\",\".\",\".\",\"6\",\".\",\".\",\".\",\"3\"]\n    , [\"4\",\".\",\".\",\"8\",\".\",\"3\",\".\",\".\",\"1\"]\n    , [\"7\",\".\",\".\",\".\",\"2\",\".\",\".\",\".\",\"6\"]\n    , [\".\",\"6\",\".\",\".\",\".\",\".\",\"2\",\"8\",\".\"]\n    , [\".\",\".\",\".\",\"4\",\"1\",\"9\",\".\",\".\",\"5\"]\n    , [\".\",\".\",\".\",\".\",\"8\",\".\",\".\",\"7\",\"9\"]\n]\n",
+      "output": "false",
+      "explanation": "Bảng Sudoku này không hợp lệ vì có hai ô chứa số 8 trong cùng một hàng."
+    }
+  ],
+  "editorial": {
+    "approaches": [
+      {
+        "name": "Kiểm tra hàng, cột và ô 3x3",
+        "description": "Duyệt qua từng hàng, cột và ô 3x3, kiểm tra xem có chứa các chữ số từ 1 đến 9 không lặp lại hay không.",
+        "timeComplexity": "$O(1)$ - Bảng Sudoku có kích thước cố định 9x9.",
+        "spaceComplexity": "$O(1)$ - Không cần sử dụng không gian phụ trợ.",
+        "code": {
+          "cpp": "class Solution {\npublic:\n    bool isValidSudoku(vector<vector<char>>& board) {\n        for (int i = 0; i < 9; i++) {\n            vector<bool> row(9, false), col(9, false), box(9, false);\n            for (int j = 0; j < 9; j++) {\n                if (board[i][j] != '.') {\n                    int num = board[i][j] - '1';\n                    if (row[num]) return false;\n                    row[num] = true;\n                }\n                if (board[j][i] != '.') {\n                    int num = board[j][i] - '1';\n                    if (col[num]) return false;\n                    col[num] = true;\n                }\n            }\n            for (int j = 0; j < 9; j++) {\n                int num = board[(i / 3) * 3 + j / 3][(i % 3) * 3 + j % 3] - '1';\n                if (num >= 0 && num < 9 && box[num]) return false;\n                if (num >= 0 && num < 9) box[num] = true;\n            }\n        }\n        return true;\n    }\n};",
+          "python": "class Solution:\n    def isValidSudoku(self, board: List[List[str]]) -> bool:\n        for i in range(9):\n            row = [False] * 9\n            col = [False] * 9\n            box = [False] * 9\n            for j in range(9):\n                if board[i][j] != '.':\n                    num = int(board[i][j]) - 1\n                    if row[num]: return False\n                    row[num] = True\n                if board[j][i] != '.':\n                    num = int(board[j][i]) - 1\n                    if col[num]: return False\n                    col[num] = True\n            for j in range(9):\n                num = int(board[(i // 3) * 3 + j // 3][(i % 3) * 3 + j % 3]) - 1 if board[(i // 3) * 3 + j // 3][(i % 3) * 3 + j % 3] != '.' else -1\n                if num >= 0 and box[num]: return False\n                if num >= 0: box[num] = True\n        return True",
+          "javascript": "/**\n * @param {character[][]} board\n * @return {boolean}\n */\nvar isValidSudoku = function(board) {\n    for (let i = 0; i < 9; i++) {\n        let row = new Array(9).fill(false),\n            col = new Array(9).fill(false),\n            box = new Array(9).fill(false);\n        for (let j = 0; j < 9; j++) {\n            if (board[i][j] !== '.') {\n                let num = parseInt(board[i][j]) - 1;\n                if (row[num]) return false;\n                row[num] = true;\n            }\n            if (board[j][i] !== '.') {\n                let num = parseInt(board[j][i]) - 1;\n                if (col[num]) return false;\n                col[num] = true;\n            }\n        }\n        for (let j = 0; j < 9; j++) {\n            let num = parseInt(board[Math.floor(i / 3) * 3 + Math.floor(j / 3)][(i % 3) * 3 + j % 3]) - 1;\n            if (num >= 0 && num < 9 && box[num]) return false;\n            if (num >= 0 && num < 9) box[num] = true;\n        }\n    }\n    return true;\n};",
+          "java": "class Solution {\n    public boolean isValidSudoku(char[][] board) {\n        for (int i = 0; i < 9; i++) {\n            boolean[] row = new boolean[9],\n                   col = new boolean[9],\n                   box = new boolean[9];\n            for (int j = 0; j < 9; j++) {\n                if (board[i][j] != '.') {\n                    int num = board[i][j] - '1';\n                    if (row[num]) return false;\n                    row[num] = true;\n                }\n                if (board[j][i] != '.') {\n                    int num = board[j][i] - '1';\n                    if (col[num]) return false;\n                    col[num] = true;\n                }\n            }\n            for (int j = 0; j < 9; j++) {\n                int num = board[(i / 3) * 3 + j / 3][(i % 3) * 3 + j % 3] - '1';\n                if (num >= 0 && num < 9 && box[num]) return false;\n                if (num >= 0 && num < 9) box[num] = true;\n            }\n        }\n        return true;\n    }\n}"
+        }
+      }
+    ],
+    "videoUrl": "https://youtube.com/watch?v=TjFXEUCMqI8"
+  },
+  "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+  "content": "Bài toán này yêu cầu kiểm tra tính hợp lệ của một bảng Sudoku. Một bảng Sudoku hợp lệ phải thỏa mãn hai điều kiện: mỗi hàng và mỗi cột chứa các chữ số từ 1 đến 9 không lặp lại, và mỗi ô 3x3 cũng chứa các chữ số từ 1 đến 9 không lặp lại."
+}

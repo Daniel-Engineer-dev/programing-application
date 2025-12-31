@@ -1,0 +1,75 @@
+{
+  "id": "45-jump-game-ii",
+  "title": "Jump Game II",
+  "difficulty": "Medium",
+  "acceptance": 0.55,
+  "tags": [
+    "array",
+    "greedy"
+  ],
+  "constraints": [
+    "1 <= nums.length <= 10^4",
+    "0 <= nums[i] <= 10^5",
+    "Chỉ tồn tại duy nhất một đáp án hợp lệ."
+  ],
+  "description": "Cho một mảng số nguyên không âm nums, bạn đang đứng ở vị trí đầu tiên. Mỗi phần tử trong mảng đại diện cho số bước tối đa bạn có thể nhảy từ vị trí đó. Hãy trả về số bước tối thiểu để đến được vị trí cuối cùng.",
+  "defaultCode": {
+    "cpp": "class Solution {\npublic:\n    int jump(vector<int>& nums) {\n        \n    }\n};",
+    "java": "class Solution {\n    public int jump(int[] nums) {\n        \n    }\n}",
+    "python": "class Solution:\n    def jump(self, nums: List[int]) -> int:\n        ",
+    "javascript": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar jump = function(nums) {\n    \n};"
+  },
+  "driverCodes": {
+    "cpp": "#include <iostream>\n#include <vector>\n#include <string>\n#include <sstream>\n#include <climits>\nusing namespace std;\n\n// __USER_CODE_HERE__\n\nint main() {\n    string line;\n    if (!getline(cin, line)) return 0;\n    stringstream ss(line);\n    vector<int> nums;\n    int n;\n    while (ss >> n) nums.push_back(n);\n    Solution sol;\n    int res = sol.jump(nums);\n    cout << res;\n    return 0;\n}",
+    "python": "import sys\nfrom typing import List\n\n# __USER_CODE_HERE__\n\nif __name__ == \"__main__\":\n    input_data = sys.stdin.read().splitlines()\n    if len(input_data) < 1: sys.exit(0)\n    nums = list(map(int, input_data[0].split()))\n    sol = Solution()\n    res = sol.jump(nums)\n    print(res)",
+    "java": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextLine()) return;\n        String[] parts = sc.nextLine().split(\"\\\\s+\");\n        int[] nums = new int[parts.length];\n        for (int i = 0; i < parts.length; i++) nums[i] = Integer.parseInt(parts[i]);\n        \n        Solution sol = new Solution();\n        int res = sol.jump(nums);\n        System.out.print(res);\n    }\n}\n\n// __USER_CODE_HERE__",
+    "javascript": "const fs = require('fs');\n\n// Định nghĩa một class rỗng để tránh lỗi ReferenceError nếu người dùng không dùng class\nclass Solution {}\n\n// __USER_CODE_HERE__\n\ntry {\n    const input = fs.readFileSync(0, 'utf8').split('\\n');\n    if (input.length < 1) process.exit(0);\n\n    const nums = input[0].trim().split(/\\s+/).map(Number);\n\n    const sol = new Solution();\n    // Kiểm tra xem hàm jump nằm ở global (var/function) hay nằm trong class Solution\n    const fn = (typeof jump === 'function') ? jump : (sol.jump ? sol.jump.bind(sol) : null);\n\n    if (typeof fn === 'function') {\n        const res = fn(nums);\n        process.stdout.write(res.toString());\n    } else {\n        console.error(\"Error: function jump not found.\");\n    }\n} catch (e) {\n    console.error(e);\n}"
+  },
+  "testCases": [
+    {
+      "input": "2 3 1 1 4",
+      "expected": "2",
+      "isHidden": false
+    },
+    {
+      "input": "2 3 0 1 4",
+      "expected": "2",
+      "isHidden": false
+    },
+    {
+      "input": "0 1 2 3 4",
+      "expected": "4",
+      "isHidden": true
+    }
+  ],
+  "examples": [
+    {
+      "input": "nums = [2,3,1,1,4]",
+      "output": "2",
+      "explanation": "Từ vị trí 0, chúng ta có thể nhảy đến vị trí 1 hoặc vị trí 2. Từ vị trí 1, chúng ta có thể nhảy đến vị trí 2 hoặc vị trí 3. Từ vị trí 2, chúng ta có thể nhảy đến vị trí 3 hoặc vị trí 4. Từ vị trí 3, chúng ta có thể nhảy đến vị trí 4. Do đó, số bước tối thiểu để đến được vị trí cuối cùng là 2."
+    },
+    {
+      "input": "nums = [2,3,0,1,4]",
+      "output": "2",
+      "explanation": "Từ vị trí 0, chúng ta có thể nhảy đến vị trí 1 hoặc vị trí 2. Từ vị trí 1, chúng ta có thể nhảy đến vị trí 2 hoặc vị trí 3. Từ vị trí 2, chúng ta không thể nhảy đến vị trí 3. Từ vị trí 1, chúng ta có thể nhảy đến vị trí 3. Từ vị trí 3, chúng ta có thể nhảy đến vị trí 4. Do đó, số bước tối thiểu để đến được vị trí cuối cùng là 2."
+    }
+  ],
+  "editorial": {
+    "approaches": [
+      {
+        "name": "Greedy Approach",
+        "description": "Sử dụng một biến để lưu trữ số bước tối thiểu để đến được vị trí hiện tại. Duyệt qua mảng và cập nhật biến này.",
+        "timeComplexity": "$O(n)$ - Duyệt qua mảng một lần.",
+        "spaceComplexity": "$O(1)$ - Sử dụng một biến để lưu trữ số bước tối thiểu.",
+        "code": {
+          "cpp": "class Solution {\npublic:\n    int jump(vector<int>& nums) {\n        if (nums.size() == 1) return 0;\n        int maxReach = nums[0];\n        int step = nums[0];\n        int jumps = 1;\n        for (int i = 1; i < nums.size(); i++) {\n            if (i == nums.size() - 1) return jumps;\n            maxReach = max(maxReach, i + nums[i]);\n            step--;\n            if (step == 0) {\n                jumps++;\n                if (i >= maxReach) return -1;\n                step = maxReach - i;\n            }\n        }\n        return -1;\n    }\n};",
+          "python": "class Solution:\n    def jump(self, nums: List[int]) -> int:\n        if len(nums) == 1: return 0\n        max_reach = nums[0]\n        step = nums[0]\n        jumps = 1\n        for i in range(1, len(nums)):\n            if i == len(nums) - 1: return jumps\n            max_reach = max(max_reach, i + nums[i])\n            step -= 1\n            if step == 0:\n                jumps += 1\n                if i >= max_reach: return -1\n                step = max_reach - i",
+          "javascript": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar jump = function(nums) {\n    if (nums.length === 1) return 0;\n    let maxReach = nums[0];\n    let step = nums[0];\n    let jumps = 1;\n    for (let i = 1; i < nums.length; i++) {\n        if (i === nums.length - 1) return jumps;\n        maxReach = Math.max(maxReach, i + nums[i]);\n        step--;\n        if (step === 0) {\n            jumps++;\n            if (i >= maxReach) return -1;\n            step = maxReach - i;\n        }\n    }\n    return -1;\n};",
+          "java": "class Solution {\n    public int jump(int[] nums) {\n        if (nums.length == 1) return 0;\n        int maxReach = nums[0];\n        int step = nums[0];\n        int jumps = 1;\n        for (int i = 1; i < nums.length; i++) {\n            if (i == nums.length - 1) return jumps;\n            maxReach = Math.max(maxReach, i + nums[i]);\n            step--;\n            if (step == 0) {\n                jumps++;\n                if (i >= maxReach) return -1;\n                step = maxReach - i;\n            }\n        }\n        return -1;\n    }\n}"
+        }
+      }
+    ],
+    "videoUrl": "https://youtube.com/watch?v=dJ7sWiOoK7g",
+    "content": "Sử dụng Greedy Approach để giải quyết bài toán này với độ phức tạp thời gian $O(n)$."
+  }
+}
