@@ -28,67 +28,66 @@ const LoginForm = () => {
     e.preventDefault();
     setMessage("");
     setError("");
-    setLoading(true); // Bắt đầu loading
+    setLoading(true);
 
     try {
       let email = identifier;
+      let userData = null;
 
-      // 1. Tìm email nếu người dùng nhập username
-      if (!identifier.includes("@")) {
-        const userQuery = query(
-          collection(db, "users"),
-          where("username", "==", identifier),
-          limit(1)
-        );
-        const querySnapshot = await getDocs(userQuery);
+      // 1. Tìm kiếm người dùng trong Firestore (dù nhập Email hay Username)
+      const userQuery = identifier.includes("@")
+        ? query(
+            collection(db, "users"),
+            where("email", "==", identifier),
+            limit(1)
+          )
+        : query(
+            collection(db, "users"),
+            where("username", "==", identifier),
+            limit(1)
+          );
 
-        if (querySnapshot.empty) {
-          setError("❌ Không tìm thấy tên đăng nhập này.");
-          setLoading(false);
-          return;
-        }
-        email = querySnapshot.docs[0].data().email;
-      }
+      const querySnapshot = await getDocs(userQuery);
 
-      // 2. Kiểm tra phương thức đăng nhập (Logic quan trọng bạn yêu cầu)
-      const methods = await fetchSignInMethodsForEmail(auth, email);
-
-      if (methods.length === 0) {
-        setError("❌ Tài khoản này chưa được đăng ký. Vui lòng đăng ký mới.");
+      // Kiểm tra nếu không tồn tại trong Firestore
+      if (querySnapshot.empty) {
+        setError("❌ Tài khoản này chưa được đăng ký trong hệ thống.");
         setLoading(false);
         return;
       }
 
-      // Nếu người dùng nhập mật khẩu nhưng tài khoản chỉ có Google/Github
-      if (!methods.includes("password")) {
-        const provider = methods[0].includes("google") ? "Google" : "GitHub";
-        setError(
-          `⚠️ Tài khoản này được đăng ký bằng ${provider}. Vui lòng nhấn nút đăng nhập bằng ${provider} bên dưới.`
-        );
-        setLoading(false);
-        return;
-      }
+      // Lấy dữ liệu user từ Firestore
+      userData = querySnapshot.docs[0].data();
+      email = userData.email;
 
-      // 3. Thực hiện đăng nhập email/password
+      // 2. Kiểm tra tài khoản có phải đăng ký bằng Password không?
+      // Nếu bạn muốn chặn login bằng pass cho tài khoản Google/Github
+      // (Lưu ý: Bạn cần lưu thêm trường 'provider' khi đăng ký để kiểm tra chính xác ở đây)
+
+      // 3. Thực hiện đăng nhập Firebase Auth
       const persistence = isRememberMe
         ? browserLocalPersistence
         : browserSessionPersistence;
+
       await setPersistence(auth, persistence);
       await signInWithEmailAndPassword(auth, email, password);
 
-      alert("Đăng nhập thành công!");
+      alert("✅ Đăng nhập thành công!");
     } catch (err: any) {
       console.error(err);
+      // Xử lý các lỗi trả về từ Firebase Auth
       if (
         err.code === "auth/wrong-password" ||
         err.code === "auth/invalid-credential"
       ) {
-        setError("Mật khẩu không chính xác. Vui lòng thử lại.");
+        setError("❌ Mật khẩu không chính xác. Vui lòng thử lại.");
+      } else if (err.code === "auth/user-not-found") {
+        setError("❌ Tài khoản không tồn tại trên hệ thống xác thực.");
       } else {
         setError("Lỗi: " + err.message);
       }
     } finally {
-      setLoading(false); // Kết thúc loading dù thành công hay thất bại
+      setLoading(false);
     }
   };
 
