@@ -3,29 +3,19 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import {
-  Database,
-  Code2,
-  Terminal,
-  ArrowLeft,
-  Layers,
-  FileText,
-  PlayCircle,
-} from "lucide-react";
+import { ArrowLeft, PlayCircle, Layers, FileText } from "lucide-react";
 
 interface TopicDetailData {
   id: string;
   title: string;
   desc: string;
-  icon: string;
   level: string;
   type: string;
   htmlContent: string;
   videoUrl?: string;
-  order: number;
+  backgroundImage?: string;
 }
 
-// Hàm hỗ trợ lấy ID từ URL YouTube để tạo link Embed
 const getYouTubeEmbedUrl = (url: string) => {
   if (!url) return null;
   const regExp =
@@ -33,12 +23,6 @@ const getYouTubeEmbedUrl = (url: string) => {
   const match = url.match(regExp);
   const id = match && match[2].length === 11 ? match[2] : null;
   return id ? `https://www.youtube.com/embed/${id}` : null;
-};
-
-const renderIcon = (icon: string) => {
-  if (icon === "database") return <Database className="w-8 h-8" />;
-  if (icon === "terminal") return <Terminal className="w-8 h-8" />;
-  return <Code2 className="w-8 h-8" />;
 };
 
 export default function TopicDetail() {
@@ -50,18 +34,10 @@ export default function TopicDetail() {
     const load = async () => {
       try {
         const res = await fetch(`/routes/explore/api/explore/topic/${id}`);
-
-        if (!res.ok) {
-          throw new Error(
-            `Failed to fetch topic details: Status ${res.status}`
-          );
-        }
-
-        const data: TopicDetailData = await res.json();
+        const data = await res.json();
         setTopic(data);
       } catch (e) {
         console.error("Fetch error:", e);
-        setTopic(null);
       }
     };
     load();
@@ -69,109 +45,130 @@ export default function TopicDetail() {
 
   if (!topic)
     return (
-      <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center text-lg pt-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-        <h1 className="text-2xl font-bold mb-2">Đang tải dữ liệu...</h1>
-        <p className="text-slate-400">Vui lòng chờ trong giây lát.</p>
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center text-white">
+        Đang tải...
       </div>
     );
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white p-6 md:p-10">
-      <div className="max-w-4xl mx-auto">
-        <Link
-          href="/routes/explore"
-          className="flex items-center text-slate-400 hover:text-blue-400 mb-8 transition group"
-        >
-          <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
-          Quay lại Khám phá
-        </Link>
+    <div className="min-h-screen bg-slate-900 text-white font-sans antialiased">
+      {/* 1. HERO HEADER: Định dạng font chữ thanh lịch và dễ nhìn */}
+      <div className="relative w-full h-[350px] md:h-[400px] overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: `url('${
+              topic.backgroundImage ||
+              "https://images.unsplash.com/photo-1517694712202-14dd9538aa97"
+            }')`,
+          }}
+        />
+        {/* Lớp phủ dốc màu chuyên nghiệp */}
+        <div className="absolute inset-0 bg-slate-900/40 bg-gradient-to-t from-slate-900 via-slate-900/10 to-transparent" />
 
-        <div className="flex flex-col md:flex-row gap-8">
-          <div className="md:w-3/4">
-            {/* 1. Header: Icon & Title */}
-            <div className="flex items-center space-x-4 mb-4">
-              <div className="flex-shrink-0 h-14 w-14 flex items-center justify-center rounded-xl bg-blue-600/10 text-blue-500 border border-blue-500/20">
-                {renderIcon(topic.icon)}
-              </div>
-              <h1 className="text-4xl font-extrabold text-white leading-tight">
-                {topic.title}
-              </h1>
-            </div>
+        <div className="relative z-10 max-w-5xl mx-auto h-full flex flex-col justify-end p-6 md:p-12">
+          {/* Nút quay lại: Chữ mỏng và khoảng cách rộng (tracking-wide) */}
+          <Link
+            href="/routes/explore"
+            className="absolute top-10 left-6 md:left-12 flex items-center text-slate-100/80 hover:text-white transition group"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+            <span className="text-xs font-semibold tracking-widest uppercase italic">
+              Quay lại Khám phá
+            </span>
+          </Link>
 
-            {/* 2. Meta Tags */}
-            <div className="flex flex-wrap items-center text-sm text-slate-400 gap-3 mb-6">
-              <span className="flex items-center bg-slate-800 rounded-full px-3 py-1 border border-slate-700">
-                <Layers className="w-4 h-4 mr-1 text-blue-500" />
-                Cấp độ:{" "}
-                <span className="ml-1 font-medium capitalize text-blue-400">
-                  {topic.level}
+          <header className="mb-6">
+            {/* TIÊU ĐỀ: Sử dụng font-semibold với tracking-tight để giống mẫu */}
+            <h1 className="text-4xl md:text-5xl font-semibold text-white leading-[1.2] tracking-tight mb-4 drop-shadow-md">
+              {topic.title}
+            </h1>
+
+            {/* CÁC NHÃN META: Font chữ nhỏ, đậm và có độ giãn cách */}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/5">
+                <Layers className="w-4 h-4 mr-2 text-blue-400" />
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-200">
+                  Cấp độ: {topic.level}
                 </span>
-              </span>
-              <span className="flex items-center bg-slate-800 rounded-full px-3 py-1 border border-slate-700">
-                <FileText className="w-4 h-4 mr-1 text-slate-500" />
-                Loại: {topic.type}
-              </span>
+              </div>
+              <div className="flex items-center bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/5">
+                <FileText className="w-4 h-4 mr-2 text-slate-300" />
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-200">
+                  Loại: {topic.type}
+                </span>
+              </div>
             </div>
+          </header>
+        </div>
+      </div>
 
-            {/* 3. Tóm tắt (Desc) */}
-            <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-700 shadow-lg mb-10">
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-2">
-                Tóm tắt chủ đề
-              </h2>
-              <p className="text-slate-300 leading-relaxed italic">
-                "{topic.desc}"
-              </p>
-            </div>
-
-            {/* 4. Video Section (MỚI) */}
-            {topic.videoUrl && (
-              <section className="mb-10">
-                <div className="flex items-center space-x-2 mb-4">
-                  <PlayCircle className="w-6 h-6 text-red-500" />
-                  <h2 className="text-2xl font-bold text-white">
-                    Video bài giảng
-                  </h2>
-                </div>
-                <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-slate-700 bg-black shadow-2xl">
-                  <iframe
-                    className="absolute top-0 left-0 w-full h-full"
-                    src={getYouTubeEmbedUrl(topic.videoUrl) || ""}
-                    title={topic.title}
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
-                  ></iframe>
-                </div>
-              </section>
-            )}
-
-            {/* 5. Nội dung chi tiết */}
+      {/* 2. PHẦN NỘI DUNG CHI TIẾT */}
+      <main className="max-w-5xl mx-auto p-6 md:p-12">
+        <div className="grid md:grid-cols-3 gap-12">
+          <div className="md:col-span-2 space-y-12">
+            {/* Tóm tắt: Font chữ Italic và leading thoáng */}
             <section>
-              <h2 className="text-2xl font-bold mb-4 text-white border-b border-slate-700/50 pb-2">
-                Nội dung chi tiết
+              <h2 className="text-2xl font-bold mb-6 text-white tracking-tight border-b border-slate-800 pb-2">
+                Introduction
+              </h2>
+              <div className="bg-slate-800/30 p-8 rounded-2xl border border-slate-800/50 shadow-sm">
+                <p className="text-lg text-slate-300 leading-relaxed font-normal opacity-90">
+                  "{topic.desc}"
+                </p>
+              </div>
+            </section>
+
+            {/* Nội dung bài giảng: Tối ưu typography cho văn bản dài */}
+            <section>
+              <h2 className="text-2xl font-bold mb-6 text-white tracking-tight border-b border-slate-800 pb-2">
+                Chi tiết bài học
               </h2>
               <div
-                className="bg-slate-800/30 p-6 rounded-xl border border-slate-700 text-slate-300 min-h-60 guide-content-rendered prose prose-invert max-w-none"
+                className="prose prose-lg prose-invert max-w-none text-slate-300 leading-8 
+                prose-p:font-normal prose-p:text-slate-300/90 prose-p:mb-6 
+                prose-strong:text-white prose-strong:font-bold prose-headings:text-white"
                 dangerouslySetInnerHTML={{ __html: topic.htmlContent }}
               />
             </section>
           </div>
 
-          {/* Sidebar */}
-          <aside className="md:w-1/4">
-            <div className="sticky top-6 p-4 rounded-xl bg-slate-800/50 border border-slate-700">
-              <h3 className="font-bold mb-4 text-blue-400">
-                Thông tin bổ sung
+          {/* SIDEBAR: Định dạng kiểu chữ thông tin theo dạng thẻ danh sách */}
+          <aside className="md:col-span-1">
+            <div className="sticky top-10 p-6 bg-slate-800/80 border border-slate-700 rounded-2xl shadow-xl backdrop-blur-sm">
+              <h3 className="text-sm font-bold tracking-widest uppercase text-blue-500 mb-6 border-b border-slate-700 pb-4">
+                Thông tin học tập
               </h3>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Bài học này thuộc chương trình đào tạo lập trình cơ bản. Hãy đảm
-                bảo bạn đã nắm vững các kiến thức trước đó.
-              </p>
+              <ul className="space-y-6">
+                <li className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-slate-400">
+                    Trạng thái:
+                  </span>
+                  <span className="text-sm font-semibold text-white">
+                    Sẵn sàng
+                  </span>
+                </li>
+                <li className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-slate-400">
+                    Cấp độ:
+                  </span>
+                  <span className="text-sm font-bold text-blue-400 uppercase tracking-tight">
+                    {topic.level}
+                  </span>
+                </li>
+                <li className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-slate-400">
+                    Định dạng:
+                  </span>
+                  <span className="text-sm font-semibold text-slate-200">
+                    {topic.type}
+                  </span>
+                </li>
+              </ul>
             </div>
           </aside>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

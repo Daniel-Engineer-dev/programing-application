@@ -3,26 +3,24 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Database, Code2, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
+// --- Interfaces ---
 interface Lesson {
   id: string;
   title: string;
   ref: string;
   desc: string;
-  icon: string;
+  backgroundImage?: string;
 }
+
 interface PathDetailData {
   id: string;
   title: string;
   desc: string;
+  backgroundImage?: string;
   lessons: Lesson[];
 }
-
-const renderIcon = (icon: string) => {
-  if (icon === "database") return <Database className="w-6 h-6" />;
-  return <Code2 className="w-6 h-6" />;
-};
 
 export default function PathDetail() {
   const { id } = useParams<{ id: string }>();
@@ -33,13 +31,7 @@ export default function PathDetail() {
     const load = async () => {
       try {
         const res = await fetch(`/routes/explore/api/explore/path/${id}`);
-
-        if (!res.ok) {
-          throw new Error(
-            `Failed to fetch path details (Status: ${res.status})`
-          );
-        }
-
+        if (!res.ok) throw new Error(`Status: ${res.status}`);
         const data: PathDetailData = await res.json();
         setPath(data);
       } catch (error) {
@@ -52,65 +44,107 @@ export default function PathDetail() {
 
   if (!path)
     return (
-      <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center text-lg pt-20">
-        Đang tải chi tiết lộ trình...
+      <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center text-lg">
+        <div className="animate-pulse tracking-widest uppercase text-sm">
+          Đang tải lộ trình...
+        </div>
       </div>
     );
 
   const baseUrl = "/routes/explore/explorePage";
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-200 p-6 md:p-10 max-w-4xl mx-auto">
-      <Link
-        href="/routes/explore"
-        className="flex items-center text-slate-400 hover:text-blue-400 mb-8 transition"
-      >
-        <ArrowLeft className="w-5 h-5 mr-2" />
-        Quay lại Khám phá
-      </Link>
+    <div className="min-h-screen bg-slate-900 text-slate-200 font-sans antialiased">
+      {/* 1. HEADER VỚI KIỂU CHỮ THANH LỊCH */}
+      <div className="relative w-full h-[350px] md:h-[400px] overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center transition-transform duration-[2000ms] scale-105"
+          style={{
+            backgroundImage: `url('${
+              path.backgroundImage ||
+              "https://images.unsplash.com/photo-1517694712202-14dd9538aa97"
+            }')`,
+          }}
+        />
+        <div className="absolute inset-0 bg-slate-900/50 bg-gradient-to-t from-slate-900 via-slate-900/10 to-transparent" />
 
-      <header className="mb-12">
-        <h1 className="text-4xl font-bold mb-4 text-white">{path.title}</h1>
-        <p className="text-slate-400 text-lg leading-relaxed">{path.desc}</p>
-      </header>
+        <div className="relative z-10 max-w-5xl mx-auto h-full flex flex-col justify-end p-6 md:p-12">
+          {/* Nút quay lại kiểu mỏng */}
+          <Link
+            href="/routes/explore"
+            className="absolute top-10 left-6 md:left-12 flex items-center text-slate-100/80 hover:text-white transition group"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+            <span className="text-xs font-semibold tracking-[0.2em] uppercase italic">
+              Quay lại Khám phá
+            </span>
+          </Link>
 
-      <div className="mt-10">
-        <h2 className="text-2xl font-bold mb-6 text-white border-b border-slate-800 pb-4">
+          {/* Tiêu đề lộ trình font-semibold */}
+          <h1 className="text-4xl md:text-5xl font-semibold text-white leading-[1.2] tracking-tight mb-4 drop-shadow-md">
+            {path.title}
+          </h1>
+          <p className="text-slate-300 text-lg leading-relaxed max-w-2xl font-normal opacity-90 italic">
+            {path.desc}
+          </p>
+        </div>
+      </div>
+
+      {/* 2. NỘI DUNG BÀI HỌC TỐI GIẢN (ĐÃ BỎ ICON TÍM/XANH) */}
+      <main className="max-w-5xl mx-auto p-6 md:p-12">
+        <h2 className="text-sm font-black uppercase tracking-[0.3em] text-blue-500 mb-8 border-l-4 border-blue-600 pl-4">
           Nội dung lộ trình ({path.lessons.length} bài học)
         </h2>
 
         {path.lessons.length > 0 ? (
-          <ul className="grid gap-4">
+          <div className="grid gap-6">
             {path.lessons.map((lesson, index) => (
-              <li key={lesson.ref}>
-                <Link
-                  href={`${baseUrl}/topic/${lesson.ref}`}
-                  className="group flex gap-5 bg-slate-800/50 p-5 rounded-2xl border border-slate-700 hover:bg-slate-800 hover:border-blue-500/50 transition-all shadow-sm"
-                >
-                  <div className="h-12 w-12 flex-shrink-0 flex items-center justify-center rounded-xl bg-blue-600/10 text-blue-500 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                    {renderIcon(lesson.icon)}
-                  </div>
+              <Link
+                key={lesson.ref}
+                href={`${baseUrl}/topic/${lesson.ref}`}
+                className="group relative flex flex-col md:flex-row gap-5 overflow-hidden rounded-[2rem] border border-slate-800 hover:border-blue-500/40 transition-all shadow-xl min-h-[100px]"
+              >
+                {/* Background Image cho từng bài học mờ ảo */}
+                <div
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 opacity-20"
+                  style={{
+                    backgroundImage: `url('${
+                      lesson.backgroundImage ||
+                      "https://images.unsplash.com/photo-1555066931-4365d14bab8c"
+                    }')`,
+                  }}
+                />
+                <div className="absolute inset-0 bg-slate-900/80 group-hover:bg-slate-900/60 transition-colors" />
 
-                  <div className="flex flex-col justify-center">
-                    <h3 className="text-white font-bold group-hover:text-blue-400 transition-colors">
-                      {index + 1}. {lesson.title}
+                {/* Nội dung bài học con với kiểu chữ sắc nét */}
+                <div className="relative z-10 flex items-center p-8 w-full">
+                  <div className="flex-grow">
+                    <h3 className="text-white text-xl font-semibold tracking-tight group-hover:text-blue-400 transition-colors">
+                      <span className="text-blue-500/50 mr-2 font-light italic">
+                        {index + 1}.
+                      </span>{" "}
+                      {lesson.title}
                     </h3>
-                    <p className="text-sm text-slate-400 mt-1 line-clamp-1">
+                    <p className="text-sm text-slate-400 mt-2 font-normal leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity">
                       {lesson.desc}
                     </p>
                   </div>
-                </Link>
-              </li>
+
+                  <div className="hidden md:block ml-4 text-slate-700 group-hover:text-blue-400 transition-all group-hover:translate-x-1">
+                    <ArrowLeft className="w-5 h-5 rotate-180" />
+                  </div>
+                </div>
+              </Link>
             ))}
-          </ul>
+          </div>
         ) : (
-          <div className="text-center py-20 bg-slate-800/30 rounded-3xl border border-dashed border-slate-700">
-            <p className="text-slate-500">
-              Lộ trình này chưa có nội dung bài học.
+          <div className="text-center py-24 bg-slate-800/20 rounded-[3rem] border border-dashed border-slate-800">
+            <p className="text-slate-500 tracking-widest uppercase text-xs font-bold">
+              Lộ trình này đang được cập nhật nội dung.
             </p>
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }
