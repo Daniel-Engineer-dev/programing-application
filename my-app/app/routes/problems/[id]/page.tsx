@@ -90,6 +90,7 @@ export default function ProblemPage({
 
       <EditorPanel
         problemId={problem.id}
+        problemTitle={problem.title}
         initialCode={sourceCode}
         currentLanguage={language}
         onCodeChange={(val) => setSourceCode(val)}

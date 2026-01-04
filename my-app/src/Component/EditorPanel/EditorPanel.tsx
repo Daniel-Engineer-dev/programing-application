@@ -1,7 +1,9 @@
-"use client";
+
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Editor from "@monaco-editor/react";
 import axios from "axios";
+import { useContestSubmission } from "@/src/hooks/useContestSubmission";
 
 // 2. Import Firebase
 import {
@@ -11,6 +13,7 @@ import {
   getDocs,
   addDoc,
   serverTimestamp,
+  runTransaction,
 } from "firebase/firestore";
 import { auth, db } from "@/src/api/firebase/firebase";
 
@@ -40,21 +43,26 @@ type SubmissionResult = {
 };
 type EditorPanelProps = {
   problemId: string;
+  contestId?: string;
+  problemTitle: string;
   initialCode: string; // Mã nguồn nhận từ page.tsx
   currentLanguage: string; // Ngôn ngữ nhận từ page.tsx
   onCodeChange: (code: string) => void; // Hàm báo cho page.tsx khi gõ code
   onLanguageChange: (lang: string) => void; // Hàm báo cho page.tsx khi đổi ngôn ngữ
+  contestProblemLogicId?: string; // ID logic trong contest (A, B, C...)
 };
 
 export default function EditorPanel({
   problemId,
+  contestId,
+  problemTitle,
   initialCode,
   currentLanguage,
   onCodeChange,
   onLanguageChange,
+  contestProblemLogicId,
 }: EditorPanelProps) {
-  // Thêm vào cùng các state khác ở đầu component
-  const [problemTitle, setProblemTitle] = useState("");
+  const router = useRouter();
   // --- STATE QUẢN LÝ DỮ LIỆU ---
   const [templates, setTemplates] = useState<Record<string, string>>({});
   const [isPageLoading, setIsPageLoading] = useState(true);
@@ -102,7 +110,6 @@ export default function EditorPanel({
 
         if (problemSnap.exists()) {
           const data = problemSnap.data();
-          setProblemTitle(data.title || "");
           const fetchedTemplates = data.defaultCode || {};
           setTemplates(fetchedTemplates);
           setCodeMap(fetchedTemplates);
@@ -282,10 +289,62 @@ export default function EditorPanel({
     }
   };
 
+  // --- STATE USER ---
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((u) => {
+      setUser(u);
+    });
+    return () => unsubscribe();
+  }, []);
+
   // --- HANDLER: Nộp bài (Chạy TẤT CẢ Test Cases & Tính điểm) ---
+  const { submitCode: submitContest, isSubmitting: isContestSubmitting, result: contestResult, error: contestError } = useContestSubmission({ 
+    contestId: contestId || "", 
+    userId: user?.uid 
+  });
+
+  useEffect(() => {
+    if (contestResult) {
+       setSubmissionResult({
+         ...contestResult,
+         status: contestResult.status as any 
+       });
+    }
+  }, [contestResult]);
+  
+  useEffect(() => {
+      if (contestError) {
+          alert(contestError);
+      }
+  }, [contestError]);
+
   const handleSubmit = async () => {
+    if (!user) {
+      alert("Vui lòng đăng nhập để nộp bài!");
+      return;
+    }
+
+    if (contestId) {
+        // Sử dụng allTestCases đã load thay vì problem?.exampleTestCases
+        const submissionId = await submitContest(
+            code,
+            language,
+            contestProblemLogicId || problemId, // Logic ID (A) or fallback to doc ID
+            problemId, // Actual Doc ID
+            problemTitle,
+            allTestCases 
+        );
+
+        if (submissionId) {
+             router.push(`/routes/contests/${contestId}?tab=all-submissions&highlight=${submissionId}`);
+        }
+        return;
+    }
+
     setIsSubmitting(true);
-    setSubmissionResult(null); // Reset kết quả trước đó
+    setSubmissionResult(null);
     const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
     let passedCount = 0;
@@ -294,7 +353,6 @@ export default function EditorPanel({
     let maxMemory = 0;
 
     try {
-      // Chạy vòng lặp qua ALL test cases
       for (let i = 0; i < allTestCases.length; i++) {
         const tc = allTestCases[i];
 
@@ -315,7 +373,6 @@ export default function EditorPanel({
 
           if (stderr) {
             finalStatus = "Runtime Error";
-            // Nếu gặp lỗi Runtime, có thể dừng luôn hoặc chạy tiếp tuỳ logic (ở đây chạy tiếp để đếm)
           } else if (actual === expected) {
             passedCount++;
           } else {
@@ -326,11 +383,9 @@ export default function EditorPanel({
           finalStatus = "Runtime Error";
         }
 
-        // Delay để tránh Rate Limit (quan trọng vì submit chạy nhiều test hơn)
         if (i < allTestCases.length - 1) await delay(300);
       }
 
-      // Sau khi chạy xong hết
       const result = {
         total: allTestCases.length,
         passed: passedCount,
@@ -341,7 +396,6 @@ export default function EditorPanel({
 
       setSubmissionResult(result);
 
-      // --- GỌI HÀM LƯU VÀO FIRESTORE TẠI ĐÂY ---
       await saveSubmissionToFirestore({
         problemId,
         problemTitle,
@@ -351,8 +405,9 @@ export default function EditorPanel({
         runtime: result.runtime,
         memory: result.memory,
         language: language,
-        code: code, // Lưu lại code để người dùng xem lại sau này
+        code: code,
       });
+
     } catch (err) {
       console.error(err);
     } finally {
@@ -367,7 +422,11 @@ export default function EditorPanel({
       </div>
     );
   }
-  //hàm lưu lịch sử bài nộp
+  /* 
+   * ĐỒNG BỘ LỊCH SỬ NỘP BÀI
+   * Luôn lưu vào Global History (users/{uid}/submissions) để tính vào profile chung.
+   * Nếu đang trong Contest, lưu thêm vào Contest Submissions.
+   */
   const saveSubmissionToFirestore = async (submissionData: {
     problemId: string;
     problemTitle: string;
@@ -383,18 +442,165 @@ export default function EditorPanel({
     if (!user) return; // Nếu chưa đăng nhập thì không lưu
 
     try {
-      // Tham chiếu đến: users/{uid}/submissions
-      const submissionsRef = collection(db, "users", user.uid, "submissions");
-
-      await addDoc(submissionsRef, {
+      // 1. LUÔN LƯU VÀO GLOBAL HISTORY (Lịch sử luyện tập chung)
+      const globalSubRef = collection(db, "users", user.uid, "submissions");
+      await addDoc(globalSubRef, {
         ...submissionData,
         timestamp: serverTimestamp(), // Thời gian nộp bài theo server
+        contestId: contestId || null, // Lưu thêm contestId nếu có để biết nguồn gốc
       });
-      console.log("Lịch sử bài làm đã được lưu!");
+      console.log("Đã lưu vào Lịch sử chung (Global History)");
+
+      // 2. NẾU ĐANG TRONG CONTEST -> LƯU THÊM VÀO CONTEST HISTORY
+      if (contestId) {
+        const contestSubRef = collection(
+          db,
+          "contests",
+          contestId,
+          "user",
+          user.uid,
+          "submissions"
+        );
+        await addDoc(contestSubRef, {
+          ...submissionData,
+          userId: user.uid,
+          userName: user.displayName || "User",
+          contestId: contestId,
+          timestamp: serverTimestamp(),
+        });
+        console.log("Đã lưu vào Contest History");
+      }
     } catch (error) {
-      console.error("Lỗi khi lưu lịch sử:", error);
+      console.error("Lỗi khi lưu bài nộp:", error);
     }
   };
+
+  const updateLeaderboardIfAC = async (opts: {
+    contestId: string;
+    problemId: string;
+  }) => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const { contestId, problemId } = opts;
+    const lbRef = doc(db, "contests", contestId, "leaderboard", user.uid);
+
+    let penaltyMinutes = 0;
+    
+    // 1. Tính Time Penalty (phút từ lúc bắt đầu contest)
+    try {
+      const contestSnap = await getDoc(doc(db, "contests", contestId));
+      const data = contestSnap.data();
+      const rawTime = data?.time || data?.startAt || data?.startTime;
+
+      let startTimeMillis = 0;
+
+      if (rawTime?.toMillis) {
+        startTimeMillis = rawTime.toMillis();
+      } else if (typeof rawTime === "string") {
+        let s = rawTime.replace(" at ", " ");
+        s = s.replace(/UTC([+-]\d+)/, "GMT$1");
+        s = s.replace(/\u202F/g, " ");
+        let d = new Date(s);
+        
+        if (isNaN(d.getTime())) {
+             const todayStr = new Date().toLocaleDateString("en-US");
+             d = new Date(`${todayStr} ${s}`);
+        }
+        startTimeMillis = d.getTime();
+      } else if (typeof rawTime === "number") {
+          startTimeMillis = rawTime;
+      }
+
+      if (startTimeMillis > 0 && !isNaN(startTimeMillis)) {
+        penaltyMinutes = Math.max(
+          0,
+          Math.floor((Date.now() - startTimeMillis) / 60000)
+        );
+      }
+    } catch (e) {
+      console.error("Error calc penalty time:", e);
+    }
+
+    await runTransaction(db, async (tx) => {
+      const snap = await tx.get(lbRef);
+      const cur = snap.exists() ? snap.data() : {};
+
+      const acceptedProblems = (cur.acceptedProblems ?? {}) as Record<
+        string,
+        { penaltyMinutes?: number; acceptedAt?: any }
+      >;
+
+      // ✅ Nếu đã AC rồi thì không cộng điểm nữa
+      if (acceptedProblems[problemId]) return;
+      
+      // 2. Lấy số lần nộp sai để tính phạt (20 phút / lần)
+      const wrongSubmissionsMap = (cur.wrongSubmissions ?? {}) as Record<string, number>;
+      const wrongCount = wrongSubmissionsMap[problemId] || 0;
+      
+      const additionalPenalty = wrongCount * 20;
+      const totalProblemPenalty = penaltyMinutes + additionalPenalty;
+
+      tx.set(
+        lbRef,
+        {
+          uid: user.uid,
+          acceptedCount: Number(cur.acceptedCount ?? 0) + 1,
+          penalty: Number(cur.penalty ?? 0) + totalProblemPenalty,
+          acceptedProblems: {
+            ...acceptedProblems,
+            [problemId]: { 
+                penaltyMinutes: totalProblemPenalty, 
+                acceptedAt: serverTimestamp() 
+            },
+          },
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+    });
+  };
+
+  const markAttemptedProblem = async (opts: {
+    contestId: string;
+    problemId: string;
+    isAccepted: boolean;
+  }) => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const { contestId, problemId, isAccepted } = opts;
+    const lbRef = doc(db, "contests", contestId, "leaderboard", user.uid);
+
+    await runTransaction(db, async (tx) => {
+      const snap = await tx.get(lbRef);
+      const cur = snap.exists() ? snap.data() : {};
+      
+      const attempted = (cur.attemptedProblems ?? {}) as Record<string, boolean>;
+      const wrongSubmissions = (cur.wrongSubmissions ?? {}) as Record<string, number>;
+      const acceptedProblems = (cur.acceptedProblems ?? {}) as Record<string, any>;
+
+      // Nếu đã AC rồi thì không tính sai nữa
+      if (acceptedProblems[problemId]) return;
+
+      const newWrongCount = wrongSubmissions[problemId] || 0;
+
+      tx.set(
+        lbRef,
+        {
+          uid: user.uid,
+          attemptedProblems: { ...attempted, [problemId]: true },
+          // Nếu KHÔNG phải AC -> tăng số lần sai
+          wrongSubmissions: isAccepted 
+            ? wrongSubmissions 
+            : { ...wrongSubmissions, [problemId]: newWrongCount + 1 },
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+    });
+  };
+
   return (
     <div className="w-[55%] flex flex-col mt-2 mr-5 mb-15 ml-1 rounded-2xl border-slate-700 border h-[90vh] relative">
       {/* --- MODAL KẾT QUẢ NỘP BÀI (Overlay) --- */}
@@ -526,14 +732,14 @@ export default function EditorPanel({
           {/* Nút Nộp bài */}
           <button
             onClick={handleSubmit}
-            disabled={isRunning || isSubmitting || allTestCases.length === 0}
+            disabled={isRunning || isSubmitting || isContestSubmitting || allTestCases.length === 0}
             className={`rounded px-4 py-1 text-sm font-semibold transition-all flex items-center gap-2 ${
-              isSubmitting
+              isSubmitting || isContestSubmitting
                 ? "bg-green-800 text-gray-300 cursor-not-allowed"
                 : "bg-green-600 text-white hover:bg-green-500"
             }`}
           >
-            {isSubmitting ? (
+            {isSubmitting || isContestSubmitting ? (
               <>
                 <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
                   <circle
