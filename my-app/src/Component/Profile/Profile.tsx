@@ -247,7 +247,7 @@ export default function ProfilePage() {
         {/* Avatar Section */}
         <div className="flex items-center p-6 rounded-2xl bg-slate-900/50 border border-slate-800 mb-10">
           <img
-            src={profileData.avatar}
+            src={profileData.avatar || "/avatar.png"}
             className="w-24 h-24 rounded-full border-2 border-blue-500/50 object-cover p-1"
             alt="Avatar"
           />

@@ -48,6 +48,7 @@ type ProblemDetailsProps = {
   tags: string[];
   editorial?: Editorial;
   onRestoreCode: (code: string, language: string) => void;
+  isContestMode?: boolean;
 };
 
 type TabType = "description" | "editorial" | "solution" | "submissions";
@@ -188,6 +189,7 @@ export default function ProblemDetails({
   tags,
   editorial,
   onRestoreCode,
+  isContestMode = false,
 }: ProblemDetailsProps) {
   const [tab, setTab] = useState<TabType>("description");
   // State giả lập cho like/comment
@@ -469,18 +471,22 @@ export default function ProblemDetails({
           Mô tả
         </button>
 
-        <button
-          className={getTabClass("editorial")}
-          onClick={() => setTab("editorial")}
-        >
-          Biên tập
-        </button>
-        <button
-          className={getTabClass("solution")}
-          onClick={() => setTab("solution")}
-        >
-          Giải pháp
-        </button>
+        {!isContestMode && (
+          <>
+            <button
+              className={getTabClass("editorial")}
+              onClick={() => setTab("editorial")}
+            >
+              Biên tập
+            </button>
+            <button
+              className={getTabClass("solution")}
+              onClick={() => setTab("solution")}
+            >
+              Giải pháp
+            </button>
+          </>
+        )}
         <button
           className={getTabClass("submissions")}
           onClick={() => setTab("submissions")}
