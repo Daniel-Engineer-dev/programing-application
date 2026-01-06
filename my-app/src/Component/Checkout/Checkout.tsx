@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/src/userHook/hooks/userAuth";
 import { db } from "@/src/api/firebase/firebase";
-import { addDoc, collection, doc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { addDoc, collection, doc, serverTimestamp, updateDoc, getDoc } from "firebase/firestore";
 
 const LOGIN_PATH = "/routes/auth/login";
 const PURCHASE_PATH = "/routes/avatar/settings/buy";
@@ -75,6 +75,10 @@ export default function CheckoutPage() {
 
   const [quantity, setQuantity] = useState<number>(1);
 
+  // Product từ Firebase
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loadingProduct, setLoadingProduct] = useState(true);
+
   // Form
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
@@ -93,21 +97,35 @@ export default function CheckoutPage() {
   // ✅ modal thành công (không nút)
   const [paidOpen, setPaidOpen] = useState(false);
 
-  const catalog = useMemo<Product[]>(
-    () => [
-      { id: "kbd", name: "Bàn phím Codepro", price: 1299000 },
-      { id: "mouse", name: "Chuột không dây Codepro", price: 899000 },
-      { id: "mousepad", name: "Lót chuột Codepro", price: 159000 },
-      { id: "backpack", name: "Ba lô Codepro", price: 549000 },
-      { id: "cap", name: "Nón Codepro", price: 199000 },
-      { id: "tee", name: "Áo thun Codepro", price: 299000 },
-      { id: "note", name: "Sổ ghi chú Codepro", price: 149000 },
-      { id: "badge", name: "Huy hiệu Codepro", price: 69000 },
-    ],
-    []
-  );
+  // Lấy thông tin sản phẩm từ Firebase
+  useEffect(() => {
+    if (!productId) return;
 
-  const product = catalog.find((p) => p.id === productId);
+    const fetchProduct = async () => {
+      try {
+        const docRef = doc(db, "products", productId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setProduct({
+            id: docSnap.id,
+            name: data.name,
+            price: data.price,
+          });
+        } else {
+          setProduct(null);
+        }
+      } catch (error) {
+        console.error("Error fetching product:", error);
+        setProduct(null);
+      } finally {
+        setLoadingProduct(false);
+      }
+    };
+
+    fetchProduct();
+  }, [productId]);
 
   // Guard login
   useEffect(() => {
@@ -177,7 +195,7 @@ export default function CheckoutPage() {
     setQrOpen(true);
   };
 
-  // ✅ chỉ bấm “Xác nhận đã thanh toán” mới chạy
+  // ✅ chỉ bấm "Xác nhận đã thanh toán" mới chạy
   const confirmPaid = async () => {
     if (!user || !createdOrderId) return;
 
@@ -194,7 +212,7 @@ export default function CheckoutPage() {
     }, 900);
   };
 
-  if (loading) {
+  if (loading || loadingProduct) {
     return <div className="min-h-screen bg-slate-950 text-white p-8">Đang tải...</div>;
   }
 
@@ -224,7 +242,7 @@ export default function CheckoutPage() {
       <Modal
         open={qrOpen}
         title="Quét QR để thanh toán"
-        message="Dùng app ngân hàng để quét mã QR. Sau đó bấm “Xác nhận đã thanh toán”."
+        message='Dùng app ngân hàng để quét mã QR. Sau đó bấm "Xác nhận đã thanh toán".'
       >
         <div className="flex flex-col items-center gap-3">
           <div className="bg-white p-3 rounded-xl">
@@ -377,6 +395,6 @@ export default function CheckoutPage() {
           </button>
         </div>
       </div>
-    </div>
+    </div >
   );
 }
