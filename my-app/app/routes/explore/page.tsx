@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-import { Search } from "lucide-react";
+import { Search, Map, FileText } from "lucide-react";
 
 // --- Interfaces ---
 // Đảm bảo tất cả các interface đều có thuộc tính backgroundImage
@@ -28,6 +28,8 @@ interface Guide {
 
 export default function ExplorePage() {
   const [topics, setTopics] = useState<Topic[]>([]);
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [paths, setPaths] = useState<Path[]>([]);
   const [guides, setGuides] = useState<Guide[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,6 +57,34 @@ export default function ExplorePage() {
     }
     loadData();
   }, []);
+
+  // Filter data based on search query with useMemo to prevent unnecessary re-computation
+  const filteredTopics = useMemo(() => {
+    if (!searchQuery.trim()) return topics;
+    return topics.filter(
+      (topic) =>
+        topic?.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        topic?.desc?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [topics, searchQuery]);
+
+  const filteredPaths = useMemo(() => {
+    if (!searchQuery.trim()) return paths;
+    return paths.filter(
+      (path) =>
+        path?.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        path?.desc?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [paths, searchQuery]);
+
+  const filteredGuides = useMemo(() => {
+    if (!searchQuery.trim()) return guides;
+    return guides.filter(
+      (guide) =>
+        guide?.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        guide?.author?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [guides, searchQuery]);
 
   const baseUrl = "/routes/explore/explorePage";
 
@@ -113,70 +143,123 @@ export default function ExplorePage() {
           Khám phá lập trình
         </h1>
         <div className="relative mx-auto max-w-xl px-4">
-          <input
-            placeholder="Tìm kiếm chủ đề..."
-            className="w-full rounded-xl bg-slate-800 py-3.5 px-12 text-sm text-white outline-none border border-slate-700 focus:ring-2 focus:ring-blue-600"
-          />
-          <Search
-            className="absolute left-8 top-1/2 -translate-y-1/2 text-slate-500"
-            size={18}
-          />
+          <div
+            className={`relative flex items-center rounded-2xl border transition-all ${
+              searchFocused
+                ? "border-blue-600 ring-2 ring-blue-600"
+                : "border-slate-700"
+            } bg-slate-800`}
+          >
+            <Search
+              className="absolute left-5 text-slate-500"
+              size={18}
+            />
+            <input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => setSearchFocused(true)}
+              onBlur={() => setSearchFocused(false)}
+              placeholder="Tìm kiếm chủ đề, lộ trình, hướng dẫn..."
+              className="w-full rounded-2xl bg-transparent py-4 px-14 text-base text-white placeholder:text-slate-500 outline-none"
+            />
+          </div>
         </div>
       </div>
 
       <main className="max-w-6xl mx-auto px-6 pb-20">
         {/* PHẦN CHỦ ĐỀ - Mỗi cái 1 hình */}
         <section className="mb-16">
-          <h2 className="text-xl font-bold text-white mb-6">Chủ đề phổ biến</h2>
-          <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-            {topics.map((t) => (
-              <CustomCard
-                key={t.id}
-                href={`${baseUrl}/topic/${t.id}`}
-                title={t.title}
-                subtitle={t.desc}
-                bgImage={t.backgroundImage} // Lấy hình riêng từ Firestore
-              />
-            ))}
+          <div className="flex items-center gap-4 mb-6">
+            <h2 className="text-xl font-bold text-white">Chủ đề phổ biến</h2>
+            <div className="flex-1 h-px bg-gradient-to-r from-slate-700 via-slate-800 to-transparent" />
+            {searchQuery && (
+              <span className="text-sm text-slate-400">
+                {filteredTopics.length} kết quả
+              </span>
+            )}
           </div>
+          {filteredTopics.length > 0 ? (
+            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+              {filteredTopics.map((t) => (
+                <CustomCard
+                  key={t.id}
+                  href={`${baseUrl}/topic/${t.id}`}
+                  title={t.title}
+                  subtitle={t.desc}
+                  bgImage={t.backgroundImage} // Lấy hình riêng từ Firestore
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16 text-slate-500">
+              <Search size={48} className="mx-auto mb-4 opacity-50" />
+              <p>Không tìm thấy chủ đề nào phù hợp</p>
+            </div>
+          )}
         </section>
 
         {/* PHẦN LỘ TRÌNH - Mỗi cái 1 hình */}
         <section className="mb-16">
-          <h2 className="text-xl font-bold text-white mb-6">
-            Lộ trình học tập
-          </h2>
-          <div className="grid gap-6 md:grid-cols-2">
-            {paths.map((p) => (
-              <CustomCard
-                key={p.id}
-                href={`${baseUrl}/path/${p.id}`}
-                title={p.title}
-                subtitle={p.desc}
-                badge="Lộ trình"
-                bgImage={p.backgroundImage} // Lấy hình riêng từ Firestore
-              />
-            ))}
+          <div className="flex items-center gap-4 mb-6">
+            <h2 className="text-xl font-bold text-white">Lộ trình học tập</h2>
+            <div className="flex-1 h-px bg-gradient-to-r from-slate-700 via-slate-800 to-transparent" />
+            {searchQuery && (
+              <span className="text-sm text-slate-400">
+                {filteredPaths.length} kết quả
+              </span>
+            )}
           </div>
+          {filteredPaths.length > 0 ? (
+            <div className="grid gap-6 md:grid-cols-2">
+              {filteredPaths.map((p) => (
+                <CustomCard
+                  key={p.id}
+                  href={`${baseUrl}/path/${p.id}`}
+                  title={p.title}
+                  subtitle={p.desc}
+                  badge="Lộ trình"
+                  bgImage={p.backgroundImage} // Lấy hình riêng từ Firestore
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16 text-slate-500">
+              <Map size={48} className="mx-auto mb-4 opacity-50" />
+              <p>Không tìm thấy lộ trình nào phù hợp</p>
+            </div>
+          )}
         </section>
 
         {/* PHẦN HƯỚNG DẪN - Mỗi cái 1 hình */}
         <section>
-          <h2 className="text-xl font-bold text-white mb-6">
-            Hướng dẫn mới nhất
-          </h2>
-          <div className="grid gap-6 md:grid-cols-2">
-            {guides.map((g) => (
-              <CustomCard
-                key={g.id}
-                href={`${baseUrl}/guide/${g.id}`}
-                title={g.title}
-                subtitle={`Tác giả: ${g.author}`}
-                badge={g.level}
-                bgImage={g.backgroundImage} // Lấy hình riêng từ Firestore
-              />
-            ))}
+          <div className="flex items-center gap-4 mb-6">
+            <h2 className="text-xl font-bold text-white">Hướng dẫn mới nhất</h2>
+            <div className="flex-1 h-px bg-gradient-to-r from-slate-700 via-slate-800 to-transparent" />
+            {searchQuery && (
+              <span className="text-sm text-slate-400">
+                {filteredGuides.length} kết quả
+              </span>
+            )}
           </div>
+          {filteredGuides.length > 0 ? (
+            <div className="grid gap-6 md:grid-cols-2">
+              {filteredGuides.map((g) => (
+                <CustomCard
+                  key={g.id}
+                  href={`${baseUrl}/guide/${g.id}`}
+                  title={g.title}
+                  subtitle={`Tác giả: ${g.author}`}
+                  badge={g.level}
+                  bgImage={g.backgroundImage} // Lấy hình riêng từ Firestore
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16 text-slate-500">
+              <FileText size={48} className="mx-auto mb-4 opacity-50" />
+              <p>Không tìm thấy hướng dẫn nào phù hợp</p>
+            </div>
+          )}
         </section>
       </main>
     </div>

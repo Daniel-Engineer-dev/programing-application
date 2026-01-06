@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "title": "AI ảnh hưởng đến thị trường IT như thế nào?",
+    "description": "Trong một buổi phỏng vấn trực tuyến trên nền tảng X vào tháng một, tỷ phú công nghệ Elon Musk đã chia sẻ rằng Trí tuệ nhân tạo (AI) đã học tất cả những kiến thức do nhân loại tạo ra...",
+    "url": "https://vnexpress.net/ai-anh-huong-the-nao-den-thi-truong-tuyen-dung-it-4867758.html",
+    "gradient": "from-purple-500/20 via-pink-500/20 to-red-500/20",
+    "iconBg": "bg-gradient-to-br from-purple-500 to-pink-500"
+  },
+  {
+    "id": 2,
+    "title": "Cơ hội kết nối nhân lực IT ngành tài chính ngân hàng",
+    "description": "Nền tảng tuyển dụng ITviec.com ra mắt chuyên trang việc làm IT ngành tài chính - ngân hàng, mở ra cơ hội kết nối nguồn nhân lực, hôm 18/6...",
+    "url": "https://vnexpress.net/co-hoi-ket-noi-nhan-luc-it-nganh-tai-chinh-ngan-hang-4756867.html",
+    "gradient": "from-blue-500/20 via-cyan-500/20 to-teal-500/20",
+    "iconBg": "bg-gradient-to-br from-blue-500 to-cyan-500"
+  },
+  {
+    "id": 3,
+    "title": "Cơ hội săn nhân sự IT trẻ cho doanh nghiệp",
+    "description": "Trường Đại học Công nghệ TP HCM (HUTECH) tổ chức chuỗi \"Ngày hội Tuyển dụng và Triển lãm Công nghệ thông tin\" trong tháng 3...",
+    "url": "https://vnexpress.net/co-hoi-san-nhan-su-it-tre-cho-doanh-nghiep-4713739.html",
+    "gradient": "from-orange-500/20 via-amber-500/20 to-yellow-500/20",
+    "iconBg": "bg-gradient-to-br from-orange-500 to-amber-500"
+  },
+  {
+    "id": 4,
+    "title": "Xu hướng tuyển dụng IT năm 2024-2025",
+    "description": "Thị trường CNTT đang chứng kiến những biến động lớn sau giai đoạn đại dịch và suy thoái kinh tế toàn cầu. Từ sự sụt giảm trong nhu cầu tuyển dụng đến những thay đổi trong kỹ năng và công nghệ cần thiết, ngành IT không ngừng chuyển mình để thích ứng với bối cảnh mới. Năm 2024 – 2025, bức tranh tuyển dụng IT tại Việt Nam và thế giới được dự đoán sẽ có nhiều thay đổi đáng chú ý, từ sự gia tăng vai trò của các công nghệ đột phá như AI, điện toán đám mây, đến sự cạnh tranh khốc liệt trong việc thu hút nhân tài IT...",
+    "url": "https://topdev.vn/blog/xu-huong-tuyen-dung-it-tai-viet-nam-2024/",
+    "gradient": "from-green-500/20 via-emerald-500/20 to-teal-500/20",
+    "iconBg": "bg-gradient-to-br from-green-500 to-emerald-500"
+  },
+  {
+    "id": 5,
+    "title": "Xu hướng lập trình Vibe Coding tại Việt Nam",
+    "description": "Nhiều người dùng, gồm cả lập trình viên nhiều năm kinh nghiệm, bắt đầu sử dụng AI trong lập trình (Vibe Coding) dù chưa mạo hiểm tin tưởng hoàn toàn.\n\nVibe Coding là thuật ngữ có từ lâu để chỉ phong cách \"viết code theo cảm tính\", không chú trọng cấu trúc hay chi tiết, miễn sản phẩm hoạt động được.",
+    "url": "https://vnexpress.net/xu-huong-lap-trinh-vibe-coding-tai-viet-nam-4948389.html",
+    "gradient": "from-indigo-500/20 via-violet-500/20 to-purple-500/20",
+    "iconBg": "bg-gradient-to-br from-indigo-500 to-violet-500"
+  },
+  {
+    "id": 6,
+    "title": "5 startup Việt được chuyên gia Mỹ xếp hạng 'nổi bật toàn cầu'",
+    "description": "Nhà sáng lập Nucamp (Mỹ) xếp MindX, M Village, Sobanhang, Fundiin, Clevai vào danh sách 10 startup công nghệ nổi bật 2025, định hình Việt Nam trên bản đồ đổi mới toàn cầu...",
+    "url": "http://vnexpress.net/5-startup-viet-duoc-chuyen-gia-my-xep-hang-noi-bat-toan-cau-4926299.html",
+    "gradient": "from-rose-500/20 via-pink-500/20 to-fuchsia-500/20",
+    "iconBg": "bg-gradient-to-br from-rose-500 to-pink-500"
+  },
+  {
+    "id": 7,
+    "title": "Lương nhân sự ngành IT tiếp tục tăng",
+    "description": "Trưởng phòng IT có lương trung bình hơn 53 triệu đồng, cao nhất các lĩnh vực, còn kỹ sư AI là vị trí khó tuyển nhất trong ngành tại Việt Nam, theo TopCV.\n\nNền tảng công nghệ tuyển dụng TopCV công bố Báo cáo thị trường tuyển dụng 2025-2026, trong đó lĩnh vực IT - Phần mềm vẫn là nhóm ngành có tiềm năng, thể hiện ở nhu cầu tuyển dụng cũng như mức lương mà doanh nghiệp sẵn sàng trả...",
+    "url": "https://vnexpress.net/chuyen-doi-so-co-hoi-viec-lam-it-4845678.html",
+    "gradient": "from-cyan-500/20 via-sky-500/20 to-blue-500/20",
+    "iconBg": "bg-gradient-to-br from-cyan-500 to-sky-500"
+  },
+  {
+    "id": 8,
+    "title": "Dân IT muốn được \"săn đón\" cần kỹ năng gì ?",
+    "description": "Kỹ năng đầu tiên mà dân IT cần phải có đó chính là phát triển thuật toán. Với việc bộ lọc thư rác, các ứng dụng teamwork và phát hiện lừa đảo ngày càng trở nên phức tạp, tinh vi, các doanh nghiệp ngày càng cấn đến những nhân viên IT có thể thiết kế và phát triển thuật toán hoặc kỹ xảo để nâng cao hiệu suất cho máy tính...",
+    "url": "https://topdev.vn/blog/dan-it-muon-duoc-san-don-can-ky-nang-gi/",
+    "gradient": "from-amber-500/20 via-orange-500/20 to-red-500/20",
+    "iconBg": "bg-gradient-to-br from-amber-500 to-orange-500"
+  },
+  {
+    "id": 9,
+    "title": "Bắt nhịp 8 xu hướng tuyển dụng IT nổi bật trong năm 2023 – 2025",
+    "description": "Năm 2023, các doanh nghiệp phải đối mặt với muôn vàn thách thức do tác động từ tình trạng suy thoái kinh tế, đại dịch covid vẫn đang tiếp diễn và xung đột vũ trang ngày càng gay gắt. Những thay đổi mạnh mẽ về mặt xã hội cũng đã ảnh hưởng rất nhiều đến nhu cầu tìm việc của các nhân sự ngành IT. Vậy nên, để tuyển dụng được nhân tài chất lượng, nhà tuyển dụng cần \"đón đầu\" xu hướng để lên kế hoạch tuyển dụng phù hợp, thay đổi và thích nghi với thị trường đầy biến động như hiện nay...",
+    "url": "https://topdev.vn/blog/xu-huong-tuyen-dung-it/",
+    "gradient": "from-lime-500/20 via-green-500/20 to-emerald-500/20",
+    "iconBg": "bg-gradient-to-br from-lime-500 to-green-500"
+  }
+]
