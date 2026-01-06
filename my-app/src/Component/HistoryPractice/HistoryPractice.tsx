@@ -82,23 +82,28 @@ export default function HistoryPracticePage() {
   };
 
   return (
-    <div className="text-white bg-slate-950 p-4 md:p-12 min-h-screen">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="p-3 bg-blue-600/20 rounded-xl">
-            <Clock className="text-blue-500" size={28} />
+    <div className="text-white bg-gradient-to-br from-slate-950 via-blue-950/20 to-slate-900 p-4 md:p-12 min-h-screen relative overflow-hidden">
+      {/* Animated Background Orbs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+      </div>
+      <div className="relative z-10 max-w-6xl mx-auto">
+        <div className="flex items-center gap-4 mb-10">
+          <div className="p-4 bg-gradient-to-br from-blue-600/20 to-cyan-600/20 rounded-2xl border border-blue-500/30 backdrop-blur-xl shadow-lg">
+            <Clock className="text-blue-400" size={32} />
           </div>
           <div>
-            <h1 className="text-3xl font-bold">Lịch sử luyện tập</h1>
-            <p className="text-slate-400 text-sm">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 via-cyan-400 to-sky-400 bg-clip-text text-transparent">Lịch sử luyện tập</h1>
+            <p className="text-slate-400 text-base mt-1">
               Theo dõi quá trình chinh phục thuật toán của bạn
             </p>
           </div>
         </div>
 
-        <div className="bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden backdrop-blur-sm">
+        <div className="bg-gradient-to-br from-slate-900/50 to-blue-900/20 border border-blue-500/20 rounded-2xl overflow-hidden backdrop-blur-xl shadow-2xl">
           <table className="w-full text-left border-collapse">
-            <thead className="bg-slate-800/80 text-slate-400 text-xs uppercase tracking-wider">
+            <thead className="bg-gradient-to-r from-slate-800/90 to-blue-900/40 text-blue-300 text-xs uppercase tracking-wider border-b border-blue-500/20">
               <tr>
                 <th className="p-4 font-semibold">
                   <Hash size={16} />
@@ -114,7 +119,7 @@ export default function HistoryPracticePage() {
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-slate-800">
+            <tbody className="divide-y divide-blue-500/10">
               {loading ? (
                 <tr>
                   <td colSpan={5} className="p-10 text-center text-slate-500">
@@ -131,39 +136,39 @@ export default function HistoryPracticePage() {
                 history.map((item, index) => (
                   <tr
                     key={item.problemId}
-                    className="hover:bg-slate-800/30 transition-colors group"
+                    className="hover:bg-gradient-to-r hover:from-slate-800/40 hover:to-blue-900/20 transition-all duration-300 group border-l-4 border-l-transparent hover:border-l-blue-500"
                   >
-                    <td className="p-4 text-slate-600 font-mono">
+                    <td className="p-5 text-blue-400/50 font-mono font-bold">
                       {index + 1}
                     </td>
-                    <td className="p-4">
+                    <td className="p-5">
                       <Link
                         href={`/routes/problems/${item.problemId}`}
-                        className="flex items-center gap-2 font-bold text-slate-200 group-hover:text-blue-400 transition-colors"
+                        className="flex items-center gap-2 font-bold text-slate-200 group-hover:text-blue-400 group-hover:translate-x-1 transition-all"
                       >
                         <Code2 size={16} className="text-slate-500" />
                         {item.problemTitle}
                       </Link>
                     </td>
-                    <td className="p-4">
+                    <td className="p-5">
                       <div className="flex justify-center">
                         {item.lastStatus === "Accepted" ? (
-                          <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/10 text-green-500 text-xs font-bold border border-green-500/20">
+                          <span className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-green-500/10 to-emerald-500/10 text-green-400 text-xs font-bold border border-green-500/30 shadow-lg shadow-green-500/10">
                             <CheckCircle2 size={14} /> Chấp nhận
                           </span>
                         ) : (
-                          <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 text-red-500 text-xs font-bold border border-red-500/20">
+                          <span className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-red-500/10 to-rose-500/10 text-red-400 text-xs font-bold border border-red-500/30 shadow-lg shadow-red-500/10">
                             <XCircle size={14} /> {item.lastStatus || "Lỗi"}
                           </span>
                         )}
                       </div>
                     </td>
-                    <td className="p-4 text-center">
-                      <span className="inline-block px-2.5 py-0.5 rounded-lg bg-slate-800 text-slate-300 text-xs font-medium border border-slate-700">
+                    <td className="p-5 text-center">
+                      <span className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-gradient-to-br from-blue-500/10 to-cyan-500/10 text-blue-400 text-xs font-bold border border-blue-500/30 min-w-[50px]">
                         {item.submissionCount}
                       </span>
                     </td>
-                    <td className="p-4 text-right text-slate-400 text-sm">
+                    <td className="p-5 text-right text-slate-400 text-sm font-medium">
                       {formatRelativeTime(item.lastSubmitted)}
                     </td>
                   </tr>

@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/src/userHook/hooks/userAuth";
 import { db } from "@/src/api/firebase/firebase";
 import { addDoc, collection, doc, serverTimestamp, updateDoc, getDoc } from "firebase/firestore";
+import { ShoppingCart, ArrowLeft } from "lucide-react";
 
 const LOGIN_PATH = "/routes/auth/login";
 const PURCHASE_PATH = "/routes/avatar/settings/buy";
@@ -268,27 +269,31 @@ export default function CheckoutPage() {
       {/* ✅ Modal thành công: không nút, tự redirect */}
       <Modal open={paidOpen} title="Thanh toán thành công" message="Đang chuyển về lịch sử giao dịch..." />
 
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Thanh toán</h1>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 via-cyan-400 to-sky-400 bg-clip-text text-transparent flex items-center gap-3">
+          <ShoppingCart className="text-blue-400" size={40} />
+          Thanh toán
+        </h1>
         <button
           onClick={() => router.push(SHOP_PATH)}
-          className="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded border border-slate-700"
+          className="bg-gradient-to-r from-slate-800 to-slate-700 hover:from-slate-700 hover:to-slate-600 px-6 py-3 rounded-xl border border-slate-600 transition-all hover:scale-105 font-semibold flex items-center gap-2 shadow-lg hover:shadow-xl"
         >
+          <ArrowLeft size={18} />
           Quay lại cửa hàng
         </button>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-slate-900 border border-slate-700 rounded-xl p-6">
-            <h2 className="text-lg font-semibold mb-4">Thông tin người đặt hàng</h2>
-            <div className="grid md:grid-cols-2 gap-4">
+          <div className="bg-slate-900/80 border border-slate-700/80 rounded-xl p-6 backdrop-blur-sm shadow-xl">
+            <h2 className="text-xl font-bold mb-5">Thông tin người đặt hàng</h2>
+            <div className="grid md:grid-cols-2 gap-5">
               <div>
                 <label className="text-slate-300 text-sm">Họ và tên</label>
                 <input
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="mt-2 w-full bg-slate-950 border border-slate-700 px-4 py-2 rounded"
+                  className="mt-2 w-full bg-slate-950/80 border border-slate-700 px-4 py-3 rounded-lg outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-sm"
                 />
               </div>
               <div>
@@ -318,19 +323,19 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          <div className="bg-slate-900 border border-slate-700 rounded-xl p-6">
-            <h2 className="text-lg font-semibold mb-4">Hình thức thanh toán</h2>
-            <div className="space-y-3">
-              <label className="flex items-center gap-3 bg-slate-950/40 border border-slate-700 rounded-lg p-4 cursor-pointer">
-                <input type="radio" checked={payMethod === "COD"} onChange={() => setPayMethod("COD")} />
+          <div className="bg-slate-900/80 border border-slate-700/80 rounded-xl p-6 backdrop-blur-sm shadow-xl">
+            <h2 className="text-xl font-bold mb-5">Hình thức thanh toán</h2>
+            <div className="space-y-4">
+              <label className="flex items-center gap-3 bg-slate-950/40 border border-slate-700 rounded-lg p-5 cursor-pointer hover:border-blue-500/50 hover:bg-slate-800/50 transition-all">
+                <input type="radio" checked={payMethod === "COD"} onChange={() => setPayMethod("COD")} className="w-4 h-4" />
                 <div>
                   <div className="font-semibold">COD</div>
                   <div className="text-slate-300 text-sm">Thanh toán khi nhận hàng</div>
                 </div>
               </label>
 
-              <label className="flex items-center gap-3 bg-slate-950/40 border border-slate-700 rounded-lg p-4 cursor-pointer">
-                <input type="radio" checked={payMethod === "BANK"} onChange={() => setPayMethod("BANK")} />
+              <label className="flex items-center gap-3 bg-slate-950/40 border border-slate-700 rounded-lg p-5 cursor-pointer hover:border-blue-500/50 hover:bg-slate-800/50 transition-all">
+                <input type="radio" checked={payMethod === "BANK"} onChange={() => setPayMethod("BANK")} className="w-4 h-4" />
                 <div>
                   <div className="font-semibold">Chuyển khoản</div>
                   <div className="text-slate-300 text-sm">Mã QR</div>
@@ -340,10 +345,10 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 h-fit">
-          <h2 className="text-lg font-semibold mb-4">Đơn hàng</h2>
+        <div className="bg-slate-900/80 border border-slate-700/80 rounded-xl p-6 h-fit backdrop-blur-sm shadow-xl">
+          <h2 className="text-xl font-bold mb-5">Đơn hàng</h2>
 
-          <div className="bg-slate-950/40 border border-slate-700 rounded-lg p-4">
+          <div className="bg-slate-950/40 border border-slate-700 rounded-lg p-5 shadow-inner">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <div className="font-semibold">{product.name}</div>

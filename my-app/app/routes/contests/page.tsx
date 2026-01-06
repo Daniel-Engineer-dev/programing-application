@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Calendar, Users, Bell } from "lucide-react";
+import { Calendar, Users, Bell, Trophy, Clock, Zap } from "lucide-react";
 import Link from "next/link";
 import PageTransition from "@/src/pageTransition/pageTransition";
 
@@ -255,70 +255,84 @@ export default function ContestPage() {
 
   return (
     <PageTransition>
-      <div className="min-h-screen bg-slate-900 font-sans text-slate-300">
-        <main className="mx-auto max-w-5xl px-6 py-16">
-          <div className="text-center mb-16">
-            <h1 className="text-3xl font-bold text-white md:text-4xl mb-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-red-950/30 to-slate-900 text-slate-100 relative overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-red-500/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-rose-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl animate-pulse delay-2000"></div>
+        </div>
+
+        <main className="mx-auto max-w-6xl px-6 py-16 relative z-10">
+          {/* Hero Header */}
+          <div className="text-center mb-12">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full bg-gradient-to-r from-red-500/20 to-orange-500/20 backdrop-blur-sm border border-red-500/30">
+              <Trophy className="w-4 h-4 text-red-400 animate-pulse" />
+              <span className="text-sm text-red-300 font-medium">Cuộc Thi Lập Trình</span>
+            </div>
+
+            <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-red-400 via-rose-400 to-orange-400 bg-clip-text text-transparent animate-gradient">
               Các cuộc thi Lập trình
             </h1>
-            <p className="text-slate-400 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
               Kiểm tra kỹ năng của bạn, cạnh tranh với những người khác và giành
-              những giải thưởng hấp dẫn trong các cuộc thi lập trình của chúng
-              tôi.
+              những giải thưởng hấp dẫn trong các cuộc thi lập trình
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-2 justify-center mb-8">
+          {/* Tab Buttons */}
+          <div className="flex flex-wrap gap-3 justify-center mb-10 backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-3 max-w-2xl mx-auto">
             <button
               onClick={() => setActiveTab("ONGOING")}
-              className={`px-4 py-2 rounded-lg text-sm border transition ${
+              className={`flex-1 min-w-[120px] px-5 py-3 rounded-xl text-sm font-semibold border transition-all ${
                 activeTab === "ONGOING"
-                  ? "bg-white/10 text-white border-slate-600"
-                  : "bg-transparent text-slate-400 border-slate-800 hover:border-slate-700"
+                  ? "bg-gradient-to-r from-red-500 to-orange-500 text-white border-red-500/50 shadow-lg shadow-red-500/30"
+                  : "bg-transparent text-slate-400 border-white/10 hover:bg-white/5"
               }`}
             >
+              <Zap className="w-4 h-4 inline mr-2" />
               Đang diễn ra
             </button>
 
             <button
               onClick={() => setActiveTab("UPCOMING")}
-              className={`px-4 py-2 rounded-lg text-sm border transition ${
+              className={`flex-1 min-w-[120px] px-5 py-3 rounded-xl text-sm font-semibold border transition-all ${
                 activeTab === "UPCOMING"
-                  ? "bg-white/10 text-white border-slate-600"
-                  : "bg-transparent text-slate-400 border-slate-800 hover:border-slate-700"
+                  ? "bg-gradient-to-r from-red-500 to-orange-500 text-white border-red-500/50 shadow-lg shadow-red-500/30"
+                  : "bg-transparent text-slate-400 border-white/10 hover:bg-white/5"
               }`}
             >
+              <Calendar className="w-4 h-4 inline mr-2" />
               Sắp diễn ra
             </button>
 
             <button
               onClick={() => setActiveTab("ENDED")}
-              className={`px-4 py-2 rounded-lg text-sm border transition ${
+              className={`flex-1 min-w-[120px] px-5 py-3 rounded-xl text-sm font-semibold border transition-all ${
                 activeTab === "ENDED"
-                  ? "bg-white/10 text-white border-slate-600"
-                  : "bg-transparent text-slate-400 border-slate-800 hover:border-slate-700"
+                  ? "bg-gradient-to-r from-red-500 to-orange-500 text-white border-red-500/50 shadow-lg shadow-red-500/30"
+                  : "bg-transparent text-slate-400 border-white/10 hover:bg-white/5"
               }`}
             >
+              <Trophy className="w-4 h-4 inline mr-2" />
               Đã kết thúc
             </button>
           </div>
 
-          <div className="space-y-6">
+          {/* Contest List */}
+          <div className="space-y-5">
             {(loading || authLoading) && (
-              <div className="text-center py-10 text-slate-500">
-                <div className="flex justify-center items-center space-x-2">
-                  <div className="w-4 h-4 rounded-full animate-pulse bg-blue-500"></div>
-                  <div className="w-4 h-4 rounded-full animate-pulse bg-blue-500 delay-150"></div>
-                  <div className="w-4 h-4 rounded-full animate-pulse bg-blue-500 delay-300"></div>
-                </div>
-                <p className="mt-3">Đang tải danh sách cuộc thi...</p>
+              <div className="text-center py-20 backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl">
+                <div className="inline-block w-12 h-12 border-4 border-red-500/30 border-t-red-500 rounded-full animate-spin mb-4"></div>
+                <p className="text-slate-400">Đang tải danh sách cuộc thi...</p>
               </div>
             )}
 
             {error && (
-              <div className="text-center py-10 text-red-400 bg-red-900/20 rounded-xl p-6">
-                <Bell size={24} className="mx-auto mb-3" />
-                <p className="font-semibold">{error}</p>
+              <div className="text-center py-10 backdrop-blur-xl bg-red-500/10 border border-red-500/30 rounded-2xl p-6">
+                <Bell size={32} className="mx-auto mb-3 text-red-400" />
+                <p className="font-semibold text-red-400">{error}</p>
               </div>
             )}
 
@@ -326,63 +340,88 @@ export default function ContestPage() {
               !authLoading &&
               !error &&
               filteredContests.length === 0 && (
-                <div className="text-center py-10 text-slate-500 text-white">
-                  Không có cuộc thi nào trong mục này.
+                <div className="text-center py-20 backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl">
+                  <Trophy size={48} className="mx-auto mb-4 text-slate-600" />
+                  <p className="text-slate-400 text-lg">
+                    Không có cuộc thi nào trong mục này.
+                  </p>
                 </div>
               )}
 
             {!loading &&
               !authLoading &&
               !error &&
-              filteredContests.map((contest) => (
+              filteredContests.map((contest, index) => (
                 <Link
                   key={contest.id}
                   href={`/routes/contests/${contest.id}`}
                   className="block"
+                  style={{ animationDelay: `${index * 50}ms` }}
                 >
-                  <div className="rounded-xl bg-slate-800 p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm border border-transparent hover:border-slate-700 transition-all">
+                  <div className="rounded-2xl backdrop-blur-xl bg-white/5 border border-white/10 p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl hover:shadow-2xl hover:shadow-red-500/20 hover:border-red-500/50 hover:bg-white/10 transition-all duration-300 hover:scale-[1.01] animate-fadeIn">
                     {/* Left */}
-                    <div className="space-y-3">
-                      <h3 className="text-lg md:text-xl font-bold text-white">
-                        {contest.title}
-                      </h3>
+                    <div className="space-y-4 flex-1">
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 rounded-xl bg-gradient-to-br from-red-500/20 to-orange-500/20 border border-red-500/30">
+                          <Trophy className="w-5 h-5 text-red-400" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-xl md:text-2xl font-bold text-white mb-2 group-hover:text-red-300 transition-colors">
+                            {contest.title}
+                          </h3>
 
-                      {/* CHIP/BADGE nổi bật */}
+                          {/* Status Badge */}
+                          <div className="inline-flex items-center gap-2 mb-3">
+                            {contest.computedStatus === "ONGOING" && (
+                              <span className="px-3 py-1 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold uppercase flex items-center gap-1.5 shadow-lg">
+                                <Zap className="w-3 h-3" />
+                                Đang diễn ra
+                              </span>
+                            )}
+                            {contest.computedStatus === "UPCOMING" && (
+                              <span className="px-3 py-1 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-xs font-bold uppercase flex items-center gap-1.5 shadow-lg">
+                                <Clock className="w-3 h-3" />
+                                Sắp diễn ra
+                              </span>
+                            )}
+                            {contest.computedStatus === "ENDED" && (
+                              <span className="px-3 py-1 rounded-full bg-gradient-to-r from-slate-600 to-slate-700 text-slate-300 text-xs font-bold uppercase shadow-lg">
+                                Đã kết thúc
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Info Badges */}
                       <div className="flex flex-wrap gap-2 text-xs">
-                        <span className="px-2 py-1 rounded-lg bg-blue-500/10 text-blue-300 border border-blue-500/20">
-                          <span className="font-semibold text-blue-400">
-                            📅 Bắt đầu:
-                          </span>{" "}
+                        <span className="px-3 py-2 rounded-lg bg-red-500/10 text-red-300 border border-red-500/30 font-medium">
+                          <Calendar className="w-3 h-3 inline mr-1.5" />
                           {contest.dateText}
                         </span>
 
-                        <span className="px-2 py-1 rounded-lg bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
-                          <span className="font-semibold text-emerald-400">
-                            ⏰ Giờ:
-                          </span>{" "}
+                        <span className="px-3 py-2 rounded-lg bg-orange-500/10 text-orange-300 border border-orange-500/30 font-medium">
+                          <Clock className="w-3 h-3 inline mr-1.5" />
                           {contest.timeText}
                         </span>
 
-                        <span className="px-2 py-1 rounded-lg bg-purple-500/10 text-purple-300 border border-purple-500/20">
-                          <span className="font-semibold text-purple-400">
-                            ⏳ Thời gian:
-                          </span>{" "}
-                          {contest.lengthHHMM}
+                        <span className="px-3 py-2 rounded-lg bg-rose-500/10 text-rose-300 border border-rose-500/30 font-medium">
+                          ⏳ {contest.lengthHHMM}
                         </span>
 
-                        <span className="px-2 py-1 rounded-lg bg-sky-500/10 text-sky-300 border border-sky-500/20">
-                          <span className="font-semibold text-sky-400">👥</span>{" "}
-                          {contest.participants} người đăng ký
+                        <span className="px-3 py-2 rounded-lg bg-amber-500/10 text-amber-300 border border-amber-500/30 font-medium">
+                          <Users className="w-3 h-3 inline mr-1.5" />
+                          {contest.participants} người
                         </span>
                       </div>
                     </div>
 
                     {/* Right Button */}
-                    <div>
+                    <div className="md:ml-6">
                       {contest.computedStatus === "ENDED" ? (
                         <button
                           disabled
-                          className="w-full md:w-auto rounded-lg bg-slate-800 px-6 py-2.5 text-sm font-medium text-slate-500 border border-slate-700 cursor-not-allowed"
+                          className="w-full md:w-auto rounded-xl bg-slate-800/50 px-6 py-3 text-sm font-semibold text-slate-500 border border-slate-700/50 cursor-not-allowed"
                         >
                           Đã kết thúc
                         </button>
@@ -393,15 +432,16 @@ export default function ContestPage() {
                             e.preventDefault();
                             e.stopPropagation();
                           }}
-                          className="w-full md:w-auto rounded-lg bg-slate-700/60 px-6 py-2.5 text-sm font-medium text-slate-300 border border-slate-600 cursor-not-allowed"
+                          className="w-full md:w-auto rounded-xl bg-green-500/20 px-6 py-3 text-sm font-semibold text-green-400 border border-green-500/30 cursor-not-allowed flex items-center gap-2 justify-center"
                         >
+                          <Trophy className="w-4 h-4" />
                           Đã tham gia
                         </button>
                       ) : (
                         <button
                           onClick={(e) => handleQuickRegister(e, contest.id)}
                           disabled={registeringId === contest.id}
-                          className={`w-full md:w-auto rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20 ${
+                          className={`w-full md:w-auto rounded-xl bg-gradient-to-r from-red-600 to-orange-600 px-6 py-3 text-sm font-semibold text-white hover:from-red-500 hover:to-orange-500 transition-all shadow-lg shadow-red-600/30 hover:shadow-red-600/50 hover:scale-105 ${
                             registeringId === contest.id
                               ? "opacity-80 cursor-wait"
                               : ""
@@ -419,9 +459,33 @@ export default function ContestPage() {
           </div>
         </main>
 
-        <footer className="border-t border-slate-800 py-8 text-center text-xs text-slate-500">
+        <footer className="border-t border-white/10 py-8 text-center text-xs text-slate-500 relative z-10 backdrop-blur-xl">
           © 2024 Code Pro. Đã đăng ký Bản quyền.
         </footer>
+
+        <style jsx>{`
+          @keyframes gradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+          }
+          .animate-gradient {
+            background-size: 200% 200%;
+            animation: gradient 3s ease infinite;
+          }
+          @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.1); }
+          }
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out forwards;
+          }
+          .delay-1000 { animation-delay: 1s; }
+          .delay-2000 { animation-delay: 2s; }
+        `}</style>
       </div>
     </PageTransition>
   );

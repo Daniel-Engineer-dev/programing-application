@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/src/userHook/hooks/userAuth";
 import { db } from "@/src/api/firebase/firebase";
 import { doc, onSnapshot, Timestamp, updateDoc } from "firebase/firestore";
+import { Package, Clock, CheckCircle, XCircle, Save, ShoppingBag } from "lucide-react";
 
 const LOGIN_PATH = "/routes/auth/login";
 const PURCHASE_PATH = "/routes/avatar/settings/buy";
@@ -322,7 +323,15 @@ export default function OrderDetailPage() {
   const confirmPaidDisabled = editable; // trong 5 phút => disable
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950/30 to-slate-900 text-white p-8 relative overflow-hidden">
+      {/* Animated Background Orbs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+      </div>
+      
+      <div className="relative z-10">
       <Modal open={modalOpen} title={modalTitle} message={modalMsg} onClose={closeModal} />
 
       <ConfirmModal
@@ -337,78 +346,90 @@ export default function OrderDetailPage() {
       />
 
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-start justify-between gap-6 mb-6">
+        <div className="flex items-start justify-between gap-6 mb-10">
           <div>
-            <h1 className="text-3xl font-bold">Chi tiết đơn hàng</h1>
-            <div className="mt-2 text-slate-300">
-              Trạng thái: <span className={st.cls}>{st.text}</span>
-              <span className="mx-2">•</span>
-              Ngày đặt: {formatDateDDMMYYYY(order.purchasedAt)}
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-400 via-cyan-400 to-sky-400 bg-clip-text text-transparent flex items-center gap-3 mb-4">
+              <Package className="text-blue-400" size={48} />
+              Chi tiết đơn hàng
+            </h1>
+            <div className="flex items-center gap-4 text-lg">
+              <span className="text-slate-400">Trạng thái:</span>
+              <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold ${
+                order.status === 'PAID' ? 'bg-gradient-to-r from-green-500/10 to-emerald-500/10 text-green-400 border border-green-500/30' :
+                order.status === 'PENDING' ? 'bg-gradient-to-r from-yellow-500/10 to-amber-500/10 text-yellow-400 border border-yellow-500/30' :
+                'bg-gradient-to-r from-red-500/10 to-rose-500/10 text-red-400 border border-red-500/30'
+              }`}>
+                {order.status === 'PAID' ? <CheckCircle size={16} /> : order.status === 'PENDING' ? <Clock size={16} /> : <XCircle size={16} />}
+                {st.text}
+              </span>
+              <span className="text-slate-500">•</span>
+              <span className="text-slate-400">Ngày đặt: {formatDateDDMMYYYY(order.purchasedAt)}</span>
             </div>
           </div>
 
           <button
             onClick={() => router.push(PURCHASE_PATH)}
-            className="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded border border-slate-700"
+            className="bg-gradient-to-r from-slate-800 to-blue-900/40 hover:from-slate-700 hover:to-blue-800/40 px-6 py-3 rounded-xl border border-blue-500/30 transition-all hover:scale-105 font-semibold"
           >
             Quay lại
           </button>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-6 items-start">
+        <div className="grid lg:grid-cols-2 gap-6 items-stretch">
           {/* LEFT */}
-          <div className="bg-slate-900 border border-slate-700 rounded-xl p-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Thông tin đơn hàng</h2>
-              <div className="text-sm text-slate-300">
-                Thời gian chỉnh sửa còn lại:{" "}
-                <span className="font-mono text-white">
+          <div className="bg-slate-900 border border-blue-500/30 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-xl font-bold">Thông tin đơn hàng</h2>
+              <div className="flex items-center gap-2 text-sm bg-slate-800 px-3 py-2 rounded-lg border border-slate-700">
+                <Clock size={14} className="text-blue-400" />
+                <span className="text-slate-400 text-xs">Còn lại:</span>
+                <span className="font-mono text-blue-400 font-semibold text-xs">
                   {order.status === "CANCELLED" ? "--:--" : remainingText(order.purchasedAt)}
                 </span>
               </div>
             </div>
 
-            <div className="mt-4 grid md:grid-cols-2 gap-4 text-sm">
-              <div className="bg-slate-950/40 border border-slate-700 rounded-lg p-4">
-                <div className="text-slate-300">Sản phẩm</div>
+            <div className="mt-4 grid md:grid-cols-2 gap-3 text-sm">
+              <div className="bg-slate-950/50 border border-slate-700 rounded-lg p-4">
+                <div className="text-slate-400 text-xs mb-1">Sản phẩm</div>
                 <div className="font-semibold">{order.productName}</div>
               </div>
-              <div className="bg-slate-950/40 border border-slate-700 rounded-lg p-4">
-                <div className="text-slate-300">Số lượng</div>
+              <div className="bg-slate-950/50 border border-slate-700 rounded-lg p-4">
+                <div className="text-slate-400 text-xs mb-1">Số lượng</div>
                 <div className="font-semibold">{order.quantity}</div>
               </div>
-              <div className="bg-slate-950/40 border border-slate-700 rounded-lg p-4">
-                <div className="text-slate-300">Đơn giá</div>
+              <div className="bg-slate-950/50 border border-slate-700 rounded-lg p-4">
+                <div className="text-slate-400 text-xs mb-1">Đơn giá</div>
                 <div className="font-semibold">{formatVND(order.amountVND)}</div>
               </div>
-              <div className="bg-slate-950/40 border border-slate-700 rounded-lg p-4">
-                <div className="text-slate-300">Phí ship</div>
+              <div className="bg-slate-950/50 border border-slate-700 rounded-lg p-4">
+                <div className="text-slate-400 text-xs mb-1">Phí ship</div>
                 <div className="font-semibold">
                   {order.shippingFee === 0 ? "Miễn phí" : formatVND(order.shippingFee)}
                 </div>
               </div>
-              <div className="bg-slate-950/40 border border-slate-700 rounded-lg p-4 md:col-span-2">
-                <div className="text-slate-300">Tổng thanh toán</div>
-                <div className="font-semibold text-lg">{formatVND(order.totalVND)}</div>
+              <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 md:col-span-2">
+                <div className="text-blue-400 text-xs mb-1">Tổng thanh toán</div>
+                <div className="font-bold text-xl text-blue-400">{formatVND(order.totalVND)}</div>
               </div>
             </div>
 
             {!editable ? (
-              <div className="mt-4 text-slate-300 text-sm">
+              <div className="mt-4 p-3 bg-slate-800/50 border border-slate-700 rounded-lg text-slate-400 text-sm">
                 {order.status === "CANCELLED"
                   ? "Đơn đã huỷ nên không thể thao tác."
                   : "Hết thời gian chỉnh sửa nên đơn hàng đã bị khoá thao tác."}
               </div>
             ) : (
-              <div className="mt-4 text-slate-300 text-sm">
+              <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg text-blue-400 text-sm">
                 Trong 5 phút bạn có thể chỉnh sửa thông tin nhận hàng / huỷ đơn.
               </div>
             )}
           </div>
 
           {/* RIGHT */}
-          <div className="bg-slate-900 border border-slate-700 rounded-xl p-6">
-            <h2 className="text-lg font-semibold mb-4">Thông tin nhận hàng</h2>
+          <div className="bg-slate-900 border border-blue-500/30 rounded-xl p-6">
+            <h2 className="text-xl font-bold mb-5">Thông tin nhận hàng</h2>
 
             {order.status === "CANCELLED" ? (
               <div className="text-slate-300 text-sm">Đơn đã huỷ nên không thể chỉnh sửa.</div>
@@ -416,39 +437,39 @@ export default function OrderDetailPage() {
               <>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-slate-300 text-sm">Họ và tên</label>
+                    <label className="text-slate-400 text-xs font-medium">Họ và tên</label>
                     <input
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       disabled={!editable}
-                      className="mt-2 w-full bg-slate-950 border border-slate-700 px-4 py-2 rounded disabled:opacity-60"
+                      className="mt-2 w-full bg-slate-950/50 border border-slate-700 px-4 py-2.5 rounded-lg outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                   </div>
                   <div>
-                    <label className="text-slate-300 text-sm">Số điện thoại</label>
+                    <label className="text-slate-400 text-xs font-medium">Số điện thoại</label>
                     <input
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       disabled={!editable}
-                      className="mt-2 w-full bg-slate-950 border border-slate-700 px-4 py-2 rounded disabled:opacity-60"
+                      className="mt-2 w-full bg-slate-950/50 border border-slate-700 px-4 py-2.5 rounded-lg outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="text-slate-300 text-sm">Địa chỉ</label>
+                    <label className="text-slate-400 text-xs font-medium">Địa chỉ</label>
                     <input
                       value={address}
                       onChange={(e) => setAddress(e.target.value)}
                       disabled={!editable}
-                      className="mt-2 w-full bg-slate-950 border border-slate-700 px-4 py-2 rounded disabled:opacity-60"
+                      className="mt-2 w-full bg-slate-950/50 border border-slate-700 px-4 py-2.5 rounded-lg outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="text-slate-300 text-sm">Ghi chú</label>
+                    <label className="text-slate-400 text-xs font-medium">Ghi chú</label>
                     <input
                       value={note}
                       onChange={(e) => setNote(e.target.value)}
                       disabled={!editable}
-                      className="mt-2 w-full bg-slate-950 border border-slate-700 px-4 py-2 rounded disabled:opacity-60"
+                      className="mt-2 w-full bg-slate-950/50 border border-slate-700 px-4 py-2.5 rounded-lg outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                   </div>
                 </div>
@@ -457,15 +478,16 @@ export default function OrderDetailPage() {
                   <button
                     onClick={saveEdits}
                     disabled={!editable}
-                    className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-xl font-semibold disabled:opacity-60"
+                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-5 py-2.5 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                   >
+                    <Save size={16} />
                     Lưu chỉnh sửa
                   </button>
 
                   <button
                     onClick={() => setConfirmCancelOpen(true)}
                     disabled={!editable}
-                    className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-xl font-semibold disabled:opacity-60"
+                    className="bg-red-600 hover:bg-red-700 px-5 py-2.5 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                   >
                     Huỷ đơn
                   </button>
@@ -475,7 +497,7 @@ export default function OrderDetailPage() {
                     <button
                       onClick={confirmPaid}
                       disabled={confirmPaidDisabled}
-                      className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-xl font-semibold disabled:opacity-60"
+                      className="bg-green-600 hover:bg-green-700 px-5 py-2.5 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                       title={
                         confirmPaidDisabled
                           ? "Trong 5 phút đầu đơn còn có thể chỉnh sửa nên chưa thể xác nhận thanh toán."
@@ -495,8 +517,9 @@ export default function OrderDetailPage() {
                 ) : null}
               </>
             )}
-          </div>
+           </div>
         </div>
+      </div>
       </div>
     </div>
   );

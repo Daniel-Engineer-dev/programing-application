@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Trophy, ShoppingBag, Settings, LogOut } from "lucide-react";
+import { Trophy, ShoppingBag, Settings, LogOut, User } from "lucide-react";
 // Sign out
 import { signOut } from "firebase/auth";
 import { auth, db } from "@/src/api/firebase/firebase";
@@ -155,8 +155,8 @@ export default function UserMenu({ name }: UserMenuProps) {
                 />
                 <MenuItem
                   href="/routes/avatar/settings"
-                  icon={Settings}
-                  label="Account Settings"
+                  icon={User}
+                  label="Profiles"
                 />
               </div>
 

@@ -21,6 +21,7 @@ import {
 } from "firebase/auth";
 import { getCroppedImg } from "@/src/utils/cropImage";
 import Cropper from "react-easy-crop";
+import { User, Mail, Lock, Camera, Save, X } from "lucide-react";
 export default function ProfilePage() {
   const { user } = useAuthContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -182,7 +183,13 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="text-white bg-slate-950 min-h-screen p-8 flex justify-center">
+    <div className="text-white bg-gradient-to-br from-slate-950 via-blue-950/30 to-slate-900 min-h-screen p-8 flex justify-center relative overflow-hidden">
+      {/* Animated Background Orbs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+      </div>
       {/* --- MODAL CẮT ẢNH --- */}
       {imageToCrop && (
         <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/90 p-4">
@@ -238,24 +245,28 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
-      <div className="max-w-2xl w-full">
-        <h1 className="text-3xl font-bold mb-2">Hồ sơ</h1>
-        <p className="text-slate-400 mb-8">
-          Thông tin cá nhân và quản lý tài khoản.
+      <div className="relative z-10 max-w-2xl w-full">
+        <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-blue-400 via-cyan-400 to-sky-400 bg-clip-text text-transparent">Hồ sơ cá nhân</h1>
+        <p className="text-slate-400 mb-10 text-lg">
+          Quản lý thông tin tài khoản và cài đặt bảo mật.
         </p>
 
         {/* Avatar Section */}
-        <div className="flex items-center p-6 rounded-2xl bg-slate-900/50 border border-slate-800 mb-10">
-          <img
-            src={profileData.avatar || "/avatar.png"}
-            className="w-24 h-24 rounded-full border-2 border-blue-500/50 object-cover p-1"
-            alt="Avatar"
-          />
-          <div className="ml-6">
-            <h2 className="text-2xl font-bold text-white">
+        <div className="flex items-center p-8 rounded-2xl bg-gradient-to-br from-slate-900/50 to-blue-900/20 backdrop-blur-xl border border-blue-500/30 mb-10 shadow-2xl hover:shadow-blue-500/10 transition-all group">
+          <div className="relative">
+            <img
+              src={profileData.avatar || "/avatar.png"}
+              className="w-28 h-28 rounded-full border-4 border-blue-500/50 object-cover p-1 shadow-lg shadow-blue-500/20 group-hover:border-blue-400/70 transition-all"
+              alt="Avatar"
+            />
+            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-blue-500/20 to-cyan-500/20 blur-xl opacity-50 group-hover:opacity-75 transition-opacity"></div>
+          </div>
+          <div className="ml-6 flex-1">
+            <h2 className="text-2xl font-bold text-white mb-1">
               {loading ? "Đang tải..." : profileData.username}
             </h2>
-            <p className="text-slate-400">
+            <p className="text-slate-400 flex items-center gap-2">
+              <Mail size={14} />
               {loading ? "..." : profileData.email}
             </p>
           </div>
@@ -269,20 +280,30 @@ export default function ProfilePage() {
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={isUpdating}
-            className="ml-auto bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-semibold px-4 py-2 rounded-xl border border-slate-700 transition-all"
+            className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all flex items-center gap-2 shadow-lg hover:shadow-blue-500/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
           >
+            <Camera size={16} />
             {isUpdating ? "Đang xử lý..." : "Thay đổi ảnh"}
           </button>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-8">
+          {/* Account Info Header */}
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 rounded-lg bg-blue-500/10 border border-blue-500/30">
+              <User size={20} className="text-blue-400" />
+            </div>
+            <h3 className="text-xl font-bold text-white">Thông tin tài khoản</h3>
+          </div>
+
           {/* Tên đăng nhập (Editable) */}
           <div>
-            <label className="block mb-2 text-sm font-medium text-slate-400 uppercase tracking-wider">
+            <label className="block mb-3 text-sm font-semibold text-blue-400 uppercase tracking-wider flex items-center gap-2">
+              <User size={14} />
               Tên đăng nhập
             </label>
             <input
-              className="bg-slate-900/80 border border-slate-800 w-full px-4 py-3 rounded-xl text-white outline-none focus:border-blue-500 transition-all"
+              className="bg-gradient-to-br from-slate-900/80 to-blue-900/20 border border-blue-500/30 w-full px-5 py-3.5 rounded-xl text-white outline-none focus:border-blue-400 focus:shadow-lg focus:shadow-blue-500/20 transition-all backdrop-blur-xl"
               value={profileData.username}
               onChange={(e) =>
                 setProfileData({ ...profileData, username: e.target.value })
@@ -292,11 +313,12 @@ export default function ProfilePage() {
 
           {/* Email (Editable) */}
           <div>
-            <label className="block mb-2 text-sm font-medium text-slate-400 uppercase tracking-wider">
+            <label className="block mb-3 text-sm font-semibold text-blue-400 uppercase tracking-wider flex items-center gap-2">
+              <Mail size={14} />
               Địa chỉ Email
             </label>
             <input
-              className="bg-slate-900/80 border border-slate-800 w-full px-4 py-3 rounded-xl text-white outline-none focus:border-blue-500 transition-all"
+              className="bg-gradient-to-br from-slate-900/80 to-blue-900/20 border border-blue-500/30 w-full px-5 py-3.5 rounded-xl text-white outline-none focus:border-blue-400 focus:shadow-lg focus:shadow-blue-500/20 transition-all backdrop-blur-xl"
               value={profileData.email}
               onChange={(e) =>
                 setProfileData({ ...profileData, email: e.target.value })
@@ -304,30 +326,19 @@ export default function ProfilePage() {
             />
           </div>
 
-          <div className="h-px bg-slate-800 my-8"></div>
+          <div className="h-px bg-gradient-to-r from-transparent via-blue-500/30 to-transparent my-10"></div>
 
           {/* Password Section */}
-          <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-            </svg>
-            Đổi mật khẩu
-          </h2>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 rounded-lg bg-blue-500/10 border border-blue-500/30">
+              <Lock size={20} className="text-blue-400" />
+            </div>
+            <h3 className="text-xl font-bold text-white">Bảo mật và mật khẩu</h3>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block mb-2 text-sm font-medium text-slate-400">
+              <label className="block mb-3 text-sm font-semibold text-slate-400">
                 Mật khẩu mới
               </label>
               <input
@@ -335,11 +346,11 @@ export default function ProfilePage() {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="••••••••"
-                className="bg-slate-900/80 border border-slate-800 w-full px-4 py-3 rounded-xl focus:border-blue-500 outline-none transition-all"
+                className="bg-gradient-to-br from-slate-900/80 to-blue-900/20 border border-blue-500/30 w-full px-5 py-3.5 rounded-xl focus:border-blue-400 outline-none transition-all text-white focus:shadow-lg focus:shadow-blue-500/20 backdrop-blur-xl"
               />
             </div>
             <div>
-              <label className="block mb-2 text-sm font-medium text-slate-400">
+              <label className="block mb-3 text-sm font-semibold text-slate-400">
                 Xác nhận mật khẩu
               </label>
               <input
@@ -347,26 +358,28 @@ export default function ProfilePage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
-                className="bg-slate-900/80 border border-slate-800 w-full px-4 py-3 rounded-xl focus:border-blue-500 outline-none transition-all"
+                className="bg-gradient-to-br from-slate-900/80 to-blue-900/20 border border-blue-500/30 w-full px-5 py-3.5 rounded-xl focus:border-blue-400 outline-none transition-all text-white focus:shadow-lg focus:shadow-blue-500/20 backdrop-blur-xl"
               />
             </div>
           </div>
 
-          <div className="flex justify-end gap-4 pt-10">
+          <div className="flex justify-end gap-4 pt-12">
             <button
               onClick={() => {
                 setNewPassword("");
                 setConfirmPassword("");
               }}
-              className="px-8 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-all font-semibold"
+              className="px-8 py-3.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 border border-slate-700/50 hover:border-slate-600 transition-all font-semibold flex items-center gap-2"
             >
+              <X size={18} />
               Hủy bỏ
             </button>
             <button
               onClick={handleSaveChanges}
               disabled={isUpdating}
-              className="bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 px-8 py-3 rounded-xl font-bold shadow-lg transition-all"
+              className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 disabled:from-blue-800 disabled:to-cyan-800 px-8 py-3.5 rounded-xl font-bold shadow-2xl hover:shadow-blue-500/50 transition-all disabled:cursor-not-allowed hover:scale-105 flex items-center gap-2"
             >
+              <Save size={18} />
               {isUpdating ? "Đang lưu..." : "Lưu thông tin"}
             </button>
           </div>

@@ -121,16 +121,22 @@ export default function NotesPage() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-64px)] bg-slate-950 text-slate-200 overflow-hidden font-sans">
+    <div className="flex h-[calc(100vh-64px)] bg-gradient-to-br from-slate-950 via-blue-950/30 to-slate-900 text-slate-200 overflow-hidden font-sans relative">
+      {/* Animated Background Orbs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+      </div>
       {/* SIDEBAR: DANH SÁCH GHI CHÚ */}
-      <aside className="w-80 border-r border-slate-800 bg-slate-900/30 flex flex-col">
-        <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-          <h2 className="font-bold text-lg">Ghi chú ({notes.length})</h2>
+      <aside className="relative z-10 w-80 border-r border-blue-500/20 bg-gradient-to-br from-slate-900/50 to-blue-900/20 backdrop-blur-xl flex flex-col">
+        <div className="p-5 border-b border-blue-500/20 flex items-center justify-between">
+          <h2 className="font-bold text-xl bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Ghi chú ({notes.length})</h2>
           <button
             onClick={handleNewNote}
-            className="p-2 bg-blue-600 rounded-lg hover:bg-blue-500 transition-all active:scale-95"
+            className="p-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-lg hover:from-blue-500 hover:to-cyan-500 transition-all active:scale-95 shadow-lg hover:shadow-blue-500/50"
           >
-            <Plus size={18} />
+            <Plus size={20} />
           </button>
         </div>
 
@@ -144,27 +150,27 @@ export default function NotesPage() {
               <div
                 key={n.id}
                 onClick={() => selectNote(n)}
-                className={`p-4 border-b border-slate-800/50 cursor-pointer transition-all hover:bg-slate-800 group relative
+                className={`p-4 border-b border-blue-500/10 cursor-pointer transition-all hover:bg-gradient-to-r hover:from-slate-800/40 hover:to-blue-900/20 group relative
                 ${
                   selectedNote?.id === n.id
-                    ? "bg-slate-800 border-l-4 border-l-blue-500"
+                    ? "bg-gradient-to-r from-slate-800/60 to-blue-900/30 border-l-4 border-l-blue-500 shadow-lg"
                     : ""
                 }`}
               >
-                <h3 className="font-semibold text-sm truncate pr-6">
+                <h3 className="font-semibold text-base truncate pr-6 group-hover:text-blue-400 transition-colors">
                   {n.title || "Ghi chú không tên"}
                 </h3>
-                <div className="flex items-center gap-2 mt-1 text-[10px] text-slate-500 uppercase font-bold tracking-wider">
-                  <Calendar size={10} />{" "}
+                <div className="flex items-center gap-2 mt-2 text-[11px] text-slate-400 uppercase font-bold tracking-wider">
+                  <Calendar size={11} />{" "}
                   {n.updatedAt?.toDate
                     ? n.updatedAt.toDate().toLocaleDateString()
                     : "Vừa xong"}
                 </div>
                 <button
                   onClick={(e) => handleDelete(n.id, e)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 opacity-0 group-hover:opacity-100 text-slate-600 hover:text-red-500 transition-all"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-2 opacity-0 group-hover:opacity-100 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
                 >
-                  <Trash2 size={14} />
+                  <Trash2 size={16} />
                 </button>
               </div>
             ))
@@ -173,21 +179,21 @@ export default function NotesPage() {
       </aside>
 
       {/* MAIN: EDITOR */}
-      <main className="flex-1 flex flex-col p-8 relative">
+      <main className="relative z-10 flex-1 flex flex-col p-8">
         <div className="max-w-4xl w-full mx-auto flex flex-col h-full">
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Tiêu đề ghi chú..."
-            className="bg-transparent text-3xl font-bold outline-none mb-6 placeholder:text-slate-800"
+            className="bg-transparent text-4xl font-bold outline-none mb-8 placeholder:text-slate-800 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent"
           />
 
-          <div className="flex-1 relative mb-6">
+          <div className="flex-1 relative mb-8">
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="Bắt đầu viết nội dung tại đây..."
-              className="w-full h-full bg-slate-900/50 border border-slate-800 rounded-3xl p-6 text-lg outline-none focus:border-blue-500/30 transition-all resize-none scrollbar-thin scrollbar-thumb-slate-800"
+              className="w-full h-full bg-gradient-to-br from-slate-900/50 to-blue-900/20 border border-blue-500/30 rounded-2xl p-6 text-lg outline-none focus:border-blue-400 focus:shadow-lg focus:shadow-blue-500/20 transition-all resize-none scrollbar-thin scrollbar-thumb-blue-500/30 backdrop-blur-xl"
             />
           </div>
 
@@ -195,7 +201,7 @@ export default function NotesPage() {
             <button
               onClick={handleSave}
               disabled={isSaving || !title.trim()}
-              className="flex items-center gap-2 px-8 py-3 bg-blue-600 rounded-xl font-bold hover:bg-blue-500 disabled:opacity-50 transition-all active:scale-95 shadow-lg shadow-blue-500/20"
+              className="flex items-center gap-2.5 px-10 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 shadow-2xl hover:shadow-blue-500/50"
             >
               {isSaving ? (
                 <Loader2 className="animate-spin" size={20} />

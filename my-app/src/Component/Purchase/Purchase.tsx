@@ -7,6 +7,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 import { useAuth } from "@/src/userHook/hooks/userAuth";
 import { db } from "@/src/api/firebase/firebase";
+import { ShoppingBag, Search, Calendar, Filter } from "lucide-react";
 import {
   collection,
   onSnapshot,
@@ -163,57 +164,75 @@ export default function PurchasePage() {
   }, [orders, search, status, selectedDate]);
 
   return (
-    <div className="text-white bg-slate-950 min-h-screen p-8">
-      <div className="flex items-start justify-between gap-6">
+    <div className="text-white bg-gradient-to-br from-slate-950 via-blue-950/30 to-slate-900 min-h-screen p-8 relative overflow-hidden">
+      {/* Animated Background Orbs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+      </div>
+      
+      <div className="relative z-10">
+      <div className="flex items-start justify-between gap-6 mb-10">
         <div>
-          <h1 className="text-4xl font-bold mb-2">Lịch sử giao dịch</h1>
-          <p className="text-slate-300">
+          <h1 className="text-5xl font-bold mb-3 bg-gradient-to-r from-blue-400 via-cyan-400 to-sky-400 bg-clip-text text-transparent">Lịch sử giao dịch</h1>
+          <p className="text-slate-300 text-lg">
             Theo dõi các đơn hàng và trạng thái thanh toán của bạn.
           </p>
         </div>
 
         <button
           onClick={() => router.push(SHOP_PATH)}
-          className="bg-blue-600 hover:bg-blue-700 px-5 py-3 rounded-xl font-semibold flex items-center gap-2"
+          className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 px-6 py-3.5 rounded-xl font-semibold flex items-center gap-2.5 shadow-2xl hover:shadow-blue-500/50 transition-all hover:scale-105"
         >
-          🛍️ <span>Cửa hàng</span>
+          <ShoppingBag size={20} />
+          <span>Cửa hàng</span>
         </button>
       </div>
 
-      <div className="flex gap-4 mt-8 mb-6">
-        <input
-          className="bg-slate-900 border border-slate-700 px-4 py-3 rounded w-1/2"
-          placeholder="Tìm theo mã đơn hàng hoặc tên sản phẩm..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+      <div className="flex gap-4 mb-8">
+        <div className="relative flex-1">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+          <input
+            className="bg-gradient-to-br from-slate-900/80 to-blue-900/20 border border-blue-500/30 pl-12 pr-4 py-3.5 rounded-xl w-full text-white outline-none focus:border-blue-400 focus:shadow-lg focus:shadow-blue-500/20 transition-all backdrop-blur-xl"
+            placeholder="Tìm theo mã đơn hàng hoặc tên sản phẩm..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
 
-        <select
-          className="bg-slate-900 border border-slate-700 px-4 py-3 rounded"
-          value={status}
-          onChange={(e) => setStatus(e.target.value as any)}
-        >
-          <option value="ALL">Tất cả trạng thái</option>
-          <option value="PAID">Đã thanh toán</option>
-          <option value="PENDING">Đang chờ</option>
-          <option value="CANCELLED">Đã huỷ</option>
-        </select>
+        <div className="relative">
+          <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
+          <select
+            className="bg-gradient-to-br from-slate-900/80 to-blue-900/20 border border-blue-500/30 pl-12 pr-8 py-3.5 rounded-xl text-white outline-none focus:border-blue-400 transition-all appearance-none cursor-pointer backdrop-blur-xl"
+            value={status}
+            onChange={(e) => setStatus(e.target.value as any)}
+          >
+            <option value="ALL" className="bg-slate-900">Tất cả trạng thái</option>
+            <option value="PAID" className="bg-slate-900">Đã thanh toán</option>
+            <option value="PENDING" className="bg-slate-900">Đang chờ</option>
+            <option value="CANCELLED" className="bg-slate-900">Đã huỷ</option>
+          </select>
+        </div>
 
-        <DatePicker
-          selected={selectedDate}
-          onChange={(d) => setSelectedDate(d)}
-          dateFormat="dd/MM/yyyy"
-          placeholderText="dd/mm/yyyy"
-          isClearable
-          popperPlacement="bottom-end"
-          className="bg-slate-900 border border-slate-700 px-4 py-3 rounded w-48 text-white outline-none"
-          calendarClassName="bg-slate-900 text-white border border-slate-700"
-        />
+        <div className="relative">
+          <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10" size={18} />
+          <DatePicker
+            selected={selectedDate}
+            onChange={(d) => setSelectedDate(d)}
+            dateFormat="dd/MM/yyyy"
+            placeholderText="dd/mm/yyyy"
+            isClearable
+            popperPlacement="bottom-end"
+            className="bg-gradient-to-br from-slate-900/80 to-blue-900/20 border border-blue-500/30 pl-12 pr-4 py-3.5 rounded-xl w-48 text-white outline-none focus:border-blue-400 transition-all backdrop-blur-xl"
+            calendarClassName="bg-slate-900 text-white border border-slate-700"
+          />
+        </div>
       </div>
 
-      <div className="bg-slate-900 border border-slate-700 rounded overflow-hidden">
+      <div className="bg-gradient-to-br from-slate-900/50 to-blue-900/20 border border-blue-500/20 rounded-2xl overflow-hidden backdrop-blur-xl shadow-2xl">
         <table className="w-full text-left">
-          <thead className="bg-slate-800 text-slate-200">
+          <thead className="bg-gradient-to-r from-slate-800/90 to-blue-900/40 text-blue-300 border-b border-blue-500/20">
             <tr>
               <th className="p-3">Mã đơn hàng</th>
               <th>Sản phẩm</th>
@@ -225,7 +244,7 @@ export default function PurchasePage() {
             </tr>
           </thead>
 
-          <tbody>
+          <tbody className="divide-y divide-blue-500/10">
             {fetching ? (
               <tr className="border-t border-slate-700">
                 <td className="p-3 text-slate-300" colSpan={7}>
@@ -250,24 +269,29 @@ export default function PurchasePage() {
                 return (
                   <tr
                     key={o.id}
-                    className="border-t border-slate-700 hover:bg-slate-800/40 cursor-pointer"
+                    className="hover:bg-gradient-to-r hover:from-slate-800/40 hover:to-blue-900/20 transition-all duration-300 cursor-pointer group border-l-4 border-l-transparent hover:border-l-blue-500"
                     onClick={() => router.push(`/routes/orders/${o.id}`)}
                   >
-                    <td className="p-3 font-semibold">{displayOrderCode(o.id)}</td>
-                    <td>{o.productName}</td>
-                    <td className="font-semibold">{o.quantity}</td>
-                    <td>{formatDateDDMMYYYY(o.purchasedAt)}</td>
-                    <td className="font-semibold">{formatVND(money)}</td>
-                    <td>
-                      <span className={st.cls}>{st.text}</span>
+                    <td className="p-4 font-bold text-blue-400">{displayOrderCode(o.id)}</td>
+                    <td className="p-4 group-hover:text-blue-300 transition-colors">{o.productName}</td>
+                    <td className="p-4 font-semibold">{o.quantity}</td>
+                    <td className="p-4">{formatDateDDMMYYYY(o.purchasedAt)}</td>
+                    <td className="p-4 font-semibold text-emerald-400">{formatVND(money)}</td>
+                    <td className="p-4">
+                      <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold ${
+                        o.status === 'PAID' ? 'bg-gradient-to-r from-green-500/10 to-emerald-500/10 text-green-400 border border-green-500/30 shadow-lg shadow-green-500/10' :
+                        o.status === 'PENDING' ? 'bg-gradient-to-r from-yellow-500/10 to-amber-500/10 text-yellow-400 border border-yellow-500/30 shadow-lg shadow-yellow-500/10' :
+                        'bg-gradient-to-r from-red-500/10 to-rose-500/10 text-red-400 border border-red-500/30 shadow-lg shadow-red-500/10'
+                      }`}>{st.text}</span>
                     </td>
-                    <td className="font-mono">{countdown}</td>
+                    <td className="p-4 font-mono text-slate-400">{countdown}</td>
                   </tr>
                 );
               })
             )}
           </tbody>
         </table>
+      </div>
       </div>
     </div>
   );
