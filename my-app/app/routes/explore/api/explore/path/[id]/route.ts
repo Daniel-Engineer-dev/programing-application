@@ -10,7 +10,7 @@ import {
   documentId,
 } from "firebase/firestore";
 
-export async function GET(req: Request, context: { params: { id: string } }) {
+export async function GET(req: Request, context: { params: Promise<{ id: string }> }) {
   try {
     // FIX LỖI PROMISE
     const { id } = await context.params;

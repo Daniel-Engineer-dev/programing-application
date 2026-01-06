@@ -5,7 +5,7 @@ import { db } from "@/src/api/firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { marked } from "marked";
 
-export async function GET(req: Request, context: { params: { id: string } }) {
+export async function GET(req: Request, context: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await context.params;
 
