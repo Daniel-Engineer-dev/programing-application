@@ -14,7 +14,7 @@ import { collection, query, where, getDocs, limit } from "firebase/firestore";
 import { useAuthContext } from "@/src/userHook/context/authContext";
 
 const LoginForm = () => {
-  const { signInWithGoogle, signInWithGithub } = useAuthContext();
+  const { loginWithGoogle, loginWithGithub } = useAuthContext();
 
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -93,10 +93,17 @@ const LoginForm = () => {
 
   const handleSocialLogin = async (type: "google" | "github") => {
     setLoading(true);
+    setError("");
     try {
-      setError("");
-      if (type === "google") await signInWithGoogle();
-      else await signInWithGithub();
+      const result = type === "google" 
+        ? await loginWithGoogle() 
+        : await loginWithGithub();
+      
+      if (!result.success && result.message) {
+        setError(result.message);
+      } else if (result.success) {
+        alert("✅ Đăng nhập thành công!");
+      }
     } catch (err: any) {
       setError("Lỗi đăng nhập mạng xã hội: " + err.message);
     } finally {

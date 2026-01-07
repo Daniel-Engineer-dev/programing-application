@@ -16,7 +16,7 @@ import {
 import { useAuthContext } from "@/src/userHook/context/authContext";
 
 const SignupForm = () => {
-  const { signInWithGoogle, signInWithGithub } = useAuthContext(); // Lấy hàm từ context
+  const { signUpWithGoogle, signUpWithGithub } = useAuthContext(); // Lấy hàm từ context
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
@@ -25,6 +25,7 @@ const SignupForm = () => {
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Kiểm tra email hợp lệ
   const validEmail = (email: string) => {
@@ -111,14 +112,24 @@ const SignupForm = () => {
     }
   };
 
-  // Xử lý đăng nhập mạng xã hội
-  const handleSocialLogin = async (type: "google" | "github") => {
+  // Xử lý đăng ký mạng xã hội
+  const handleSocialSignup = async (type: "google" | "github") => {
+    setLoading(true);
+    setError("");
     try {
-      if (type === "google") await signInWithGoogle();
-      else await signInWithGithub();
-      // Logic redirect đã được xử lý ở useEffect của SignupPage
+      const result = type === "google" 
+        ? await signUpWithGoogle() 
+        : await signUpWithGithub();
+      
+      if (!result.success && result.message) {
+        setError(result.message);
+      } else if (result.success) {
+        alert("✅ Đăng ký thành công!");
+      }
     } catch (err: any) {
       setError("Lỗi kết nối mạng xã hội: " + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -229,7 +240,7 @@ const SignupForm = () => {
           <div className="grid grid-cols-2 gap-4">
             <button
               type="button"
-              onClick={() => handleSocialLogin("google")}
+              onClick={() => handleSocialSignup("google")}
               className="flex items-center justify-center gap-2 rounded-lg border border-slate-700 bg-slate-950 py-2.5 text-sm font-medium text-white hover:bg-slate-800"
             >
               <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -254,7 +265,7 @@ const SignupForm = () => {
             </button>
             <button
               type="button"
-              onClick={() => handleSocialLogin("github")}
+              onClick={() => handleSocialSignup("github")}
               className="flex items-center justify-center gap-2 rounded-lg border border-slate-700 bg-slate-950 py-2.5 text-sm font-medium text-white hover:bg-slate-800"
             >
               <Github size={20} />
