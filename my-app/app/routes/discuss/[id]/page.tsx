@@ -1311,24 +1311,41 @@ export default function DiscussionDetailPage() {
   // =========================
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-900 text-white">
-        Đang tải bài đăng...
+      <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -left-40 -top-40 h-80 w-80 animate-pulse rounded-full bg-blue-600/20 blur-3xl" />
+          <div className="absolute -bottom-40 -right-40 h-96 w-96 animate-pulse rounded-full bg-purple-600/20 blur-3xl" />
+        </div>
+        <div className="relative z-10 flex min-h-screen items-center justify-center">
+          <div className="flex flex-col items-center gap-4">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-400 border-t-transparent" />
+            <p className="text-slate-400">Đang tải bài đăng...</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (!discussion) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-slate-900 p-6 text-white">
-        <Frown size={48} className="mb-4 text-red-500" />
-        <h1 className="mb-2 text-2xl font-bold">Không tìm thấy chủ đề</h1>
-        <p className="text-slate-400">ID không tồn tại hoặc đã bị xoá.</p>
-        <Link
-          href="/routes/discuss"
-          className="mt-6 text-blue-400 underline hover:text-blue-300"
-        >
-          Quay lại trang thảo luận
-        </Link>
+      <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -left-40 -top-40 h-80 w-80 animate-pulse rounded-full bg-red-600/20 blur-3xl" />
+        </div>
+        <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4">
+          <div className="w-full max-w-md rounded-2xl border border-slate-700/50 bg-slate-900/80 p-8 text-center shadow-2xl backdrop-blur-xl">
+            <Frown size={48} className="mx-auto mb-4 text-red-400" />
+            <h1 className="mb-2 text-2xl font-bold text-white">Không tìm thấy chủ đề</h1>
+            <p className="mb-6 text-slate-400">ID không tồn tại hoặc đã bị xoá.</p>
+            <Link
+              href="/routes/discuss"
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition-all hover:shadow-xl"
+            >
+              <ArrowLeft size={16} />
+              Quay lại trang thảo luận
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }
@@ -1337,31 +1354,40 @@ export default function DiscussionDetailPage() {
   const isPostDisliked = currentVote === "dislike";
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-200">
-      <main className="relative mx-auto max-w-4xl space-y-10 px-6 py-12">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-200">
+      {/* Animated background orbs */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -left-40 -top-40 h-80 w-80 animate-pulse rounded-full bg-blue-600/20 blur-3xl" />
+        <div className="absolute -bottom-40 -right-40 h-96 w-96 animate-pulse rounded-full bg-purple-600/20 blur-3xl" style={{ animationDelay: "1s" }} />
+        <div className="absolute left-1/2 top-1/3 h-64 w-64 -translate-x-1/2 animate-pulse rounded-full bg-emerald-600/10 blur-3xl" style={{ animationDelay: "2s" }} />
+      </div>
+
+      <main className="relative z-10 mx-auto max-w-4xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
+        {/* Back button */}
         <Link
           href="/routes/discuss"
-          className="mb-4 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition"
+          className="inline-flex items-center gap-2 text-sm text-slate-400 transition-colors hover:text-white"
           title="Quay lại trang thảo luận"
         >
-          <ArrowLeft size={18} />
+          <ArrowLeft size={16} />
+          Quay lại danh sách
         </Link>
 
-        {/* Header */}
-        <header className="border-b border-slate-700 pb-6">
+        {/* Header Card */}
+        <header className="rounded-2xl border border-slate-700/50 bg-slate-900/80 p-6 shadow-2xl backdrop-blur-xl sm:p-8">
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-            <div>
-              <h1 className="mb-3 text-3xl font-bold text-white">
+            <div className="flex-1">
+              <h1 className="mb-3 text-2xl font-bold text-white sm:text-3xl">
                 {discussion.title}
               </h1>
-              <p className="mb-4 text-slate-400">{discussion.excerpt}</p>
+              <p className="mb-4 text-sm text-slate-400 leading-relaxed">{discussion.excerpt}</p>
 
               {discussion.tags.length > 0 && (
-                <div className="mb-2 flex flex-wrap gap-2">
+                <div className="mb-4 flex flex-wrap gap-2">
                   {discussion.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="rounded-full bg-slate-800 px-2 py-0.5 text-[11px] text-slate-400 border border-slate-700"
+                      className="rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-300"
                     >
                       {tag}
                     </span>
@@ -1369,33 +1395,33 @@ export default function DiscussionDetailPage() {
                 </div>
               )}
 
-              <div className="mt-2 flex flex-wrap items-center gap-4 text-sm text-slate-400">
-                <span className="flex items-center gap-2">
-                  <User size={16} />
+              <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400">
+                <span className="flex items-center gap-1.5">
+                  <User size={14} className="text-slate-500" />
                   {discussion.authorName}
                 </span>
-                <span className="flex items-center gap-2">
-                  <Clock size={16} />
+                <span className="flex items-center gap-1.5">
+                  <Clock size={14} className="text-slate-500" />
                   {discussion.createdAt}
                 </span>
-                <span className="flex items-center gap-2">
-                  <MessageSquare size={16} />
+                <span className="flex items-center gap-1.5">
+                  <MessageSquare size={14} className="text-slate-500" />
                   {discussion.repliesCount} phản hồi
                 </span>
-                <span className="flex items-center gap-2">
-                  <Eye size={16} />
+                <span className="flex items-center gap-1.5">
+                  <Eye size={14} className="text-slate-500" />
                   {discussion.viewsCount} lượt xem
                 </span>
               </div>
             </div>
 
-            {/* ✅ Tác giả: dấu 3 chấm dọc -> menu 2 dòng */}
+            {/* Author menu */}
             {canEditPost && (
               <div className="relative">
                 <button
                   type="button"
                   onClick={() => setPostMenuOpen((o) => !o)}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-600 bg-slate-800 text-slate-200 hover:border-slate-400"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-300 transition-all hover:border-slate-500 hover:bg-slate-700"
                   title="Tuỳ chọn"
                 >
                   <MoreVertical size={18} />
@@ -1431,15 +1457,15 @@ export default function DiscussionDetailPage() {
               </div>
             )}
 
-            {/* ✅ LỖI 1: Báo cáo 1 hàng */}
+            {/* Report button */}
             {canReportPost && (
               <button
                 type="button"
                 onClick={() => setReportPostOpen(true)}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-600 bg-slate-800 px-4 py-2 text-sm text-slate-200 hover:border-slate-400 whitespace-nowrap leading-none"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-600/50 bg-slate-800/80 px-4 py-2 text-sm text-slate-300 transition-all hover:border-red-400/50 hover:text-red-300 whitespace-nowrap"
               >
                 <Flag size={16} />
-                <span className="whitespace-nowrap">Báo cáo</span>
+                <span>Báo cáo</span>
               </button>
             )}
           </div>
@@ -1473,31 +1499,36 @@ export default function DiscussionDetailPage() {
           </div>
         </header>
 
-        {(() => {
-          const contentHtml = markdownToHtml(discussion?.content || "");
-          return <div dangerouslySetInnerHTML={{ __html: contentHtml }} />;
-        })()}
+        {/* Content Card */}
+        <div className="rounded-2xl border border-slate-700/50 bg-slate-900/60 p-6 shadow-xl backdrop-blur-sm sm:p-8">
+          {(() => {
+            const contentHtml = markdownToHtml(discussion?.content || "");
+            return <div className="prose prose-invert prose-slate max-w-none" dangerouslySetInnerHTML={{ __html: contentHtml }} />;
+          })()}
+        </div>
 
-        {/* Comments */}
-        <section className="space-y-4">
+        {/* Comments Section */}
+        <section className="space-y-6">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <h2 className="flex items-center gap-2 text-xl font-semibold text-white">
-              <MessageSquare size={20} /> Bình luận
+              <MessageSquare size={20} className="text-blue-400" />
+              <span>Bình luận</span>
+              <span className="rounded-full bg-blue-500/20 px-2 py-0.5 text-xs text-blue-300">{discussion.repliesCount}</span>
             </h2>
 
-            {/* ✅ Sort: chỉ 3 dòng */}
+            {/* Sort dropdown */}
             <div className="relative">
               <button
                 type="button"
                 onClick={() => setSortOpen((o) => !o)}
-                className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-200 hover:border-slate-500"
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-700/50 bg-slate-800/80 px-4 py-2.5 text-sm text-slate-200 transition-all hover:border-slate-600 hover:bg-slate-700"
               >
                 Sắp xếp: <span className="font-semibold">{sortLabel}</span>
                 <ChevronDown size={16} />
               </button>
 
               {sortOpen && (
-                <div className="absolute right-0 mt-2 w-64 rounded-xl border border-slate-700 bg-slate-900 p-2 shadow-xl z-10">
+                <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-slate-700/50 bg-slate-900/95 p-2 shadow-2xl backdrop-blur-xl z-10">
                   {[
                     { key: "BEST" as const, label: "Hay nhất" },
                     {
@@ -1514,10 +1545,10 @@ export default function DiscussionDetailPage() {
                         setSortOpen(false);
                         setParentPage(1);
                       }}
-                      className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm ${
+                      className={`flex w-full items-center justify-between rounded-xl px-4 py-2.5 text-left text-sm transition-all ${
                         sortKey === it.key
-                          ? "bg-slate-800 text-white"
-                          : "text-slate-200 hover:bg-slate-800"
+                          ? "bg-blue-500/20 text-blue-200"
+                          : "text-slate-300 hover:bg-slate-800"
                       }`}
                     >
                       {it.label}
@@ -1531,31 +1562,41 @@ export default function DiscussionDetailPage() {
             </div>
           </div>
 
-          {/* ✅ Placeholder đúng yêu cầu */}
-          <div className="rounded-xl border border-slate-700 bg-slate-900/40 p-4">
+          {/* Comment input */}
+          <div className="rounded-2xl border border-slate-700/50 bg-slate-900/60 p-5 shadow-xl backdrop-blur-sm">
             <textarea
               value={newCommentText}
               onChange={(e) => setNewCommentText(e.target.value)}
               rows={4}
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-200 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              className="w-full resize-none rounded-xl border border-slate-700/50 bg-slate-800/50 px-4 py-3 text-sm text-slate-200 placeholder-slate-500 outline-none transition-all focus:border-blue-500/50 focus:bg-slate-800 focus:ring-2 focus:ring-blue-500/20"
               placeholder="Nhập bình luận của bạn..."
             />
-            <div className="mt-3 flex justify-end">
+            <div className="mt-4 flex justify-end">
               <button
                 type="button"
                 onClick={handleCreateComment}
-                className="rounded-lg bg-emerald-600 px-5 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:bg-emerald-900"
+                className="rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all hover:shadow-xl hover:shadow-emerald-500/30 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
                 disabled={postingComment}
               >
-                {postingComment ? "Đang đăng..." : "Đăng bình luận"}
+                {postingComment ? (
+                  <span className="flex items-center gap-2">
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+                    Đang đăng...
+                  </span>
+                ) : (
+                  "Đăng bình luận"
+                )}
               </button>
             </div>
           </div>
 
           {sortedParents.length === 0 ? (
-            <p className="text-sm text-slate-500">
-              Chưa có bình luận nào. Hãy là người đầu tiên!
-            </p>
+            <div className="rounded-2xl border border-slate-700/30 bg-slate-900/40 p-8 text-center">
+              <MessageSquare size={40} className="mx-auto mb-3 text-slate-600" />
+              <p className="text-sm text-slate-500">
+                Chưa có bình luận nào. Hãy là người đầu tiên!
+              </p>
+            </div>
           ) : (
             <div className="space-y-4">
               {sortedParents.map((c) => renderCommentCard(c, false))}
