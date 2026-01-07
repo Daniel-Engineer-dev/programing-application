@@ -1,12 +1,10 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, useRef } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import {
   onAuthStateChanged,
   User,
   signInWithPopup,
-  signInWithRedirect,
-  getRedirectResult,
   GoogleAuthProvider,
   GithubAuthProvider,
 } from "firebase/auth";
@@ -33,7 +31,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(true);
-  const redirectHandled = useRef(false); // Flag để tránh xử lý redirect nhiều lần
 
   // Hàm đồng bộ dữ liệu User vào Firestore collection "users"
   const syncUserToFirestore = async (currentUser: User) => {
@@ -62,15 +59,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      // Sử dụng redirect cho production (tránh COOP error trên Vercel)
-      // Popup cho development (UX tốt hơn)
-      if (process.env.NODE_ENV === 'production') {
-        await signInWithRedirect(auth, provider);
-      } else {
-        const result = await signInWithPopup(auth, provider);
-        await syncUserToFirestore(result.user);
+      const result = await signInWithPopup(auth, provider);
+      await syncUserToFirestore(result.user);
+    } catch (error: unknown) {
+      // Bỏ qua lỗi popup bị đóng bởi user
+      if (error instanceof Error && error.message?.includes('popup-closed-by-user')) {
+        return;
       }
-    } catch (error) {
       console.error("Lỗi đăng nhập Google:", error);
     }
   };
@@ -78,36 +73,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signInWithGithub = async () => {
     const provider = new GithubAuthProvider();
     try {
-      if (process.env.NODE_ENV === 'production') {
-        await signInWithRedirect(auth, provider);
-      } else {
-        const result = await signInWithPopup(auth, provider);
-        await syncUserToFirestore(result.user);
+      const result = await signInWithPopup(auth, provider);
+      await syncUserToFirestore(result.user);
+    } catch (error: unknown) {
+      // Bỏ qua lỗi popup bị đóng bởi user
+      if (error instanceof Error && error.message?.includes('popup-closed-by-user')) {
+        return;
       }
-    } catch (error) {
       console.error("Lỗi đăng nhập Github:", error);
     }
   };
 
   useEffect(() => {
-    // Xử lý kết quả redirect (cho production) - CHỈ MỘT LẦN
-    const handleRedirectResult = async () => {
-      if (redirectHandled.current) return; // Đã xử lý rồi thì bỏ qua
-      
-      redirectHandled.current = true; // Đánh dấu đã xử lý
-      
-      try {
-        const result = await getRedirectResult(auth);
-        if (result?.user) {
-          await syncUserToFirestore(result.user);
-        }
-      } catch (error) {
-        console.error("Lỗi xử lý redirect:", error);
-      }
-    };
-
-    handleRedirectResult();
-
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
