@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useRef } from "react";
 import {
   onAuthStateChanged,
   User,
@@ -33,6 +33,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(true);
+  const redirectHandled = useRef(false); // Flag để tránh xử lý redirect nhiều lần
 
   // Hàm đồng bộ dữ liệu User vào Firestore collection "users"
   const syncUserToFirestore = async (currentUser: User) => {
@@ -89,8 +90,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    // Xử lý kết quả redirect (cho production)
+    // Xử lý kết quả redirect (cho production) - CHỈ MỘT LẦN
     const handleRedirectResult = async () => {
+      if (redirectHandled.current) return; // Đã xử lý rồi thì bỏ qua
+      
+      redirectHandled.current = true; // Đánh dấu đã xử lý
+      
       try {
         const result = await getRedirectResult(auth);
         if (result?.user) {
