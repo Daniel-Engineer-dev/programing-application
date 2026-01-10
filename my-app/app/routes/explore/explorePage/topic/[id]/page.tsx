@@ -3,7 +3,11 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, PlayCircle, Layers, FileText, BookOpen } from "lucide-react";
+import { ArrowLeft, PlayCircle, Layers, FileText, BookOpen, Check, Bookmark, BookmarkCheck } from "lucide-react";
+import { useAuthContext } from "@/src/userHook/context/authContext";
+import { db } from "@/src/api/firebase/firebase";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { toast } from "sonner";
 
 interface TopicDetailData {
   id: string;
@@ -28,7 +32,12 @@ const getYouTubeEmbedUrl = (url: string) => {
 export default function TopicDetail() {
   const { id } = useParams<{ id: string }>();
   const [topic, setTopic] = useState<TopicDetailData | null>(null);
+  const { user } = useAuthContext();
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [interactionLoading, setInteractionLoading] = useState(true);
 
+  // Fetch Topic Data
   useEffect(() => {
     if (!id) return;
     const load = async () => {
@@ -42,6 +51,77 @@ export default function TopicDetail() {
     };
     load();
   }, [id]);
+
+  // Fetch User Interaction
+  useEffect(() => {
+    if (!user || !id) {
+        setInteractionLoading(false);
+        return;
+    }
+    const checkInteraction = async () => {
+      try {
+        const ref = doc(db, "users", user.uid, "interactions", `topic_${id}`);
+        const snap = await getDoc(ref);
+        if (snap.exists()) {
+          const data = snap.data();
+          setIsCompleted(data.completed || false);
+          setIsSaved(data.saved || false);
+        }
+      } catch (error) {
+        console.error("Error fetching interaction:", error);
+      } finally {
+        setInteractionLoading(false);
+      }
+    };
+    checkInteraction();
+  }, [user, id]);
+
+  const handleMarkComplete = async () => {
+    if (!user) {
+        toast.error("Vui lòng đăng nhập để sử dụng tính năng này");
+        return;
+    }
+    try {
+        const newState = !isCompleted;
+        setIsCompleted(newState); // Optimistic update
+        const ref = doc(db, "users", user.uid, "interactions", `topic_${id}`);
+        await setDoc(ref, { 
+            completed: newState,
+            type: 'topic',
+            updatedAt: serverTimestamp() 
+        }, { merge: true });
+        
+        if (newState) toast.success("Đã đánh dấu hoàn thành!");
+    } catch (error) {
+        setIsCompleted(!isCompleted); // Revert
+        toast.error("Có lỗi xảy ra");
+        console.error(error);
+    }
+  };
+
+  const handleSaveToList = async () => {
+    if (!user) {
+        toast.error("Vui lòng đăng nhập để sử dụng tính năng này");
+        return;
+    }
+    try {
+        const newState = !isSaved;
+        setIsSaved(newState); // Optimistic update
+        const ref = doc(db, "users", user.uid, "interactions", `topic_${id}`);
+        await setDoc(ref, { 
+            saved: newState,
+            type: 'topic',
+            updatedAt: serverTimestamp() 
+        }, { merge: true });
+
+        if (newState) toast.success("Đã lưu vào danh sách!");
+        else toast.info("Đã xóa khỏi danh sách");
+    } catch (error) {
+        setIsSaved(!isSaved); // Revert
+        toast.error("Có lỗi xảy ra");
+        console.error(error);
+    }
+  };
 
   if (!topic)
     return (
@@ -264,11 +344,42 @@ export default function TopicDetail() {
                     Hành động
                   </h3>
                   <div className="space-y-2">
-                    <button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white px-4 py-3 rounded-xl font-semibold text-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
-                      Đánh dấu hoàn thành
+                    <button 
+                        onClick={handleMarkComplete}
+                        className={`w-full px-4 py-3 rounded-xl font-semibold text-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 flex items-center justify-center gap-2
+                        ${isCompleted 
+                            ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white' 
+                            : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white'
+                        }`}
+                    >
+                      {isCompleted ? (
+                          <>
+                            <Check className="w-4 h-4" />
+                            Đã hoàn thành
+                          </>
+                      ) : (
+                          "Đánh dấu hoàn thành"
+                      )}
                     </button>
-                    <button className="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-4 py-3 rounded-xl font-semibold text-sm transition-all duration-300 border border-slate-700">
-                      Lưu vào danh sách
+                    <button 
+                        onClick={handleSaveToList}
+                        className={`w-full px-4 py-3 rounded-xl font-semibold text-sm transition-all duration-300 border flex items-center justify-center gap-2
+                        ${isSaved
+                            ? 'bg-blue-900/50 border-blue-500/50 text-blue-200'
+                            : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border-slate-700'
+                        }`}
+                    >
+                      {isSaved ? (
+                          <>
+                            <BookmarkCheck className="w-4 h-4" />
+                            Đã lưu
+                          </>
+                      ) : (
+                          <>
+                            <Bookmark className="w-4 h-4" />
+                            Lưu vào danh sách
+                          </>
+                      )}
                     </button>
                   </div>
                 </div>

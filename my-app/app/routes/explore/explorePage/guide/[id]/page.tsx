@@ -2,8 +2,12 @@
 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Layers, FileText, ArrowLeft, User, BookMarked, Clock } from "lucide-react";
+import { Layers, FileText, ArrowLeft, User, BookMarked, Clock, Printer, BookmarkCheck, Bookmark } from "lucide-react";
 import Link from "next/link";
+import { useAuthContext } from "@/src/userHook/context/authContext";
+import { db } from "@/src/api/firebase/firebase";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { toast } from "sonner";
 
 // --- Interfaces ---
 interface GuideDetailData {
@@ -22,6 +26,8 @@ export default function GuideDetail() {
   const [guide, setGuide] = useState<GuideDetailData | null>(null);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const { user } = useAuthContext();
+  const [isSaved, setIsSaved] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -43,6 +49,50 @@ export default function GuideDetail() {
     };
     load();
   }, [id]);
+
+  // Fetch Interaction
+  useEffect(() => {
+    if (!user || !id) return;
+    const checkInteraction = async () => {
+        try {
+            const ref = doc(db, "users", user.uid, "interactions", `guide_${id}`);
+            const snap = await getDoc(ref);
+            if (snap.exists()) {
+                setIsSaved(snap.data().saved || false);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    checkInteraction();
+  }, [user, id]);
+
+  const handleSaveGuide = async () => {
+    if (!user) {
+        toast.error("Vui lòng đăng nhập để lưu hướng dẫn");
+        return;
+    }
+    try {
+        const newState = !isSaved;
+        setIsSaved(newState);
+        const ref = doc(db, "users", user.uid, "interactions", `guide_${id}`);
+        await setDoc(ref, {
+            saved: newState,
+            type: 'guide',
+            updatedAt: serverTimestamp()
+        }, { merge: true });
+        
+        if (newState) toast.success("Đã lưu hướng dẫn");
+        else toast.info("Đã bỏ lưu hướng dẫn");
+    } catch (error) {
+        setIsSaved(!isSaved);
+        toast.error("Có lỗi xảy ra");
+    }
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
 
   if (loading)
     return (
@@ -268,10 +318,31 @@ export default function GuideDetail() {
                     Hành động
                   </h3>
                   <div className="space-y-2">
-                    <button className="w-full bg-gradient-to-r from-pink-600 to-orange-600 hover:from-pink-500 hover:to-orange-500 text-white px-4 py-3 rounded-xl font-semibold text-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
-                      Lưu hướng dẫn
+                    <button 
+                        onClick={handleSaveGuide}
+                        className={`w-full px-4 py-3 rounded-xl font-semibold text-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 flex items-center justify-center gap-2
+                        ${isSaved 
+                            ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white' 
+                            : 'bg-gradient-to-r from-pink-600 to-orange-600 hover:from-pink-500 hover:to-orange-500 text-white'
+                        }`}
+                    >
+                      {isSaved ? (
+                          <>
+                            <BookmarkCheck className="w-4 h-4" />
+                            Đã lưu
+                          </>
+                      ) : (
+                          <>
+                            <BookMarked className="w-4 h-4" />
+                            Lưu hướng dẫn
+                          </>
+                      )}
                     </button>
-                    <button className="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-4 py-3 rounded-xl font-semibold text-sm transition-all duration-300 border border-slate-700">
+                    <button 
+                        onClick={handlePrint}
+                        className="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-4 py-3 rounded-xl font-semibold text-sm transition-all duration-300 border border-slate-700 flex items-center justify-center gap-2"
+                    >
+                      <Printer className="w-4 h-4" />
                       In tài liệu
                     </button>
                   </div>

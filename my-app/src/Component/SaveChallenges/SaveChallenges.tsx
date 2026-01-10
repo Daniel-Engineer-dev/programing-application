@@ -73,7 +73,7 @@ export default function SaveChallengesPage() {
   };
 
   const handleDelete = async (challengeId: string) => {
-    if (userId && confirm("Bạn muốn xóa lộ trình này?")) {
+    if (userId && confirm("Bạn muốn xóa danh sách này?")) {
       await deleteDoc(doc(db, "users", userId, "savechallenges", challengeId));
       fetchData(userId);
     }
@@ -112,14 +112,14 @@ export default function SaveChallengesPage() {
               Thử thách đã lưu
             </h1>
             <p className="text-slate-400 mt-3 text-lg">
-              Quản lý các lộ trình học tập cá nhân của bạn
+              Quản lý các danh sách học tập cá nhân của bạn
             </p>
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
             className="flex items-center gap-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 px-6 py-3.5 rounded-xl font-bold transition-all hover:scale-105 active:scale-95 shadow-2xl hover:shadow-blue-500/50"
           >
-            <FiPlus size={20} /> Tạo lộ trình
+            <FiPlus size={20} /> Tạo danh sách
           </button>
         </div>
 
@@ -134,11 +134,11 @@ export default function SaveChallengesPage() {
               <FiBookOpen className="w-20 h-20 text-blue-400" />
             </div>
             <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-3">
-              Chưa có lộ trình nào
+              Chưa có danh sách nào
             </h2>
             <p className="text-slate-400 text-center max-w-md mb-10 leading-relaxed text-lg">
-              Bạn chưa tạo thử thách nào. Hãy kết hợp các bài tập để tạo nên một
-              lộ trình riêng biệt cho mình!
+              Bạn chưa tạo danh sách nào. Hãy kết hợp các bài tập để tạo nên một
+              danh sách riêng biệt cho mình!
             </p>
             <button
               onClick={() => setIsModalOpen(true)}

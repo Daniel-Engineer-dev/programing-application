@@ -3,7 +3,11 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Map, CheckCircle2, Circle } from "lucide-react";
+import { ArrowLeft, Map, CheckCircle2, Circle, Bookmark, BookmarkCheck } from "lucide-react";
+import { useAuthContext } from "@/src/userHook/context/authContext";
+import { db } from "@/src/api/firebase/firebase";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { toast } from "sonner";
 
 // --- Interfaces ---
 interface Lesson {
@@ -25,6 +29,10 @@ interface PathDetailData {
 export default function PathDetail() {
   const { id } = useParams<{ id: string }>();
   const [path, setPath] = useState<PathDetailData | null>(null);
+  const { user } = useAuthContext();
+  const [completedLessonIds, setCompletedLessonIds] = useState<Set<string>>(new Set());
+  const [progress, setProgress] = useState(0);
+  const [isSaved, setIsSaved] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -41,6 +49,86 @@ export default function PathDetail() {
     };
     load();
   }, [id]);
+
+  useEffect(() => {
+    if (!user || !path || path.lessons.length === 0) return;
+
+    const checkProgress = async () => {
+        const completed = new Set<string>();
+        for (const lesson of path.lessons) {
+            try {
+                // lesson.ref is the topic id
+                const ref = doc(db, "users", user.uid, "interactions", `topic_${lesson.ref}`);
+                const snap = await getDoc(ref);
+                if (snap.exists() && snap.data().completed) {
+                    completed.add(lesson.ref);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        setCompletedLessonIds(completed);
+        const percent = Math.round((completed.size / path.lessons.length) * 100);
+        setProgress(percent);
+
+        // Auto-mark Path as Completed
+        if (user) {
+            try {
+                const isPathCompleted = percent === 100;
+                const pathRef = doc(db, "users", user.uid, "interactions", `path_${path.id}`);
+                // Only update if necessary (to reduce writes/toasts could require fetching first, but merge is safe)
+                await setDoc(pathRef, {
+                    completed: isPathCompleted,
+                    type: 'path',
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+            } catch (err) {
+                console.error("Error auto-completing path:", err);
+            }
+        }
+    };
+    checkProgress();
+  }, [user, path]);
+
+  // Fetch Saved State
+  useEffect(() => {
+    if (!user || !id) return;
+    const checkSaved = async () => {
+        try {
+            const ref = doc(db, "users", user.uid, "interactions", `path_${id}`);
+            const snap = await getDoc(ref);
+            if (snap.exists() && snap.data().saved) {
+                setIsSaved(true);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
+    checkSaved();
+  }, [user, id]);
+
+  const handleSavePath = async () => {
+    if (!user) {
+        toast.error("Vui lòng đăng nhập để lưu lộ trình");
+        return;
+    }
+    try {
+        const newState = !isSaved;
+        setIsSaved(newState);
+        const ref = doc(db, "users", user.uid, "interactions", `path_${id}`);
+        await setDoc(ref, {
+            saved: newState,
+            type: 'path',
+            updatedAt: serverTimestamp()
+        }, { merge: true });
+
+        if (newState) toast.success("Đã lưu lộ trình");
+        else toast.info("Đã bỏ lưu lộ trình");
+    } catch (e) {
+        setIsSaved(!isSaved);
+        toast.error("Có lỗi xảy ra");
+    }
+  };
 
   if (!path)
     return (
@@ -182,10 +270,21 @@ export default function PathDetail() {
                     
                     {/* Progress Indicator */}
                     <div className="flex items-center gap-2 mt-4">
-                      <Circle className="w-3 h-3 text-slate-600" />
-                      <span className="text-xs text-slate-500 uppercase tracking-wider">
-                        Chưa hoàn thành
-                      </span>
+                      {completedLessonIds.has(lesson.ref) ? (
+                          <>
+                            <CheckCircle2 className="w-4 h-4 text-green-500" />
+                            <span className="text-xs text-green-400 uppercase tracking-wider font-semibold">
+                              Đã hoàn thành
+                            </span>
+                          </>
+                      ) : (
+                          <>
+                            <Circle className="w-3 h-3 text-slate-600" />
+                            <span className="text-xs text-slate-500 uppercase tracking-wider">
+                              Chưa hoàn thành
+                            </span>
+                          </>
+                      )}
                     </div>
                   </div>
 
@@ -225,18 +324,46 @@ export default function PathDetail() {
                   Tiến độ học tập
                 </h3>
                 <p className="text-sm text-slate-400">
-                  Hoàn thành 0/{path.lessons.length} bài học
+                  Hoàn thành {completedLessonIds.size}/{path.lessons.length} bài học
                 </p>
               </div>
               <div className="text-right">
                 <div className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                  0%
+                  {progress}%
                 </div>
                 <p className="text-xs text-slate-500 mt-1">Hoàn thành</p>
               </div>
             </div>
+            
+            {/* Action Buttons */}
+            <div className="mt-6 flex justify-end">
+                <button
+                    onClick={handleSavePath}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all duration-300 font-semibold text-sm
+                    ${isSaved 
+                        ? 'bg-purple-900/50 border-purple-500/50 text-purple-200' 
+                        : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border-slate-700'
+                    }`}
+                >
+                    {isSaved ? (
+                        <>
+                            <BookmarkCheck className="w-4 h-4" />
+                            Đã lưu lộ trình
+                        </>
+                    ) : (
+                        <>
+                            <Bookmark className="w-4 h-4" />
+                            Lưu lộ trình
+                        </>
+                    )}
+                </button>
+            </div>
+
             <div className="mt-6 h-2 bg-slate-800 rounded-full overflow-hidden">
-              <div className="h-full w-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full transition-all duration-500" />
+              <div 
+                className="h-full bg-gradient-to-r from-purple-600 to-pink-600 rounded-full transition-all duration-1000 ease-out" 
+                style={{ width: `${progress}%` }}
+              />
             </div>
           </div>
         )}
