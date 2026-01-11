@@ -136,7 +136,7 @@ export default function ParticipantsTab({ contestId }: { contestId: string }) {
                     </thead>
                     <tbody className="divide-y divide-slate-800">
                         {filtered.map((p, idx) => (
-                            <tr key={p.uid} className="hover:bg-slate-800/50 transition-colors group">
+                            <tr key={`participant-${p.uid}`} className="hover:bg-slate-800/50 transition-colors group">
                                 <td className="px-6 py-4 text-slate-500 font-mono">{idx + 1}</td>
                                 <td className="px-6 py-4">
                                     <div className="flex items-center gap-3">

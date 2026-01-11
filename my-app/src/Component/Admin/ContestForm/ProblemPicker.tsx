@@ -76,7 +76,7 @@ export default function ProblemPicker({ onSelect, excludeIds, onClose }: Props) 
             ) : (
                 filtered.map(p => (
                     <button 
-                        key={p.id}
+                        key={`picker-${p.id}`}
                         onClick={() => onSelect(p)}
                         className="w-full text-left p-3 rounded-xl hover:bg-slate-800 transition-colors flex items-center justify-between group border border-transparent hover:border-slate-700"
                     >

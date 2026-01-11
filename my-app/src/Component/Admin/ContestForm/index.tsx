@@ -334,7 +334,7 @@ export default function ContestForm({ initialData, onSubmit, isEdit }: Props) {
                 
                 <div className="flex-1 space-y-3 min-h-[300px]">
                     {formData.problems.map((p, idx) => (
-                        <div key={p.problemID || idx} className="bg-slate-950 border border-slate-800 p-3 rounded-xl flex items-center justify-between group hover:border-slate-700 transition-all gap-3">
+                        <div key={`problem-${p.problemID || idx}`} className="bg-slate-950 border border-slate-800 p-3 rounded-xl flex items-center justify-between group hover:border-slate-700 transition-all gap-3">
                             <span className="text-yellow-500 font-bold text-sm w-6 h-6 flex-shrink-0 flex items-center justify-center bg-yellow-500/10 rounded">{p.id}</span>
                             
                             <div className="flex-1 min-w-0">
