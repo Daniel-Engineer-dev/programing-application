@@ -10,12 +10,13 @@ const SignupPage = () => {
   const { user, loading } = useAuthContext();
   const router = useRouter();
 
-  useEffect(() => {
-    if (!loading && user) {
-      // Nếu người dùng đã đăng nhập, không cho phép truy cập trang đăng ký
-      router.push("/");
-    }
-  }, [user, loading, router]);
+  // Tự động redirect ở đây gây lỗi race condition với Social Login
+  // Khi popup Google login xong, user được set -> trang redirect ngay lập tức TRƯỚC KHI logic kiểm tra duplicate/tạo user kịp chạy.
+  // useEffect(() => {
+  //   if (!loading && user) {
+  //     router.push("/");
+  //   }
+  // }, [user, loading, router]);
 
   // Hiển thị màn hình chờ trong khi xác thực trạng thái người dùng
   if (loading) {
@@ -27,11 +28,12 @@ const SignupPage = () => {
   }
 
   // Nếu chưa đăng nhập (user === null), hiển thị form đăng ký
-  return !user ? (
+  // UPDATE: Luôn hiển thị form để tránh unmount khi Social Login tự động set user
+  return (
     <PageTransition>
       <SignupForm />
     </PageTransition>
-  ) : null;
+  );
 };
 
 export default SignupPage;

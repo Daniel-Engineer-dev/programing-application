@@ -14,6 +14,8 @@ export default function ChallengeModal({
   const [name, setName] = useState("");
   const [allProblems, setAllProblems] = useState<any[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
 
@@ -87,6 +89,12 @@ export default function ChallengeModal({
     }
   };
 
+  // Filter problems based on search
+  const filteredProblems = allProblems.filter(p => 
+      (p.title || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (p.id || "").toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[100] p-4">
       <div className="bg-slate-900 border border-slate-700 w-full max-w-md rounded-lg p-6 shadow-2xl text-white">
@@ -97,12 +105,22 @@ export default function ChallengeModal({
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
+        
+        <div className="mb-2">
+             <input
+                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-sm text-slate-300 focus:border-blue-500 outline-none"
+                placeholder="🔍 Tìm kiếm bài tập..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+            />
+        </div>
 
-        <p className="text-sm text-slate-400 mb-2 font-medium">
-          Chọn bài tập ({selectedIds.length}):
+        <p className="text-xs text-slate-400 mb-2 font-medium flex justify-between">
+          <span>Chọn bài tập:</span>
+          <span>Đã chọn: {selectedIds.length}</span>
         </p>
         <div className="max-h-60 overflow-y-auto border border-slate-800 rounded bg-slate-950 p-2 mb-6 custom-scrollbar">
-          {allProblems.map((p) => (
+          {filteredProblems.map((p) => (
             <div
               key={p.id}
               className={`flex items-center justify-between p-3 mb-2 rounded-lg cursor-pointer transition ${
@@ -140,6 +158,9 @@ export default function ChallengeModal({
               </span>
             </div>
           ))}
+          {filteredProblems.length === 0 && (
+              <p className="text-center text-slate-500 text-xs py-4">Không tìm thấy bài tập nào.</p>
+          )}
         </div>
         <div className="flex justify-end gap-3">
           <button

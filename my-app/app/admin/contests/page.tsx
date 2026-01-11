@@ -89,8 +89,8 @@ export default function ContestsAdminPage() {
         else if (now >= start && now <= end) status = "ongoing";
 
         return {
-          id: doc.id,
           ...data,
+          id: doc.id, // Ensure Firestore ID is used, not overridden by potential empty 'id' field in data
           startTime: start.toISOString(),
           endTime: end.toISOString(),
           status

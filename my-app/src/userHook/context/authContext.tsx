@@ -10,7 +10,8 @@ import {
   signOut,
 } from "firebase/auth";
 import { auth, db } from "@/src/api/firebase/firebase";
-import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs, limit } from "firebase/firestore";
+import { updateProfile } from "firebase/auth";
 
 interface AuthContextType {
   user: User | null;
@@ -51,17 +52,59 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   // Tạo user mới trong Firestore
-  const createUserInFirestore = async (currentUser: User) => {
+  const createUserInFirestore = async (currentUser: User, email: string) => {
+    let baseName = "";
+    
+    // Ưu tiên 1: GitHub username (screenName) - có trong reloadUserInfo (undocumented prop)
+    const screenName = (currentUser as any).reloadUserInfo?.screenName;
+    
+    // Ưu tiên 2: Email prefix
+    const emailPrefix = email ? email.split('@')[0] : "";
+
+    if (screenName) {
+        baseName = screenName;
+    } else if (emailPrefix) {
+        baseName = emailPrefix;
+    } else {
+        baseName = currentUser.displayName?.replace(/\s+/g, '') || "User_" + currentUser.uid.slice(0, 5);
+    }
+
+    // Sanitize: Chỉ giữ lại chữ, số, gạch dưới, gạch ngang
+    baseName = baseName.replace(/[^a-zA-Z0-9-_]/g, "");
+    if (baseName.length < 3) baseName = baseName + "_user";
+
+    // Kiểm tra trùng lặp username
+    let finalUsername = baseName;
+    const usersRef = collection(db, "users");
+    
+    // Kiểm tra lần 1
+    const q1 = query(usersRef, where("username", "==", finalUsername), limit(1));
+    const snap1 = await getDocs(q1);
+
+    if (!snap1.empty) {
+        // Nếu trùng, thêm suffix random 4 số
+        const randomSuffix = Math.floor(1000 + Math.random() * 9000); // 1000-9999
+        finalUsername = `${baseName}_${randomSuffix}`;
+    }
+
     const userRef = doc(db, "users", currentUser.uid);
     const newUser = {
       uid: currentUser.uid,
-      email: currentUser.email,
-      username: currentUser.displayName || "User_" + currentUser.uid.slice(0, 5),
+      email: email, // Sử dụng email được truyền vào (đã verify)
+      username: finalUsername,
       avatar: currentUser.photoURL || "",
       role: "user",
       createdAt: serverTimestamp(),
     };
     await setDoc(userRef, newUser);
+    
+    // Cập nhật luôn displayName cho Firebase Auth User để đồng bộ
+    try {
+        await updateProfile(currentUser, { displayName: finalUsername });
+    } catch (e) {
+        console.error("Lỗi cập nhật profile:", e);
+    }
+    
     setUsername(newUser.username);
     setRole(newUser.role);
   };
@@ -69,13 +112,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // ===== ĐĂNG KÝ BẰNG GOOGLE =====
   const signUpWithGoogle = async (): Promise<{ success: boolean; message: string }> => {
     const provider = new GoogleAuthProvider();
+    provider.addScope('email');
+    provider.addScope('profile');
     try {
       const result = await signInWithPopup(auth, provider);
-      const email = result.user.email;
+      
+      let email = result.user.email;
+      
+      // Fallback: Check providerData if main email is null
+      if (!email && result.user.providerData.length > 0) {
+         const profile = result.user.providerData.find(p => p.email);
+         if (profile) email = profile.email;
+      }
+
+      if (!email) {
+        // Force refresh user to get email if initially missing
+        await result.user.reload();
+        email = auth.currentUser?.email || null;
+      }
 
       if (!email) {
         await signOut(auth);
-        return { success: false, message: "Không thể lấy email từ tài khoản Google." };
+        console.log("Full User Object:", result.user); // Debug info for user
+        return { success: false, message: "Không thể lấy email từ Google. (Email is null/hidden). Vui lòng thử lại." };
       }
 
       // Kiểm tra xem email đã tồn tại chưa
@@ -86,27 +145,43 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       // Tạo user mới
-      await createUserInFirestore(result.user);
+      await createUserInFirestore(result.user, email);
       return { success: true, message: "Đăng ký thành công!" };
     } catch (error: unknown) {
       if (error instanceof Error && error.message?.includes('popup-closed-by-user')) {
         return { success: false, message: "" }; // User đóng popup, không hiện lỗi
       }
       console.error("Lỗi đăng ký Google:", error);
-      return { success: false, message: "Lỗi đăng ký. Vui lòng thử lại." };
+      return { success: false, message: `Lỗi: ${(error as any).message || "Unknown error"}` };
     }
   };
 
   // ===== ĐĂNG KÝ BẰNG GITHUB =====
   const signUpWithGithub = async (): Promise<{ success: boolean; message: string }> => {
     const provider = new GithubAuthProvider();
+    provider.addScope('user:email');
     try {
       const result = await signInWithPopup(auth, provider);
-      const email = result.user.email;
+      
+      // GitHub sometimes returns null email even with scope if email is private
+      // But Firebase usually handles this if 'user:email' scope is present
+      let email = result.user.email;
+
+      // Fallback: Check providerData if main email is null
+      if (!email && result.user.providerData.length > 0) {
+         const profile = result.user.providerData.find(p => p.providerId === 'github.com' && p.email);
+         if (profile) email = profile.email;
+      }
+
+      if (!email) {
+        // Force refresh user to get email if initially missing
+        await result.user.reload();
+        email = auth.currentUser?.email || null;
+      }
 
       if (!email) {
         await signOut(auth);
-        return { success: false, message: "Không thể lấy email từ tài khoản GitHub." };
+        return { success: false, message: "Không thể lấy email từ tài khoản GitHub. Hãy đảm bảo email của bạn là công khai hoặc cấp quyền truy cập." };
       }
 
       // Kiểm tra xem email đã tồn tại chưa
@@ -117,23 +192,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       // Tạo user mới
-      await createUserInFirestore(result.user);
+      await createUserInFirestore(result.user, email);
       return { success: true, message: "Đăng ký thành công!" };
     } catch (error: unknown) {
       if (error instanceof Error && error.message?.includes('popup-closed-by-user')) {
         return { success: false, message: "" };
       }
       console.error("Lỗi đăng ký GitHub:", error);
-      return { success: false, message: "Lỗi đăng ký. Vui lòng thử lại." };
+      return { success: false, message: `Lỗi: ${(error as any).message || "Unknown error"}` };
     }
   };
 
   // ===== ĐĂNG NHẬP BẰNG GOOGLE =====
   const loginWithGoogle = async (): Promise<{ success: boolean; message: string }> => {
     const provider = new GoogleAuthProvider();
+    provider.addScope('email');
+    provider.addScope('profile');
     try {
       const result = await signInWithPopup(auth, provider);
-      const email = result.user.email;
+      let email = result.user.email;
+
+       // Fallback: Check providerData if main email is null
+      if (!email && result.user.providerData.length > 0) {
+         const profile = result.user.providerData.find(p => p.email);
+         if (profile) email = profile.email;
+      }
+
+      if (!email) {
+         await result.user.reload();
+         email = auth.currentUser?.email || null;
+      }
 
       if (!email) {
         await signOut(auth);
@@ -142,9 +230,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       // Kiểm tra xem tài khoản đã tồn tại chưa
       const exists = await checkUserExists(email);
+      
       if (!exists) {
-        await signOut(auth);
-        return { success: false, message: "Tài khoản chưa được đăng ký. Vui lòng đăng ký trước." };
+        // TỰ ĐỘNG ĐĂNG KÝ MỚI nếu chưa có tài khoản
+        await createUserInFirestore(result.user, email);
+        return { success: true, message: "Đăng nhập (Link tài khoản mới) thành công!" };
       }
 
       // Lấy username từ Firestore
@@ -162,16 +252,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return { success: false, message: "" };
       }
       console.error("Lỗi đăng nhập Google:", error);
-      return { success: false, message: "Lỗi đăng nhập. Vui lòng thử lại." };
+      return { success: false, message: `Lỗi: ${(error as any).message || "Unknown error"}` };
     }
   };
 
   // ===== ĐĂNG NHẬP BẰNG GITHUB =====
   const loginWithGithub = async (): Promise<{ success: boolean; message: string }> => {
     const provider = new GithubAuthProvider();
+    provider.addScope('user:email');
     try {
       const result = await signInWithPopup(auth, provider);
-      const email = result.user.email;
+      let email = result.user.email;
+
+      // Fallback: Check providerData if main email is null
+      if (!email && result.user.providerData.length > 0) {
+         const profile = result.user.providerData.find(p => p.providerId === 'github.com' && p.email);
+         if (profile) email = profile.email;
+      }
+
+      if (!email) {
+        // Force refresh user to get email if initially missing
+        await result.user.reload();
+        email = auth.currentUser?.email || null;
+      }
 
       if (!email) {
         await signOut(auth);
@@ -180,9 +283,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       // Kiểm tra xem tài khoản đã tồn tại chưa
       const exists = await checkUserExists(email);
-      if (exists) {
-        await signOut(auth);
-        return { success: false, message: "Tài khoản chưa được đăng ký. Vui lòng đăng ký trước." };
+      
+      if (!exists) {
+        // TỰ ĐỘNG ĐĂNG KÝ mới nếu chưa có tài khoản
+        await createUserInFirestore(result.user, email);
+        return { success: true, message: "Đăng nhập (Link tài khoản mới) thành công!" };
       }
 
       // Lấy username từ Firestore
@@ -200,7 +305,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return { success: false, message: "" };
       }
       console.error("Lỗi đăng nhập GitHub:", error);
-      return { success: false, message: "Lỗi đăng nhập. Vui lòng thử lại." };
+      return { success: false, message: `Lỗi: ${(error as any).message || "Unknown error"}` };
     }
   };
 

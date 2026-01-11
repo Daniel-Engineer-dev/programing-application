@@ -272,8 +272,8 @@ function formatDuration(ms: number) {
             />
             {!isUpcoming && (
               <>
-                {/* Submit Tab: Only show if ONGOING (Real or Virtual) AND Registered */}
-                {effectiveStatus === "ONGOING" && isRegistered && (
+                {/* Submit Tab: Only show if ONGOING (Real or Virtual) AND Registered/Virtual */}
+                {effectiveStatus === "ONGOING" && (isRegistered || virtualState.isVirtual) && (
                     <TabLink
                     href="?tab=submissions"
                     active={safeTab === "submissions"}
@@ -282,8 +282,8 @@ function formatDuration(ms: number) {
                     />
                 )}
 
-                {/* Only show if Registered */}
-                {isRegistered && (
+                {/* Only show if Registered or Virtual */}
+                {(isRegistered || virtualState.isVirtual) && (
                   <TabLink
                     href="?tab=all-submissions"
                     active={safeTab === "all-submissions"}
@@ -310,7 +310,7 @@ function formatDuration(ms: number) {
           >
             {safeTab === "overview" && <OverviewTab contest={contest} />}
 
-            {!isUpcoming && safeTab === "submissions" && isRegistered && (
+            {!isUpcoming && safeTab === "submissions" && (isRegistered || virtualState.isVirtual) && (
               <div className="w-full max-w-4xl mx-auto">
                 <SubmissionTab
                   problems={contest.problems}
@@ -319,7 +319,7 @@ function formatDuration(ms: number) {
               </div>
             )}
 
-            {!isUpcoming && safeTab === "all-submissions" && isRegistered && (
+            {!isUpcoming && safeTab === "all-submissions" && (isRegistered || virtualState.isVirtual) && (
               <div className="w-full max-w-4xl mx-auto">
                 <AllSubmissionsTab 
                   contestId={contest.id} 

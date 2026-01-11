@@ -18,7 +18,7 @@ export default function EditContestPage({ params }: { params: Promise<{ id: stri
     if (id) {
       getDoc(doc(db, "contests", id)).then(snap => {
         if (snap.exists()) {
-            setInitialData({ id: snap.id, ...snap.data() });
+            setInitialData({ ...snap.data(), id: snap.id });
         }
       });
     }
