@@ -172,8 +172,8 @@ export default function ContestsAdminPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-8">
-        {filteredContests.map(c => (
-            <div key={c.id} className="bg-slate-900/40 border border-slate-800/60 rounded-3xl p-8 hover:border-yellow-500/30 transition-all shadow-2xl backdrop-blur-md group relative overflow-hidden group hover:shadow-yellow-500/5">
+        {filteredContests.map((c, idx) => (
+            <div key={`contest-${c.id || idx}`} className="bg-slate-900/40 border border-slate-800/60 rounded-3xl p-8 hover:border-yellow-500/30 transition-all shadow-2xl backdrop-blur-md group relative overflow-hidden group hover:shadow-yellow-500/5">
                 <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 via-transparent to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
                 <div className="absolute top-0 right-0 p-8 opacity-5 text-yellow-500 group-hover:opacity-10 transition-opacity duration-500 rotate-12 transform scale-150">
