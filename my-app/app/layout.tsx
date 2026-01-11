@@ -1,9 +1,6 @@
-// app/layout.tsx
 import "./globals.css";
-import NavBar from "@/src/Component/NavBar/NavBar"; // CHÚ Ý: "Component" viết hoa
-import ChatbotWidget from "@/src/Component/ChatbotWidget/ChatbotWidget";
 import { AuthProvider } from "@/src/userHook/context/authContext";
-import ChatUI from "@/src/Component/ChatUI/ChatUI";
+import SystemAnnouncement from "@/src/Component/Global/SystemAnnouncement";
 
 export const metadata = {
   title: "Codepro",
@@ -18,12 +15,10 @@ export default function RootLayout({
   return (
     <html lang="vi " suppressHydrationWarning>
       <body className="min-h-screen bg-slate-900 text-gray-900 antialiased">
+        <SystemAnnouncement />
         <AuthProvider>
-          <NavBar />
           {children}
-          <ChatUI />
         </AuthProvider>
-        <ChatbotWidget />
       </body>
     </html>
   );

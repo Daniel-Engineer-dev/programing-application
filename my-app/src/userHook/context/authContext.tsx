@@ -15,6 +15,7 @@ import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs
 interface AuthContextType {
   user: User | null;
   username: string;
+  role: string | null;
   loading: boolean;
   // Đăng ký - tạo tài khoản mới
   signUpWithGoogle: () => Promise<{ success: boolean; message: string }>;
@@ -27,6 +28,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   username: "",
+  role: null,
   loading: true,
   signUpWithGoogle: async () => ({ success: false, message: "" }),
   signUpWithGithub: async () => ({ success: false, message: "" }),
@@ -37,6 +39,7 @@ const AuthContext = createContext<AuthContextType>({
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [username, setUsername] = useState("");
+  const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Kiểm tra xem user đã tồn tại trong Firestore chưa (theo email)
@@ -60,6 +63,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
     await setDoc(userRef, newUser);
     setUsername(newUser.username);
+    setRole(newUser.role);
   };
 
   // ===== ĐĂNG KÝ BẰNG GOOGLE =====
@@ -147,7 +151,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const userRef = doc(db, "users", result.user.uid);
       const userSnap = await getDoc(userRef);
       if (userSnap.exists()) {
-        setUsername(userSnap.data().username);
+        const data = userSnap.data();
+        setUsername(data.username);
+        setRole(data.role || "user");
       }
 
       return { success: true, message: "Đăng nhập thành công!" };
@@ -174,7 +180,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       // Kiểm tra xem tài khoản đã tồn tại chưa
       const exists = await checkUserExists(email);
-      if (!exists) {
+      if (exists) {
         await signOut(auth);
         return { success: false, message: "Tài khoản chưa được đăng ký. Vui lòng đăng ký trước." };
       }
@@ -183,7 +189,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const userRef = doc(db, "users", result.user.uid);
       const userSnap = await getDoc(userRef);
       if (userSnap.exists()) {
-        setUsername(userSnap.data().username);
+        const data = userSnap.data();
+        setUsername(data.username);
+        setRole(data.role || "user");
       }
 
       return { success: true, message: "Đăng nhập thành công!" };
@@ -203,10 +211,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const userRef = doc(db, "users", currentUser.uid);
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
-          setUsername(userSnap.data().username);
+          const data = userSnap.data();
+          setUsername(data.username);
+          setRole(data.role || "user");
         }
       } else {
         setUsername("");
+        setRole(null);
       }
       setLoading(false);
     });
@@ -219,6 +230,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       value={{ 
         user, 
         username, 
+        role,
         loading, 
         signUpWithGoogle, 
         signUpWithGithub,

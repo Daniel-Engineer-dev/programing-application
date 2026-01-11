@@ -175,7 +175,7 @@ export default function EditorPanel({
           const testCaseObj = {
             id: doc.id,
             input: t.input,
-            expectedOutput: t.expected || t.expectedOutput,
+            expectedOutput: t.expected || t.expectedOutput || t.output || "",
             isHidden: isHidden,
           };
 
