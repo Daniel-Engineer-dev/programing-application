@@ -64,6 +64,27 @@ export function useContestSubmission({ contestId, userId }: UseContestSubmission
       const contestSnap = await getDoc(contestRef);
       if (!contestSnap.exists()) throw new Error("Contest not found");
 
+      // Verify Registration OR Active Virtual Participation
+      const regRef = doc(db, "contests", contestId, "registrations", userId);
+      const regSnap = await getDoc(regRef);
+      
+      let hasValidRegistration = regSnap.exists();
+      let isVirtualRegistration = false;
+
+      if (!hasValidRegistration) {
+           // Check if virtual participation exists
+           const vRef = doc(db, "contests", contestId, "virtual_participations", userId);
+           const vSnap = await getDoc(vRef);
+           if (vSnap.exists() && vSnap.data().status === "ONGOING") {
+               isVirtualRegistration = true;
+               hasValidRegistration = true;
+           }
+      }
+
+      if (!hasValidRegistration) {
+          throw new Error("Bạn chưa đăng ký tham gia contest này hoặc chưa bắt đầu thi ảo!");
+      }
+
       const contestData = contestSnap.data();
       const rawTime = contestData?.time || contestData?.startAt || contestData?.startTime;
       const startTimeMillis = parseStartTime(rawTime);
