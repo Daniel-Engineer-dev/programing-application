@@ -374,7 +374,7 @@ export default function ProblemsTable() {
                         </td>
                         <td className="px-6 py-5">
                           <span
-                            className={`inline-flex px-3 py-1.5 rounded-full text-xs font-bold border shadow-lg
+                            className={`inline-flex px-3 py-1.5 rounded-full text-xs font-bold border shadow-lg whitespace-nowrap
                             ${
                               p.difficulty === "Easy"
                                 ? "bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-400 border-green-500/30 shadow-green-500/20"

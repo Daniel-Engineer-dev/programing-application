@@ -14,7 +14,7 @@ import {
   createUserWithEmailAndPassword,
 } from "firebase/auth";
 import { auth, db } from "@/src/api/firebase/firebase";
-import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs, limit } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs, limit, updateDoc } from "firebase/firestore";
 import { updateProfile } from "firebase/auth";
 
 interface AuthContextType {
@@ -619,9 +619,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser(currentUser);
           setUsername(data.username);
           setRole(data.role || "user");
+          
+          // Cập nhật trạng thái online
+          try {
+            await updateDoc(userRef, {
+              online: true,
+              lastSeen: serverTimestamp()
+            });
+          } catch (e) {
+            console.error("Lỗi cập nhật trạng thái online:", e);
+          }
         } else {
           // User KHÔNG tồn tại trong Firestore → Không cho đăng nhập
-          // Đây là trường hợp user vừa được tạo bởi OAuth nhưng chưa đăng ký
           setUser(null);
           setUsername("");
           setRole(null);
@@ -636,6 +645,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     return () => unsubscribe();
   }, []);
+
+  // Cập nhật trạng thái offline khi đóng tab/window
+  useEffect(() => {
+    const handleBeforeUnload = async () => {
+      if (user) {
+        try {
+          const userRef = doc(db, "users", user.uid);
+          await updateDoc(userRef, {
+            online: false,
+            lastSeen: serverTimestamp()
+          });
+        } catch (e) {
+          console.error("Lỗi cập nhật trạng thái offline:", e);
+        }
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [user]);
 
   return (
     <AuthContext.Provider
