@@ -213,7 +213,7 @@ export default function DiscussionDetailPage() {
     // update vào doc để trang list (ngoài discuss) lấy đúng
     await updateDoc(doc(db, "discussions", did), {
       repliesCount: parentCount,
-    }).catch(() => {});
+    }).catch(() => { });
     return parentCount;
   };
 
@@ -330,10 +330,10 @@ export default function DiscussionDetailPage() {
         setDiscussion((p) =>
           p
             ? {
-                ...p,
-                likesCount: p.likesCount - (type === "like" ? 1 : 0),
-                dislikesCount: p.dislikesCount - (type === "dislike" ? 1 : 0),
-              }
+              ...p,
+              likesCount: p.likesCount - (type === "like" ? 1 : 0),
+              dislikesCount: p.dislikesCount - (type === "dislike" ? 1 : 0),
+            }
             : p
         );
         return;
@@ -351,10 +351,10 @@ export default function DiscussionDetailPage() {
         setDiscussion((p) =>
           p
             ? {
-                ...p,
-                likesCount: p.likesCount + (type === "like" ? 1 : 0),
-                dislikesCount: p.dislikesCount + (type === "dislike" ? 1 : 0),
-              }
+              ...p,
+              likesCount: p.likesCount + (type === "like" ? 1 : 0),
+              dislikesCount: p.dislikesCount + (type === "dislike" ? 1 : 0),
+            }
             : p
         );
         return;
@@ -373,10 +373,10 @@ export default function DiscussionDetailPage() {
       setDiscussion((p) =>
         p
           ? {
-              ...p,
-              likesCount: p.likesCount + incLike,
-              dislikesCount: p.dislikesCount + incDislike,
-            }
+            ...p,
+            likesCount: p.likesCount + incLike,
+            dislikesCount: p.dislikesCount + incDislike,
+          }
           : p
       );
     } catch (e) {
@@ -1107,9 +1107,8 @@ export default function DiscussionDetailPage() {
     return (
       <div
         key={c.id}
-        className={`rounded-xl border border-slate-700 bg-slate-900/40 p-4 ${
-          isReply ? "ml-8" : ""
-        }`}
+        className={`rounded-xl border border-slate-700 bg-slate-900/40 p-4 ${isReply ? "ml-8" : ""
+          }`}
       >
         <div className="flex items-start justify-between gap-4">
           <div className="flex flex-col">
@@ -1206,11 +1205,10 @@ export default function DiscussionDetailPage() {
             onClick={() =>
               handleVoteComment(c.id, "like", parentIdForReplyList)
             }
-            className={`inline-flex items-center gap-1 rounded-lg border px-3 py-1 transition-colors ${
-              isLiked
+            className={`inline-flex items-center gap-1 rounded-lg border px-3 py-1 transition-colors ${isLiked
                 ? "border-blue-500 bg-blue-600/20 text-blue-300"
                 : "border-slate-700 bg-slate-800 text-slate-300 hover:border-blue-500 hover:text-blue-300"
-            }`}
+              }`}
           >
             <ThumbsUp size={16} />
             <span>{c.likesCount}</span>
@@ -1221,11 +1219,10 @@ export default function DiscussionDetailPage() {
             onClick={() =>
               handleVoteComment(c.id, "dislike", parentIdForReplyList)
             }
-            className={`inline-flex items-center gap-1 rounded-lg border px-3 py-1 transition-colors ${
-              isDisliked
+            className={`inline-flex items-center gap-1 rounded-lg border px-3 py-1 transition-colors ${isDisliked
                 ? "border-red-500 bg-red-600/20 text-red-300"
                 : "border-slate-700 bg-slate-800 text-slate-300 hover:border-red-500 hover:text-red-300"
-            }`}
+              }`}
           >
             <ThumbsDown size={16} />
             <span>{c.dislikesCount}</span>
@@ -1474,11 +1471,10 @@ export default function DiscussionDetailPage() {
             <button
               type="button"
               onClick={() => handleVotePost("like")}
-              className={`inline-flex items-center gap-1 rounded-lg border px-3 py-1 transition-colors ${
-                isPostLiked
+              className={`inline-flex items-center gap-1 rounded-lg border px-3 py-1 transition-colors ${isPostLiked
                   ? "border-blue-500 bg-blue-600/20 text-blue-300"
                   : "border-slate-700 bg-slate-800 text-slate-300 hover:border-blue-500 hover:text-blue-300"
-              }`}
+                }`}
             >
               <ThumbsUp size={16} />
               <span>{discussion.likesCount}</span>
@@ -1487,11 +1483,10 @@ export default function DiscussionDetailPage() {
             <button
               type="button"
               onClick={() => handleVotePost("dislike")}
-              className={`inline-flex items-center gap-1 rounded-lg border px-3 py-1 transition-colors ${
-                isPostDisliked
+              className={`inline-flex items-center gap-1 rounded-lg border px-3 py-1 transition-colors ${isPostDisliked
                   ? "border-red-500 bg-red-600/20 text-red-300"
                   : "border-slate-700 bg-slate-800 text-slate-300 hover:border-red-500 hover:text-red-300"
-              }`}
+                }`}
             >
               <ThumbsDown size={16} />
               <span>{discussion.dislikesCount}</span>
@@ -1545,11 +1540,10 @@ export default function DiscussionDetailPage() {
                         setSortOpen(false);
                         setParentPage(1);
                       }}
-                      className={`flex w-full items-center justify-between rounded-xl px-4 py-2.5 text-left text-sm transition-all ${
-                        sortKey === it.key
+                      className={`flex w-full items-center justify-between rounded-xl px-4 py-2.5 text-left text-sm transition-all ${sortKey === it.key
                           ? "bg-blue-500/20 text-blue-200"
                           : "text-slate-300 hover:bg-slate-800"
-                      }`}
+                        }`}
                     >
                       {it.label}
                       {sortKey === it.key && (
@@ -1621,7 +1615,8 @@ export default function DiscussionDetailPage() {
             <button
               type="button"
               onClick={() => setParentPage((p) => p + 1)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-700 bg-slate-800 text-slate-200 hover:border-slate-500"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-700 bg-slate-800 text-slate-200 hover:border-slate-500 disabled:opacity-40"
+              disabled={sortedParents.length < PAGE_SIZE || parentPage >= Math.ceil((discussion?.repliesCount ?? 0) / PAGE_SIZE)}
               title="Trang sau"
             >
               <ChevronRight size={16} />
@@ -1741,11 +1736,10 @@ export default function DiscussionDetailPage() {
                       onClick={() =>
                         setReportPostSelected((p) => toggleReason(p, r))
                       }
-                      className={`w-full rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
-                        selected
+                      className={`w-full rounded-lg border px-3 py-2 text-left text-sm transition-colors ${selected
                           ? "border-blue-500 bg-blue-600/20 text-blue-200"
                           : "border-slate-700 bg-slate-800 text-slate-200 hover:border-slate-500"
-                      }`}
+                        }`}
                     >
                       {selected ? "✓ " : ""}
                       {r}
@@ -1850,11 +1844,10 @@ export default function DiscussionDetailPage() {
                       onClick={() =>
                         setReportCommentSelected((p) => toggleReason(p, r))
                       }
-                      className={`w-full rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
-                        selected
+                      className={`w-full rounded-lg border px-3 py-2 text-left text-sm transition-colors ${selected
                           ? "border-blue-500 bg-blue-600/20 text-blue-200"
                           : "border-slate-700 bg-slate-800 text-slate-200 hover:border-slate-500"
-                      }`}
+                        }`}
                     >
                       {selected ? "✓ " : ""}
                       {r}
