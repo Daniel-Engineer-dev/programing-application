@@ -27,11 +27,18 @@ export default function ProblemPage({
           const data = snap.data();
 
           // Chuyển đổi Timestamp thủ công cho các trường phức tạp
+          const lastUpdatedRaw = data.editorial?.lastUpdated;
+          let lastUpdatedStr = null;
+          if (lastUpdatedRaw?.toDate) {
+            lastUpdatedStr = lastUpdatedRaw.toDate().toISOString();
+          } else if (typeof lastUpdatedRaw === 'string') {
+            lastUpdatedStr = lastUpdatedRaw;
+          }
+
           const editorial = data.editorial
             ? {
                 ...data.editorial,
-                lastUpdated:
-                  data.editorial.lastUpdated?.toDate().toISOString() || null,
+                lastUpdated: lastUpdatedStr,
               }
             : null;
 

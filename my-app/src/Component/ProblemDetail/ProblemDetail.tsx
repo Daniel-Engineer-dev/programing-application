@@ -374,9 +374,9 @@ export default function ProblemDetails({
         // Kiểm tra xem user hiện tại đã tương tác chưa
         if (user) {
           setUserInteractions({
-            liked: data.likes?.includes(user.uid),
-            disliked: data.dislikes?.includes(user.uid),
-            starred: data.stars?.includes(user.uid),
+            liked: Array.isArray(data.likes) && data.likes.includes(user.uid),
+            disliked: Array.isArray(data.dislikes) && data.dislikes.includes(user.uid),
+            starred: Array.isArray(data.stars) && data.stars.includes(user.uid),
           });
         }
       }
