@@ -47,31 +47,42 @@ const ForgotPasswordForm = () => {
         return;
       }
 
-      // 2. Kiểm tra phương thức đăng nhập (Nâng cao)
-      // Giúp người dùng biết nếu họ dùng Google/Github thay vì mật khẩu
+      // Lấy thông tin user từ Firestore
+      const userData = querySnapshot.docs[0].data();
+      console.log("User data from Firestore:", userData);
+
+      // 2. Kiểm tra phương thức đăng nhập
       const methods = await fetchSignInMethodsForEmail(auth, email);
-      if (methods.length > 0 && !methods.includes("password")) {
+      console.log("Sign-in methods for email:", methods);
+
+      // Kiểm tra nếu user đăng ký bằng Google/GitHub (không có password)
+      if (userData.provider && userData.provider !== "password") {
         setIsError(true);
         setMessage(
-          "Tài khoản này đăng nhập bằng Google/GitHub. Bạn không cần đặt lại mật khẩu."
+          `Tài khoản này đăng nhập bằng ${userData.provider === "google.com" ? "Google" : "GitHub"}. Bạn không cần đặt lại mật khẩu.`
         );
         setLoading(false);
         return;
       }
 
       // 3. Gửi email khôi phục
+      console.log("Sending password reset email to:", email);
       await sendPasswordResetEmail(auth, email);
+      console.log("Password reset email sent successfully!");
 
       setIsError(false);
       setMessage("Thành công! Kiểm tra hộp thư đến (hoặc thư rác) của bạn.");
       setCooldown(60); // Bắt đầu đếm ngược 60s
     } catch (err: any) {
+      console.error("Error sending password reset email:", err);
       setIsError(true);
-      setMessage(
-        err.code === "auth/invalid-email"
-          ? "Email không hợp lệ!"
-          : "Lỗi: " + err.message
-      );
+      if (err.code === "auth/invalid-email") {
+        setMessage("Email không hợp lệ!");
+      } else if (err.code === "auth/user-not-found") {
+        setMessage("Email này không tồn tại trong hệ thống xác thực Firebase. Có thể tài khoản chưa được đăng ký hoặc đã bị xóa.");
+      } else {
+        setMessage("Lỗi: " + err.message + " (Code: " + err.code + ")");
+      }
     } finally {
       setLoading(false);
     }
