@@ -165,6 +165,10 @@ export default function EditorPanel({
         const testCasesRef = collection(db, "problems", problemId, "testCases");
         const testCasesSnap = await getDocs(testCasesRef);
 
+
+        const problemData = problemSnap.exists() ? problemSnap.data() : null;
+        const examples = problemData?.examples || [];
+
         const allTests: TestCase[] = [];
         const publicTests: TestCase[] = [];
 
@@ -185,6 +189,19 @@ export default function EditorPanel({
             publicTests.push(testCaseObj); // Chỉ lưu public để hiện Tab
           }
         });
+
+        // FALLBACK: Nếu không có test case nào trong sub-collection, dùng examples từ document chính
+        if (allTests.length === 0 && examples.length > 0) {
+          const fallbackTests = examples.map((ex: any, idx: number) => ({
+            id: `example-${idx}`,
+            input: ex.input || "",
+            expectedOutput: ex.output || "",
+            isHidden: false,
+          }));
+          
+          allTests.push(...fallbackTests);
+          publicTests.push(...fallbackTests);
+        }
 
         setAllTestCases(allTests);
         setPublicTestCases(publicTests.slice(0, 3)); // Lấy tối đa 3 test public để hiện tab
