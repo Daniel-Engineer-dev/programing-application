@@ -365,18 +365,18 @@ export default function ProblemDetails({
       if (doc.exists()) {
         const data = doc.data();
         setStats({
-          likes: data.likes?.length || 0,
-          dislikes: data.dislikes?.length || 0,
-          stars: data.stars?.length || 0,
+          likes: Array.isArray(data.likes) ? data.likes.length : 0,
+          dislikes: Array.isArray(data.dislikes) ? data.dislikes.length : 0,
+          stars: Array.isArray(data.stars) ? data.stars.length : 0,
           comments: data.commentCount || 0,
         });
 
         // Kiểm tra xem user hiện tại đã tương tác chưa
         if (user) {
           setUserInteractions({
-            liked: data.likes?.includes(user.uid),
-            disliked: data.dislikes?.includes(user.uid),
-            starred: data.stars?.includes(user.uid),
+            liked: Array.isArray(data.likes) ? data.likes.includes(user.uid) : false,
+            disliked: Array.isArray(data.dislikes) ? data.dislikes.includes(user.uid) : false,
+            starred: Array.isArray(data.stars) ? data.stars.includes(user.uid) : false,
           });
         }
       }

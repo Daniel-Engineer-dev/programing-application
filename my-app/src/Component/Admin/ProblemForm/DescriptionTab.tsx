@@ -18,7 +18,7 @@ export default function DescriptionTab({ data, onChange }: Props) {
         <textarea
           className="flex-1 w-full bg-slate-950/50 border border-slate-700 rounded-xl p-4 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-slate-200 font-mono text-sm leading-relaxed resize-none shadow-inner"
           placeholder="# Tiêu đề bài toán&#10;&#10;Mô tả chi tiết đề bài ở đây..."
-          value={data.description}
+          value={data.description || ""}
           onChange={(e) => onChange({ description: e.target.value })}
         />
       </div>

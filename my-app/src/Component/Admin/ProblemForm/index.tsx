@@ -50,6 +50,9 @@ export default function ProblemForm({ problemId }: Props) {
         setFormData({
             ...INITIAL_PROBLEM_DATA,
             ...data,
+            title: data.title || "", // Prevent null
+            description: data.description || "", // Prevent null
+            difficulty: data.difficulty || "Easy",
             id: snap.id,
             testCases,
         } as ProblemFormData);

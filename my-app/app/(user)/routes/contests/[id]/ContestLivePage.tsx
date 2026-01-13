@@ -347,12 +347,14 @@ function formatDuration(ms: number) {
                   {contest.problems.map((p) => {
                     const href = `/routes/contests/${contest.id}/${p.problemID}`;
 
-                    if (isUpcoming) {
+                    const isLocked = isUpcoming || (effectiveStatus === "ONGOING" && !isRegistered && !virtualState.isVirtual);
+
+                    if (isLocked) {
                       return (
                         <div
                           key={p.id}
                           className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg border border-slate-700 opacity-60 cursor-not-allowed"
-                          title="Tạm khóa truy cập đề bài"
+                          title={isUpcoming ? "Cuộc thi chưa bắt đầu" : "Vui lòng đăng ký tham gia để xem đề bài"}
                         >
                           <span className="font-mono font-bold text-white w-8">
                             {p.id}

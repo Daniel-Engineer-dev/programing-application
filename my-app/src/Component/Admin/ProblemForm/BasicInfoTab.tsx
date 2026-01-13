@@ -85,7 +85,7 @@ export default function BasicInfoTab({ data, onChange, isEditMode }: Props) {
             type="text"
             className="w-full bg-slate-950/50 border border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-white transition-all shadow-inner"
             placeholder="VD: Two Sum (Tổng hai số)"
-            value={data.title}
+            value={data.title || ""}
             onChange={(e) => onChange({ title: e.target.value })}
           />
         </div>
