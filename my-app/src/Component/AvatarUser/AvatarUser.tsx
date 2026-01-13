@@ -123,17 +123,17 @@ export default function UserMenu({ name }: UserMenuProps) {
                 <QuickTile
                   href="/routes/avatar/settings/saved"
                   iconPath="/list.png"
-                  label="Lists"
+                  label="Danh sách"
                 />
                 <QuickTile
                   href="/routes/avatar/settings/notes"
                   iconPath="/notebook.png"
-                  label="Notes"
+                  label="Ghi chú"
                 />
                 <QuickTile
                   href="/routes/avatar/settings/history"
                   iconPath="/progress.png"
-                  label="Stats"
+                  label="Lịch sử"
                 />
               </div>
 
@@ -141,22 +141,22 @@ export default function UserMenu({ name }: UserMenuProps) {
                 <MenuItem
                   href="/routes/avatar/points"
                   icon={Trophy}
-                  label="Reward Points"
+                  label="Điểm thưởng"
                   right={
                     <span className="bg-yellow-600 text-[10px] px-1.5 py-0.5 rounded-full text-white font-bold">
-                      New
+                      Mới
                     </span>
                   }
                 />
                 <MenuItem
                   href="/routes/avatar/settings/buy"
                   icon={ShoppingBag}
-                  label="Orders & Billing"
+                  label="Mua hàng"
                 />
                 <MenuItem
                   href="/routes/avatar/settings"
                   icon={User}
-                  label="Profiles"
+                  label="Hồ sơ"
                 />
               </div>
 
@@ -165,7 +165,7 @@ export default function UserMenu({ name }: UserMenuProps) {
                 <MenuItem
                   onClick={handleLogout}
                   icon={LogOut}
-                  label="Sign Out"
+                  label="Đăng xuất"
                 />
               </div>
             </div>

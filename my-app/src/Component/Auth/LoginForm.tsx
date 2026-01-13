@@ -1,20 +1,15 @@
 "use client";
 import React, { useState } from "react";
-import { Eye, EyeOff, Github, Loader2 } from "lucide-react"; // Thêm Loader2
+import { Eye, EyeOff, Github, Loader2 } from "lucide-react";
 import Link from "next/link";
-import {
-  signInWithEmailAndPassword,
-  setPersistence,
-  browserLocalPersistence,
-  browserSessionPersistence,
-  fetchSignInMethodsForEmail,
-} from "firebase/auth";
-import { auth, db } from "@/src/api/firebase/firebase";
+import { useRouter } from "next/navigation";
+import { db } from "@/src/api/firebase/firebase";
 import { collection, query, where, getDocs, limit } from "firebase/firestore";
 import { useAuthContext } from "@/src/userHook/context/authContext";
 
 const LoginForm = () => {
-  const { loginWithGoogle, loginWithGithub } = useAuthContext();
+  const { loginWithGoogle, loginWithGithub, loginWithEmailPassword } = useAuthContext();
+  const router = useRouter();
 
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -22,7 +17,7 @@ const LoginForm = () => {
   const [message, setMessage] = useState("");
   const [identifier, setIdentifier] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false); // State quản lý loading
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -32,60 +27,38 @@ const LoginForm = () => {
 
     try {
       let email = identifier;
-      let userData = null;
 
-      // 1. Tìm kiếm người dùng trong Firestore (dù nhập Email hay Username)
-      const userQuery = identifier.includes("@")
-        ? query(
-            collection(db, "users"),
-            where("email", "==", identifier),
-            limit(1)
-          )
-        : query(
-            collection(db, "users"),
-            where("username", "==", identifier),
-            limit(1)
-          );
-
-      const querySnapshot = await getDocs(userQuery);
-
-      // Kiểm tra nếu không tồn tại trong Firestore
-      if (querySnapshot.empty) {
-        setError("❌ Tài khoản này chưa được đăng ký trong hệ thống.");
-        setLoading(false);
-        return;
+      // Nếu nhập username, tìm email từ Firestore
+      if (!identifier.includes("@")) {
+        const userQuery = query(
+          collection(db, "users"),
+          where("username", "==", identifier),
+          limit(1)
+        );
+        const querySnapshot = await getDocs(userQuery);
+        
+        if (querySnapshot.empty) {
+          setError("❌ Tài khoản này chưa được đăng ký trong hệ thống.");
+          setLoading(false);
+          return;
+        }
+        
+        const userData = querySnapshot.docs[0].data();
+        email = userData.email;
       }
 
-      // Lấy dữ liệu user từ Firestore
-      userData = querySnapshot.docs[0].data();
-      email = userData.email;
-
-      // 2. Kiểm tra tài khoản có phải đăng ký bằng Password không?
-      // Nếu bạn muốn chặn login bằng pass cho tài khoản Google/Github
-      // (Lưu ý: Bạn cần lưu thêm trường 'provider' khi đăng ký để kiểm tra chính xác ở đây)
-
-      // 3. Thực hiện đăng nhập Firebase Auth
-      const persistence = isRememberMe
-        ? browserLocalPersistence
-        : browserSessionPersistence;
-
-      await setPersistence(auth, persistence);
-      await signInWithEmailAndPassword(auth, email, password);
-
-      alert("✅ Đăng nhập thành công!");
+      // Sử dụng loginWithEmailPassword từ context (đã có setUser bên trong)
+      const result = await loginWithEmailPassword(email, password);
+      
+      if (!result.success) {
+        setError(result.message);
+      } else {
+        // Đăng nhập thành công - chuyển hướng đến trang chủ
+        router.push("/");
+      }
     } catch (err: any) {
       console.error(err);
-      // Xử lý các lỗi trả về từ Firebase Auth
-      if (
-        err.code === "auth/wrong-password" ||
-        err.code === "auth/invalid-credential"
-      ) {
-        setError("❌ Mật khẩu không chính xác. Vui lòng thử lại.");
-      } else if (err.code === "auth/user-not-found") {
-        setError("❌ Tài khoản không tồn tại trên hệ thống xác thực.");
-      } else {
-        setError("Lỗi: " + err.message);
-      }
+      setError("Lỗi: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -102,7 +75,8 @@ const LoginForm = () => {
       if (!result.success && result.message) {
         setError(result.message);
       } else if (result.success) {
-        alert("✅ Đăng nhập thành công!");
+        // Đăng nhập thành công - chuyển hướng đến trang chủ
+        router.push("/");
       }
     } catch (err: any) {
       setError("Lỗi đăng nhập mạng xã hội: " + err.message);

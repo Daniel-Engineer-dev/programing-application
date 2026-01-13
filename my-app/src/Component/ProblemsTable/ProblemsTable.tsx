@@ -181,14 +181,14 @@ export default function ProblemsTable() {
                     setIsDiffOpen(!isDiffOpen);
                     setIsTagOpen(false);
                   }}
-                  className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-xs font-bold uppercase tracking-wider transition-all
+                  className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-xs font-bold transition-all
                     ${
                       selectedDifficulty !== "All"
                         ? "border-blue-500/50 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 text-blue-400 shadow-lg shadow-blue-500/20"
                         : "border-slate-700/50 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50"
                     }`}
                 >
-                  {selectedDifficulty === "All" ? "Độ khó" : selectedDifficulty}
+                  {selectedDifficulty === "All" ? "Độ khó" : selectedDifficulty === "Easy" ? "Dễ" : selectedDifficulty === "Medium" ? "Trung bình" : "Khó"}
                   <ChevronDown
                     size={14}
                     className={`transition-transform ${
@@ -217,7 +217,7 @@ export default function ProblemsTable() {
                               : "text-slate-300 hover:bg-slate-800"
                           }`}
                         >
-                          {d === "All" ? "Tất cả độ khó" : d}
+                          {d === "All" ? "Tất cả độ khó" : d === "Easy" ? "Dễ" : d === "Medium" ? "Trung bình" : "Khó"}
                         </button>
                       ))}
                     </motion.div>
@@ -374,7 +374,7 @@ export default function ProblemsTable() {
                         </td>
                         <td className="px-6 py-5">
                           <span
-                            className={`inline-flex px-3 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase border shadow-lg
+                            className={`inline-flex px-3 py-1.5 rounded-full text-xs font-bold border shadow-lg
                             ${
                               p.difficulty === "Easy"
                                 ? "bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-400 border-green-500/30 shadow-green-500/20"
@@ -383,7 +383,7 @@ export default function ProblemsTable() {
                                 : "bg-gradient-to-r from-red-500/20 to-rose-500/20 text-red-400 border-red-500/30 shadow-red-500/20"
                             }`}
                           >
-                            {p.difficulty}
+                            {p.difficulty === "Easy" ? "Dễ" : p.difficulty === "Medium" ? "Trung bình" : "Khó"}
                           </span>
                         </td>
                         <td className="px-6 py-5">

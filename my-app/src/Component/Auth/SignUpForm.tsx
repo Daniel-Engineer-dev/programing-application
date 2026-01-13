@@ -2,21 +2,12 @@
 import React, { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { Eye, EyeOff, Github } from "lucide-react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "@/src/api/firebase/firebase";
-import {
-  doc,
-  setDoc,
-  getDocs,
-  collection,
-  query,
-  where,
-} from "firebase/firestore";
-// Import hook context để sử dụng các hàm đăng nhập mạng xã hội
+import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/src/userHook/context/authContext";
 
 const SignupForm = () => {
-  const { signUpWithGoogle, signUpWithGithub } = useAuthContext(); // Lấy hàm từ context
+  const { signUpWithGoogle, signUpWithGithub, signUpWithEmailPassword } = useAuthContext();
+  const router = useRouter();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
@@ -44,71 +35,42 @@ const SignupForm = () => {
     e.preventDefault();
     setError("");
     setMessage("");
+    setLoading(true);
 
     try {
+      // Validation cơ bản
       if (!validEmail(email)) {
         setMessage("Email này không hợp lệ!");
-        return;
-      }
-
-      // Kiểm tra Email và Username trong collection "users"
-      const emailQuery = query(
-        collection(db, "users"),
-        where("email", "==", email)
-      );
-      const emailSnap = await getDocs(emailQuery);
-      if (!emailSnap.empty) {
-        setMessage("❌ Email này đã được sử dụng");
-        return;
-      }
-
-      const usernameQuery = query(
-        collection(db, "users"),
-        where("username", "==", username)
-      );
-      const usernameSnap = await getDocs(usernameQuery);
-      if (!usernameSnap.empty) {
-        setMessage("⚠️ Tên đăng nhập đã được sử dụng");
+        setLoading(false);
         return;
       }
 
       if (!validatePassword(password)) {
-        setMessage(
-          "Mật khẩu có ít nhất 8 ký tự, 1 chữ thường, 1 chữ hoa, 1 số, 1 ký tự đặc biệt"
-        );
+        setMessage("Mật khẩu có ít nhất 8 ký tự, 1 chữ thường, 1 chữ hoa, 1 số, 1 ký tự đặc biệt");
+        setLoading(false);
         return;
       }
 
       if (confirmPassword !== password) {
         setMessage("Mật khẩu xác nhận không khớp");
+        setLoading(false);
         return;
       }
 
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const uid = userCredential.user.uid;
-
-      // Lưu vào collection "users"
-      await setDoc(doc(db, "users", uid), {
-        username: username,
-        email: email,
-        uid: uid,
-        createdAt: new Date(),
-        role: "user",
-        avatar: "",
-      });
-
-      alert("✅ Đăng ký thành công!");
+      // Sử dụng signUpWithEmailPassword từ context (đã có setUser bên trong)
+      const result = await signUpWithEmailPassword(email, password, username);
+      
+      if (!result.success) {
+        setMessage(result.message);
+      } else {
+        // Đăng ký thành công - chuyển hướng đến trang chủ
+        router.push("/");
+      }
     } catch (err: any) {
       console.error(err);
-      setError(
-        err.code === "auth/email-already-in-use"
-          ? "Email đã tồn tại."
-          : err.message
-      );
+      setError("Lỗi: " + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -124,7 +86,8 @@ const SignupForm = () => {
       if (!result.success && result.message) {
         setError(result.message);
       } else if (result.success) {
-        alert("✅ Đăng ký thành công!");
+        // Đăng ký thành công - chuyển hướng đến trang chủ
+        router.push("/");
       }
     } catch (err: any) {
       setError("Lỗi kết nối mạng xã hội: " + err.message);
