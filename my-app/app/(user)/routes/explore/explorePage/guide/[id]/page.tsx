@@ -164,7 +164,7 @@ export default function GuideDetail() {
             </span>
           </Link>
 
-          <header className="mb-6">
+          <header className="article-header mb-6">
             {/* Icon Badge */}
             <div className="inline-flex mb-4">
               <div className="relative">

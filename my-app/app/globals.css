@@ -16,3 +16,185 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 /* globals.css */
+
+@media print {
+  @page {
+    margin: 2cm;
+    size: auto;
+  }
+
+  /* Force EVERYTHING to be white background and black text by default */
+  * {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    filter: none !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    background: white !important;
+    visibility: hidden; /* Hide everything initially */
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Only show the main content area */
+  main, main *, .article-header, .article-header * {
+    visibility: visible; /* Show main content AND specific article header */
+  }
+
+  /* Position main content at top left */
+  main {
+    position: static; /* Let it flow naturally */
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Hero Header Logic */
+  /* Target the hero container using a heuristic if no class name, or just general div resets */
+  div[class*="h-[400px]"], div[class*="h-[500px]"] {
+     height: auto !important;
+     min-height: 0 !important;
+     overflow: visible !important;
+     margin-bottom: 20px !important;
+  }
+  
+  /* Header specific styling */
+  .article-header {
+    margin-bottom: 30px;
+    border-bottom: 4px solid black;
+    padding-bottom: 20px;
+    display: block !important; /* Ensure it's displayed */
+  }
+
+  /* Show Meta Tags (flex-wrap) but style them simply */
+  .article-header .flex-wrap {
+    display: flex !important;
+    gap: 10px !important;
+    flex-wrap: wrap !important;
+  }
+
+  /* Meta Tag Items */
+  .article-header .flex-wrap div {
+    background: white !important;
+    border: 1px solid #000 !important;
+    color: black !important;
+    border-radius: 4px !important;
+    padding: 4px 12px !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+  
+  .article-header .flex-wrap span {
+    color: black !important;
+    font-weight: bold !important;
+  }
+  
+  /* Hide svgs in meta tags if desired, or keep them. Let's keep them but make them black */
+  .article-header .flex-wrap svg {
+    color: black !important;
+    display: inline-block !important; /* Ensure they show */
+  }
+
+  /* Hide specific UI elements within main that we don't want */
+  aside, 
+  button, 
+  a[href^="/routes/explore"], 
+  .fixed, 
+  .absolute,
+  header .inline-flex:has(div > div > svg.text-white) 
+  {
+    display: none !important;
+  }
+  
+  /* Hide the icon badge explicitly - it's usually decorative */
+  .article-header div.inline-flex.mb-4 {
+     display: none !important;
+  }
+
+  /* Typography Cleanups for Main Content */
+  h1, h2, h3, h4, h5, h6 {
+    text-align: left !important; /* Force Left Align Headings */
+    width: 100% !important;
+  }
+
+  h1 {
+    font-size: 24pt !important;
+    line-height: 1.3;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #000;
+  }
+  
+  h2 {
+    font-size: 18pt !important;
+    border-bottom: 1px solid #ddd;
+    margin-top: 32px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+  }
+
+  h3 {
+    font-size: 14pt !important;
+    margin-top: 24px;
+    margin-bottom: 12px;
+    font-weight: bold !important;
+  }
+
+  p, li {
+    font-size: 11pt !important;
+    line-height: 1.6;
+    color: #000 !important;
+    text-align: justify !important; /* Justify text for book-like appearance */
+    margin-bottom: 12px;
+  }
+
+  ul, ol {
+    margin-left: 24px !important;
+    padding-left: 0 !important;
+  }
+  
+  li {
+    margin-bottom: 8px;
+  }
+
+  /* Code Blocks - Make them pop but printable */
+  pre {
+    border: 1px solid #999 !important;
+    background: #f0f0f0 !important;
+    page-break-inside: avoid;
+    padding: 12px !important;
+    border-radius: 4px !important;
+    margin-bottom: 20px;
+    white-space: pre-wrap !important; /* Wrap code lines so they don't cut off */
+  }
+  
+  code {
+    font-family: "Courier New", Courier, monospace !important;
+    font-size: 10pt !important;
+    background: #e5e5e5 !important;
+    padding: 2px 4px !important;
+    border-radius: 2px;
+  }
+  
+  /* Images */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+    display: block !important;
+    margin: 20px auto !important; /* Center images */
+    border: 1px solid #ddd;
+  }
+
+  /* Explicitly hide the App Logo if it somehow sneaks in */
+  img[alt="Logo"], 
+  img[src*="codepro.png"],
+  img[src*="logo"] {
+    display: none !important;
+  }
+}
+

@@ -311,14 +311,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      console.log("onAuthStateChanged:", currentUser?.uid);
       setUser(currentUser);
       if (currentUser) {
         const userRef = doc(db, "users", currentUser.uid);
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
           const data = userSnap.data();
+          console.log("Firestore Data Found:", data);
           setUsername(data.username);
           setRole(data.role || "user");
+        } else {
+            console.log("Firestore Data NOT Found for UID:", currentUser.uid);
+            // Fallback: Set default role so the app doesn't hang
+            setUsername(currentUser.displayName || "User");
+            setRole("user"); 
         }
       } else {
         setUsername("");

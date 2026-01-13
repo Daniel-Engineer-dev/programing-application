@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, PlayCircle, Layers, FileText, BookOpen, Check, Bookmark, BookmarkCheck } from "lucide-react";
+import { ArrowLeft, PlayCircle, Layers, FileText, BookOpen, Check, Bookmark, BookmarkCheck, Printer } from "lucide-react";
 import { useAuthContext } from "@/src/userHook/context/authContext";
 import { db } from "@/src/api/firebase/firebase";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
@@ -123,6 +123,10 @@ export default function TopicDetail() {
     }
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   if (!topic)
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center text-white">
@@ -174,7 +178,7 @@ export default function TopicDetail() {
             </span>
           </Link>
 
-          <header className="mb-6">
+          <header className="article-header mb-6">
             {/* Icon Badge */}
             <div className="inline-flex mb-4">
               <div className="relative">
@@ -380,6 +384,13 @@ export default function TopicDetail() {
                             Lưu vào danh sách
                           </>
                       )}
+                    </button>
+                    <button 
+                        onClick={handlePrint}
+                        className="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-4 py-3 rounded-xl font-semibold text-sm transition-all duration-300 border border-slate-700 flex items-center justify-center gap-2"
+                    >
+                      <Printer className="w-4 h-4" />
+                      In tài liệu
                     </button>
                   </div>
                 </div>
