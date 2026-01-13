@@ -31,6 +31,7 @@ interface Guide {
 interface UserInteraction {
     saved?: boolean;
     completed?: boolean;
+    read?: boolean;  // for guides
 }
 
 export default function ExplorePage() {
@@ -104,8 +105,9 @@ export default function ExplorePage() {
     const interaction = interactions[key];
     const matchesSaved = !showSavedOnly || (interaction?.saved === true);
 
-    // Completed Filter
-    const matchesCompleted = !showCompletedOnly || (interaction?.completed === true);
+    // Completed Filter - check both "completed" (for topics/paths) and "read" (for guides)
+    const isCompleted = interaction?.completed === true || interaction?.read === true;
+    const matchesCompleted = !showCompletedOnly || isCompleted;
 
     return matchesSearch && matchesSaved && matchesCompleted;
   };
@@ -121,7 +123,7 @@ export default function ExplorePage() {
       const interactionKey = `${type}_${id}`;
       const interaction = interactions[interactionKey];
       const isSaved = interaction?.saved;
-      const isCompleted = interaction?.completed;
+      const isCompleted = interaction?.completed || interaction?.read; // Include read for guides
 
       return (
     <Link

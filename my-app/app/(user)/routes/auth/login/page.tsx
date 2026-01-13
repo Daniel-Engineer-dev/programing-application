@@ -8,7 +8,7 @@ import PageTransition from "@/src/pageTransition/pageTransition";
 
 // Tách nội dung chính ra để bọc Suspense
 const LoginContent = () => {
-  const { user, loading } = useAuthContext();
+  const { user, loading, role } = useAuthContext();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -16,14 +16,22 @@ const LoginContent = () => {
   const callbackUrl = searchParams.get("callbackUrl") || "/";
 
   useEffect(() => {
-    if (!loading && user) {
-      // Nếu đã đăng nhập thành công, chuyển hướng về trang trước đó hoặc trang chủ
-      router.push(callbackUrl);
+    console.log("Login Page State:", { loading, user: user?.email, role });
+    
+    // Chỉ chuyển hướng khi đã có user VÀ role
+    if (!loading && user && role) {
+      console.log("Redirecting...", { role });
+      if (role === "admin") {
+        router.push("/admin");
+      } else {
+        router.push(callbackUrl);
+      }
     }
-  }, [user, loading, router, callbackUrl]);
+  }, [user, loading, router, callbackUrl, role]);
 
-  // Nếu đang kiểm tra trạng thái đăng nhập, có thể hiện một màn hình chờ nhẹ
-  if (loading) {
+
+  // Nếu đang kiểm tra trạng thái đăng nhập, hoặc đã có user nhưng chưa có role (đang fetch)
+  if (loading || (user && !role)) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-950">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>

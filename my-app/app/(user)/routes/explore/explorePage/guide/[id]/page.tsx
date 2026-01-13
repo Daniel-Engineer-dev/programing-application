@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Layers, FileText, ArrowLeft, User, BookMarked, Clock, Printer, BookmarkCheck, Bookmark } from "lucide-react";
+import { Layers, FileText, ArrowLeft, User, BookMarked, Clock, Printer, BookmarkCheck, Bookmark, Check } from "lucide-react";
 import Link from "next/link";
 import { useAuthContext } from "@/src/userHook/context/authContext";
 import { db } from "@/src/api/firebase/firebase";
@@ -28,6 +28,7 @@ export default function GuideDetail() {
   const [fetchError, setFetchError] = useState<string | null>(null);
   const { user } = useAuthContext();
   const [isSaved, setIsSaved] = useState(false);
+  const [isRead, setIsRead] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -59,6 +60,7 @@ export default function GuideDetail() {
             const snap = await getDoc(ref);
             if (snap.exists()) {
                 setIsSaved(snap.data().saved || false);
+                setIsRead(snap.data().read || false);
             }
         } catch (error) {
             console.error(error);
@@ -87,6 +89,30 @@ export default function GuideDetail() {
     } catch (error) {
         setIsSaved(!isSaved);
         toast.error("Có lỗi xảy ra");
+    }
+  };
+
+  const handleMarkAsRead = async () => {
+    if (!user) {
+        toast.error("Vui lòng đăng nhập để sử dụng tính năng này");
+        return;
+    }
+    try {
+        const newState = !isRead;
+        setIsRead(newState);
+        const ref = doc(db, "users", user.uid, "interactions", `guide_${id}`);
+        await setDoc(ref, {
+            read: newState,
+            type: 'guide',
+            updatedAt: serverTimestamp()
+        }, { merge: true });
+        
+        if (newState) toast.success("Đã đánh dấu đã đọc!");
+        else toast.info("Đã bỏ đánh dấu");
+    } catch (error) {
+        setIsRead(!isRead);
+        toast.error("Có lỗi xảy ra");
+        console.error(error);
     }
   };
 
@@ -164,7 +190,7 @@ export default function GuideDetail() {
             </span>
           </Link>
 
-          <header className="mb-6">
+          <header className="article-header mb-6">
             {/* Icon Badge */}
             <div className="inline-flex mb-4">
               <div className="relative">
@@ -336,6 +362,23 @@ export default function GuideDetail() {
                             <BookMarked className="w-4 h-4" />
                             Lưu hướng dẫn
                           </>
+                      )}
+                    </button>
+                    <button 
+                        onClick={handleMarkAsRead}
+                        className={`w-full px-4 py-3 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2
+                        ${isRead 
+                            ? 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white shadow-lg' 
+                            : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700'
+                        }`}
+                    >
+                      {isRead ? (
+                          <>
+                            <Check className="w-4 h-4" />
+                            Đã đọc
+                          </>
+                      ) : (
+                          "Đánh dấu đã đọc"
                       )}
                     </button>
                     <button 
