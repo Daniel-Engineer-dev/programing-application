@@ -110,11 +110,17 @@ export default function ShopPage() {
               <div className="h-72 md:h-80 lg:h-96 bg-slate-800 relative overflow-hidden">
                 {/* Shimmer effect */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                <img
-                  src={p.image}
-                  alt={p.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
+                {p.image ? (
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-slate-800 flex items-center justify-center text-slate-500">
+                    No Image
+                  </div>
+                )}
                 {/* Sparkle badge */}
                 <div className="absolute top-4 right-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg">
                   <Sparkles size={12} />

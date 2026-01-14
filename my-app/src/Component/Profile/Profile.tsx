@@ -15,7 +15,6 @@ import {
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import {
   updatePassword,
-  updateEmail,
   reauthenticateWithCredential,
   EmailAuthProvider,
 } from "firebase/auth";
@@ -153,9 +152,8 @@ export default function ProfilePage() {
         setInitialUsername(profileData.username);
       }
 
-      // 2. Cập nhật Email (Firebase Auth & Firestore)
+      // 2. Cập nhật Email (chỉ trong Firestore, bỏ qua Firebase Auth để không cần xác thực)
       if (profileData.email !== user.email) {
-        await updateEmail(user, profileData.email);
         await updateDoc(doc(db, "users", user.uid), {
           email: profileData.email,
         });

@@ -3,7 +3,11 @@ import ProblemDetails from "@/src/Component/ProblemDetail/ProblemDetail";
 import { db } from "@/src/api/firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import EditorPanel from "@/src/Component/EditorPanel/EditorPanel";
-import { useState, useEffect, use } from "react"; // Thêm 'use' để giải nén params
+import { useState, useEffect, use } from "react"; 
+import { useRouter } from "next/navigation";
+import { useAuthContext } from "@/src/userHook/context/authContext";
+import { toast } from "sonner";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 
 export default function ContestProblemPage({
@@ -22,6 +26,27 @@ export default function ContestProblemPage({
   const [loading, setLoading] = useState(true);
   const [sourceCode, setSourceCode] = useState("");
   const [language, setLanguage] = useState("cpp");
+  
+  const { user } = useAuthContext();
+  const router = useRouter();
+
+  // Helper function to calculate contest status
+  const getContestStatus = (start: Date, lengthMinutes: number, now: Date) => {
+    const startMs = start.getTime();
+    const endMs = startMs + Number(lengthMinutes ?? 0) * 60 * 1000;
+    if (now.getTime() < startMs) return "UPCOMING";
+    if (now.getTime() >= startMs && now.getTime() <= endMs) return "ONGOING";
+    return "ENDED";
+  };
+  
+  // Clean time string helper
+  const parseWeirdTimeString = (input: string): Date => {
+      if (!input) return new Date();
+      let s = input.replace(" at ", " ");
+      s = s.replace(/UTC([+-]\d+(?::\d+)?)/, "GMT$1");
+      s = s.replace(/\u202F/g, " ");
+      return new Date(s);
+  };
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -36,6 +61,39 @@ export default function ContestProblemPage({
         if (probSnap.exists() && contestSnap.exists()) {
           const probData = probSnap.data();
           const contestData = contestSnap.data();
+
+          // New: Check access permissions
+          if (contestData) {
+             const now = new Date();
+             const status = getContestStatus(parseWeirdTimeString(contestData.time), contestData.length, now);
+             
+             if (status === "ONGOING") {
+                if (!user) {
+                    toast.error("Vui lòng đăng nhập và đăng ký tham gia cuộc thi!");
+                    router.push(`/routes/contests/${contestId}`);
+                    return;
+                }
+                
+                // Check if user is registered
+                const regRef = doc(db, "contests", contestId, "registrations", user.uid);
+                const regSnap = await getDoc(regRef);
+                
+                // Check virtual participation as fallback
+                const virtualRef = doc(db, "contests", contestId, "virtual_participations", user.uid);
+                const virtualSnap = await getDoc(virtualRef);
+                const isVirtual = virtualSnap.exists() && virtualSnap.data().status === "ONGOING";
+
+                if (!regSnap.exists() && !isVirtual) {
+                    toast.error("Bạn chưa đăng ký tham gia cuộc thi này!");
+                    router.push(`/routes/contests/${contestId}`);
+                    return;
+                }
+             } else if (status === "UPCOMING") {
+                 toast.error("Cuộc thi chưa bắt đầu!");
+                 router.push(`/routes/contests/${contestId}`);
+                 return;
+             }
+          }
 
           const problemInContest = contestData.problems?.find(
             (p: any) => p.problemID === problemID
@@ -56,7 +114,7 @@ export default function ContestProblemPage({
       }
     };
     fetchProblem();
-  }, [problemID, contestId]);
+  }, [problemID, contestId, user, router]);
 
   const handleRestoreCode = (
     restoredCode: string,
