@@ -110,23 +110,19 @@ export default function ProblemsTable() {
   }, [statusMap, problems]);
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950/30 to-slate-900 text-slate-100 relative overflow-hidden">
+    <section className="min-h-screen bg-slate-950 text-slate-100 relative overflow-hidden">
       {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl animate-pulse delay-2000"></div>
-      </div>
+      <div className="hidden"></div>
 
       <div className="relative z-10 px-4 md:px-12 py-12">
         {/* Hero Header */}
         <div className="mb-10 text-center">
-          <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/20 to-cyan-500/20 backdrop-blur-sm border border-blue-500/30">
-            <Code2 className="w-4 h-4 text-blue-400 animate-pulse" />
+          <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-slate-900 border border-slate-800">
+            <Code2 className="w-4 h-4 text-blue-400" />
             <span className="text-sm text-blue-300 font-medium">Thư Viện Bài Tập</span>
           </div>
           
-          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-cyan-400 to-sky-400 bg-clip-text text-transparent animate-gradient">
+          <h1 className="text-5xl font-bold mb-4 text-white">
             Danh Sách Bài Tập
           </h1>
           <p className="text-lg text-slate-300 max-w-2xl mx-auto mb-8">
@@ -136,20 +132,20 @@ export default function ProblemsTable() {
           {/* Stats Cards */}
           {user && (
             <div className="flex flex-wrap justify-center gap-4 max-w-3xl mx-auto">
-              <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl px-6 py-4 min-w-[160px]">
-                <div className="text-3xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
+              <div className="bg-slate-900 border border-slate-800 rounded-lg px-6 py-4 min-w-[160px]">
+                <div className="text-3xl font-bold text-green-400">
                   {stats.solved}
                 </div>
                 <div className="text-sm text-slate-400 mt-1">Đã hoàn thành</div>
               </div>
-              <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl px-6 py-4 min-w-[160px]">
-                <div className="text-3xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+              <div className="bg-slate-900 border border-slate-800 rounded-lg px-6 py-4 min-w-[160px]">
+                <div className="text-3xl font-bold text-yellow-400">
                   {stats.attempted}
                 </div>
                 <div className="text-sm text-slate-400 mt-1">Đang thực hiện</div>
               </div>
-              <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl px-6 py-4 min-w-[160px]">
-                <div className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+              <div className="bg-slate-900 border border-slate-800 rounded-lg px-6 py-4 min-w-[160px]">
+                <div className="text-3xl font-bold text-blue-400">
                   {stats.total}
                 </div>
                 <div className="text-sm text-slate-400 mt-1">Tổng số bài</div>
@@ -159,7 +155,7 @@ export default function ProblemsTable() {
         </div>
 
         {/* THANH TÌM KIẾM VÀ BỘ LỌC */}
-        <div className="mb-8 backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6 shadow-2xl max-w-6xl mx-auto relative z-50">
+        <div className="mb-8 bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-sm max-w-6xl mx-auto relative z-50">
           <div className="flex flex-col gap-4 md:flex-row md:items-center">
             {/* Tìm kiếm */}
             <div className="relative flex-1 group">
@@ -184,7 +180,7 @@ export default function ProblemsTable() {
                   className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-xs font-bold transition-all
                     ${
                       selectedDifficulty !== "All"
-                        ? "border-blue-500/50 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 text-blue-400 shadow-lg shadow-blue-500/20"
+                        ? "border-blue-500/50 bg-blue-600/15 text-blue-300"
                         : "border-slate-700/50 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50"
                     }`}
                 >
@@ -235,7 +231,7 @@ export default function ProblemsTable() {
                   className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-xs font-bold uppercase tracking-wider transition-all
                     ${
                       selectedTags.length > 0
-                        ? "border-blue-500/50 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 text-blue-400 shadow-lg shadow-blue-500/20"
+                        ? "border-blue-500/50 bg-blue-600/15 text-blue-300"
                         : "border-slate-700/50 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50"
                     }`}
                 >
@@ -313,7 +309,7 @@ export default function ProblemsTable() {
                     setSelectedDifficulty("All");
                     setSelectedTags([]);
                   }}
-                  className="p-3 rounded-xl border border-red-500/30 bg-gradient-to-r from-red-500/10 to-rose-500/10 text-red-400 hover:from-red-500/20 hover:to-rose-500/20 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-red-500/10"
+                  className="p-3 rounded-lg border border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors active:scale-95"
                   title="Xóa bộ lọc"
                 >
                   <FilterX size={18} />
@@ -324,11 +320,11 @@ export default function ProblemsTable() {
         </div>
 
         {/* BẢNG BÀI TẬP */}
-        <div className="overflow-hidden rounded-2xl border border-white/10 backdrop-blur-xl bg-white/5 shadow-2xl max-w-6xl mx-auto relative z-10">
+        <div className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900 shadow-sm max-w-6xl mx-auto relative z-10">
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="bg-gradient-to-r from-blue-600/80 to-cyan-600/80 text-white border-b border-white/10">
+                <tr className="bg-blue-600 text-white border-b border-blue-500">
                   <th className="w-16 px-6 py-4 font-semibold text-center">
                     <Hash size={16} className="mx-auto" />
                   </th>
@@ -367,7 +363,7 @@ export default function ProblemsTable() {
                         <td className="px-6 py-5">
                           <Link
                             href={`/problems/${p.id}`}
-                            className="text-slate-100 font-bold group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-cyan-400 group-hover:bg-clip-text group-hover:text-transparent transition-all inline-block"
+                            className="text-slate-100 font-bold group-hover:text-blue-300 transition-colors inline-block"
                           >
                             {p.title}
                           </Link>
@@ -377,10 +373,10 @@ export default function ProblemsTable() {
                             className={`inline-flex px-3 py-1.5 rounded-full text-xs font-bold border shadow-lg whitespace-nowrap
                             ${
                               p.difficulty === "Easy"
-                                ? "bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-400 border-green-500/30 shadow-green-500/20"
+                                ? "bg-green-500/10 text-green-400 border-green-500/30"
                                 : p.difficulty === "Medium"
-                                ? "bg-gradient-to-r from-yellow-500/20 to-orange-500/20 text-yellow-400 border-yellow-500/30 shadow-yellow-500/20"
-                                : "bg-gradient-to-r from-red-500/20 to-rose-500/20 text-red-400 border-red-500/30 shadow-red-500/20"
+                                ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/30"
+                                : "bg-red-500/10 text-red-400 border-red-500/30"
                             }`}
                           >
                             {p.difficulty === "Easy" ? "Dễ" : p.difficulty === "Medium" ? "Trung bình" : "Khó"}

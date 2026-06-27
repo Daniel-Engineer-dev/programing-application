@@ -204,30 +204,28 @@ export default function ChatbotWidget() {
               duration: 0.5
             }}
             style={{ width: `${width}px` }}
-            className="fixed top-0 right-0 z-50 h-full bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 border-l border-slate-700/50 shadow-2xl flex flex-col font-sans"
+            className="fixed top-0 right-0 z-50 h-full bg-slate-950 border-l border-slate-800 shadow-xl flex flex-col font-sans"
           >
             {/* Handle Resize với gradient */}
             <div
               onMouseDown={startResizing}
               className={`absolute left-0 top-0 w-2 h-full cursor-col-resize z-10 transition-all duration-300 ${
-                isResizing ? "bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500" : "hover:bg-gradient-to-b hover:from-blue-500/30 hover:via-purple-500/30 hover:to-pink-500/30"
+                isResizing ? "bg-blue-600" : "hover:bg-blue-600/30"
               }`}
             />
 
             {/* Header với gradient nổi bật */}
-            <div className="relative flex justify-between items-center p-5 border-b border-slate-700/50 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 backdrop-blur-xl overflow-hidden">
+            <div className="relative flex justify-between items-center p-5 border-b border-slate-800 bg-slate-900 overflow-hidden">
               {/* Animated gradient background */}
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-600/5 animate-pulse"></div>
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
+              <div className="absolute top-0 left-0 w-full h-1 bg-blue-600"></div>
               <div className="flex items-center gap-3 relative z-10">
                 <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl blur-lg opacity-50"></div>
-                  <div className="relative bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 p-2.5 rounded-xl shadow-lg">
+                  <div className="relative bg-blue-600 p-2.5 rounded-lg border border-blue-500">
                     <Bot size={22} className="text-white" />
                   </div>
                 </div>
                 <div>
-                  <h3 className="font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent text-lg tracking-tight">
+                  <h3 className="font-bold text-white text-lg tracking-tight">
                     CodePro AI
                   </h3>
                   <p className="text-xs text-slate-400">Gemini 3 Flash • Streaming</p>
@@ -244,10 +242,7 @@ export default function ChatbotWidget() {
             {/* Chat Content với gradient background */}
             <div
               ref={scrollRef}
-              className="flex-1 overflow-y-auto p-5 space-y-6 overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-900/50 relative"
-              style={{
-                background: 'linear-gradient(to bottom, rgba(15, 23, 42, 0.3) 0%, transparent 100%)'
-              }}
+              className="flex-1 overflow-y-auto p-5 space-y-6 overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-950 bg-slate-950 relative"
             >
               {messages.map((msg, idx) => (
                 <div
@@ -257,19 +252,19 @@ export default function ChatbotWidget() {
                   }`}
                 >
                   <div
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-lg ${
+                    className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border ${
                       msg.role === "ai"
-                        ? "bg-gradient-to-br from-blue-500/20 to-purple-500/20 text-blue-400 border border-blue-400/30 backdrop-blur-sm"
-                        : "bg-gradient-to-br from-slate-700 to-slate-800 text-slate-300 border border-slate-600"
+                        ? "bg-blue-600/10 text-blue-400 border-blue-500/30"
+                        : "bg-slate-800 text-slate-300 border-slate-700"
                     }`}
                   >
                     {msg.role === "ai" ? <Bot size={18} /> : <User size={18} />}
                   </div>
                   <div
-                    className={`max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed shadow-lg transition-all duration-300 ${
+                    className={`max-w-[85%] p-4 rounded-xl text-sm leading-relaxed transition-colors duration-200 ${
                       msg.role === "ai"
-                        ? "bg-gradient-to-br from-slate-900/90 to-slate-800/90 border border-slate-700/50 text-slate-100 rounded-tl-none backdrop-blur-sm"
-                        : "bg-gradient-to-br from-blue-600 via-blue-600 to-purple-600 text-white rounded-tr-none border border-blue-500/30"
+                        ? "bg-slate-900 border border-slate-800 text-slate-100 rounded-tl-none"
+                        : "bg-blue-600 text-white rounded-tr-none border border-blue-500"
                     }`}
                   >
                     <ReactMarkdown
@@ -339,14 +334,14 @@ export default function ChatbotWidget() {
               
               {isLoading && !isStreaming && (
                 <div className="flex gap-3">
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-lg bg-gradient-to-br from-blue-500/20 to-purple-500/20 text-blue-400 border border-blue-400/30 backdrop-blur-sm">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-blue-600/10 text-blue-400 border border-blue-500/30">
                     <Bot size={18} className="animate-pulse" />
                   </div>
-                  <div className="p-4 rounded-2xl rounded-tl-none bg-gradient-to-br from-slate-900/90 to-slate-800/90 border border-slate-700/50 backdrop-blur-sm shadow-lg">
+                  <div className="p-4 rounded-xl rounded-tl-none bg-slate-900 border border-slate-800">
                     <div className="flex gap-1.5 items-center">
                       <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                      <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                     </div>
                   </div>
                 </div>
@@ -354,10 +349,10 @@ export default function ChatbotWidget() {
             </div>
 
             {/* Input Footer với gradient */}
-            <div className="p-5 bg-gradient-to-t from-slate-950 via-slate-900 to-slate-900/50 border-t border-slate-700/50 backdrop-blur-xl">
+            <div className="p-5 bg-slate-950 border-t border-slate-800">
               {/* Preview file đang chờ gửi */}
               {attachedFile && (
-                <div className="mb-3 flex items-center justify-between bg-gradient-to-r from-slate-800/80 to-slate-900/80 border border-blue-500/30 p-3 rounded-xl animate-in fade-in slide-in-from-bottom-2 backdrop-blur-sm shadow-lg">
+                <div className="mb-3 flex items-center justify-between bg-slate-900 border border-blue-500/30 p-3 rounded-lg animate-in fade-in slide-in-from-bottom-2">
                   <div className="flex items-center gap-2 overflow-hidden">
                     <FileText size={16} className="text-blue-400" />
                     <span className="text-xs text-slate-300 truncate">
@@ -373,7 +368,7 @@ export default function ChatbotWidget() {
                 </div>
               )}
 
-              <div className="relative flex items-center gap-3 bg-gradient-to-r from-slate-900 to-slate-800 border border-slate-700/50 rounded-2xl px-5 py-3 focus-within:border-blue-500/50 focus-within:shadow-lg focus-within:shadow-blue-500/20 transition-all duration-300 backdrop-blur-sm">
+              <div className="relative flex items-center gap-3 bg-slate-900 border border-slate-700 rounded-xl px-5 py-3 focus-within:border-blue-500 transition-colors duration-200">
                 {/* Nút Upload Hidden */}
                 <input
                   type="file"
@@ -410,9 +405,9 @@ export default function ChatbotWidget() {
                 <button
                   onClick={handleSend}
                   disabled={isLoading || isStreaming || (!input.trim() && !attachedFile)}
-                  className={`p-2.5 rounded-xl transition-all duration-300 shadow-lg ${
+                  className={`p-2.5 rounded-lg transition-colors duration-200 ${
                     (input.trim() || attachedFile) && !isLoading && !isStreaming
-                      ? "bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white hover:shadow-xl hover:scale-105"
+                      ? "bg-blue-600 text-white hover:bg-blue-700"
                       : "bg-slate-800 text-slate-500"
                   }`}
                 >
@@ -429,9 +424,9 @@ export default function ChatbotWidget() {
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-8 right-8 z-50 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white rounded-2xl p-4 shadow-2xl hover:shadow-blue-500/50 flex items-center gap-3 group transition-all duration-300 hover:scale-105"
+          className="fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 text-white rounded-xl p-3 shadow-lg border border-blue-500 flex items-center justify-center transition-colors duration-200"
         >
-          <Bot size={24} className="group-hover:rotate-12 transition-transform" />
+          <Bot size={22} />
           <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-500 font-bold text-sm whitespace-nowrap">
             Trò chuyện với AI
           </span>

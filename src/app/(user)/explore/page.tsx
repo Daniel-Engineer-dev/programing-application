@@ -128,7 +128,7 @@ export default function ExplorePage() {
       return (
     <Link
       href={href}
-      className="group relative block h-52 w-full overflow-hidden rounded-2xl border border-white/10 bg-slate-800 transition-all shadow-xl hover:shadow-2xl hover:shadow-green-500/20 hover:scale-[1.02] hover:border-green-500/50"
+      className="group relative block h-52 w-full overflow-hidden rounded-xl border border-slate-800 bg-slate-900 transition-colors shadow-sm hover:border-blue-500/60"
     >
       {/* Background Image */}
       <div
@@ -162,13 +162,13 @@ export default function ExplorePage() {
       <div className="absolute bottom-0 left-0 p-6 w-full">
         <div className="flex flex-wrap gap-2 mb-3">
             {badge && (
-            <span className="px-3 py-1 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-[10px] font-bold uppercase text-white inline-block shadow-lg">
+            <span className="px-3 py-1 rounded-full bg-blue-600 text-[10px] font-bold uppercase text-white inline-block">
                 {badge}
             </span>
             )}
         </div>
         
-        <h3 className="text-xl font-bold text-white leading-tight line-clamp-2 drop-shadow-lg mb-2 group-hover:text-green-300 transition-colors">
+        <h3 className="text-xl font-bold text-white leading-tight line-clamp-2 drop-shadow-lg mb-2 group-hover:text-blue-300 transition-colors">
           {title}
         </h3>
         {subtitle && (
@@ -179,13 +179,13 @@ export default function ExplorePage() {
       </div>
 
       {/* Shimmer effect */}
-      <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+      <div className="hidden" />
     </Link>
   )};
 
   if (loading)
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-emerald-950/30 to-slate-900 text-white flex items-center justify-center">
+      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block w-12 h-12 border-4 border-green-500/30 border-t-green-500 rounded-full animate-spin mb-4"></div>
           <p className="text-slate-400">Đang tải dữ liệu...</p>
@@ -194,23 +194,19 @@ export default function ExplorePage() {
     );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-emerald-950/30 to-slate-900 text-slate-100 relative overflow-hidden">
+    <div className="min-h-screen bg-slate-950 text-slate-100 relative overflow-hidden">
       {/* Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-green-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl animate-pulse delay-2000"></div>
-      </div>
+      <div className="hidden"></div>
 
       <div className="relative z-10">
         {/* Header */}
         <div className="text-center pt-16 pb-12 px-4">
-          <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full bg-gradient-to-r from-green-500/20 to-emerald-500/20 backdrop-blur-sm border border-green-500/30">
-            <Compass className="w-4 h-4 text-green-400 animate-pulse" />
+          <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full bg-slate-900 border border-slate-800">
+            <Compass className="w-4 h-4 text-blue-400" />
             <span className="text-sm text-green-300 font-medium">Khám Phá Công Nghệ</span>
           </div>
 
-          <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400 bg-clip-text text-transparent animate-gradient">
+          <h1 className="text-5xl md:text-6xl font-bold mb-4 text-white">
             Khám phá lập trình
           </h1>
           <p className="text-lg text-slate-300 mb-8 max-w-2xl mx-auto">
@@ -220,15 +216,15 @@ export default function ExplorePage() {
           {/* Search Box & Filter */}
           <div className="relative mx-auto max-w-2xl flex flex-col items-center gap-4">
             <div
-              className={`w-full relative flex items-center rounded-2xl border transition-all backdrop-blur-xl bg-white/5 shadow-2xl ${
+              className={`w-full relative flex items-center rounded-xl border transition-colors bg-slate-900 shadow-sm ${
                 searchFocused
-                  ? "border-green-500/50 ring-2 ring-green-500/20 shadow-green-500/20"
-                  : "border-white/10"
+                  ? "border-blue-500"
+                  : "border-slate-800"
               }`}
             >
               <Search
                 className={`absolute left-5 transition-colors ${
-                  searchFocused ? "text-green-400" : "text-slate-500"
+                  searchFocused ? "text-blue-400" : "text-slate-500"
                 }`}
                 size={20}
               />
@@ -248,7 +244,7 @@ export default function ExplorePage() {
                     onClick={() => setShowSavedOnly(!showSavedOnly)}
                     className={`flex items-center gap-2 px-6 py-2 rounded-full border transition-all duration-300 ${
                         showSavedOnly 
-                        ? 'bg-blue-500/20 border-blue-500/50 text-blue-300 shadow-lg shadow-blue-500/10' 
+                        ? 'bg-blue-600/20 border-blue-500/50 text-blue-300' 
                         : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-slate-200'
                     }`}
                 >
@@ -262,7 +258,7 @@ export default function ExplorePage() {
                     onClick={() => setShowCompletedOnly(!showCompletedOnly)}
                     className={`flex items-center gap-2 px-6 py-2 rounded-full border transition-all duration-300 ${
                         showCompletedOnly
-                        ? 'bg-green-500/20 border-green-500/50 text-green-300 shadow-lg shadow-green-500/10' 
+                        ? 'bg-blue-600/20 border-blue-500/50 text-blue-300' 
                         : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-slate-200'
                     }`}
                 >
@@ -280,10 +276,10 @@ export default function ExplorePage() {
           <section className="mb-20">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500/30">
-                  <BookOpen className="w-5 h-5 text-green-400" />
+                <div className="p-2 rounded-lg bg-blue-600/15 border border-blue-500/30">
+                  <BookOpen className="w-5 h-5 text-blue-400" />
                 </div>
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
+                <h2 className="text-2xl font-bold text-white">
                   Chủ đề phổ biến
                 </h2>
               </div>
@@ -320,10 +316,10 @@ export default function ExplorePage() {
           <section className="mb-20">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500/30">
-                  <Map className="w-5 h-5 text-green-400" />
+                <div className="p-2 rounded-lg bg-blue-600/15 border border-blue-500/30">
+                  <Map className="w-5 h-5 text-blue-400" />
                 </div>
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
+                <h2 className="text-2xl font-bold text-white">
                   Lộ trình học tập
                 </h2>
               </div>
@@ -360,10 +356,10 @@ export default function ExplorePage() {
           <section>
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500/30">
-                  <TrendingUp className="w-5 h-5 text-green-400" />
+                <div className="p-2 rounded-lg bg-blue-600/15 border border-blue-500/30">
+                  <TrendingUp className="w-5 h-5 text-blue-400" />
                 </div>
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
+                <h2 className="text-2xl font-bold text-white">
                   Hướng dẫn mới nhất
                 </h2>
               </div>
