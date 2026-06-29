@@ -121,22 +121,16 @@ export default function NotesPage() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-64px)] bg-gradient-to-br from-slate-950 via-blue-950/30 to-slate-900 text-slate-200 overflow-hidden font-sans relative">
-      {/* Animated Background Orbs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
-      </div>
+    <div className="flex h-[calc(100vh-64px)] bg-slate-950 text-slate-200 overflow-hidden font-sans relative">
       {/* SIDEBAR: DANH SÁCH GHI CHÚ */}
-      <aside className="relative z-10 w-80 border-r border-blue-500/20 bg-gradient-to-br from-slate-900/50 to-blue-900/20 backdrop-blur-xl flex flex-col">
-        <div className="p-5 border-b border-blue-500/20 flex items-center justify-between">
-          <h2 className="font-bold text-xl bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Ghi chú ({notes.length})</h2>
+      <aside className="relative z-10 w-80 border-r border-slate-900 bg-slate-900/50 flex flex-col">
+        <div className="p-5 border-b border-slate-900 flex items-center justify-between">
+          <h2 className="font-bold text-lg text-white">Ghi chú ({notes.length})</h2>
           <button
             onClick={handleNewNote}
-            className="p-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-lg hover:from-blue-500 hover:to-cyan-500 transition-all active:scale-95 shadow-lg hover:shadow-blue-500/50"
+            className="p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors"
           >
-            <Plus size={20} />
+            <Plus size={18} />
           </button>
         </div>
 
@@ -150,10 +144,10 @@ export default function NotesPage() {
               <div
                 key={n.id}
                 onClick={() => selectNote(n)}
-                className={`p-4 border-b border-blue-500/10 cursor-pointer transition-all hover:bg-gradient-to-r hover:from-slate-800/40 hover:to-blue-900/20 group relative
+                className={`p-4 border-b border-slate-900 cursor-pointer transition-colors hover:bg-slate-850/50 group relative
                 ${
                   selectedNote?.id === n.id
-                    ? "bg-gradient-to-r from-slate-800/60 to-blue-900/30 border-l-4 border-l-blue-500 shadow-lg"
+                    ? "bg-slate-850 border-l-2 border-l-blue-600"
                     : ""
                 }`}
               >
@@ -179,13 +173,13 @@ export default function NotesPage() {
       </aside>
 
       {/* MAIN: EDITOR */}
-      <main className="relative z-10 flex-1 flex flex-col p-8">
+      <main className="relative z-10 flex-1 flex flex-col p-8 bg-slate-950">
         <div className="max-w-4xl w-full mx-auto flex flex-col h-full">
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Tiêu đề ghi chú..."
-            className="bg-transparent text-4xl font-bold outline-none mb-8 placeholder:text-slate-800 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent"
+            className="bg-transparent text-3xl font-bold outline-none mb-6 placeholder:text-slate-800 text-white border-b border-transparent focus:border-slate-800 pb-2"
           />
 
           <div className="flex-1 relative mb-8">
@@ -193,7 +187,7 @@ export default function NotesPage() {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="Bắt đầu viết nội dung tại đây..."
-              className="w-full h-full bg-gradient-to-br from-slate-900/50 to-blue-900/20 border border-blue-500/30 rounded-2xl p-6 text-lg outline-none focus:border-blue-400 focus:shadow-lg focus:shadow-blue-500/20 transition-all resize-none scrollbar-thin scrollbar-thumb-blue-500/30 backdrop-blur-xl"
+              className="w-full h-full bg-slate-900 border border-slate-800 rounded-xl p-5 text-base outline-none focus:border-slate-800 transition-colors resize-none scrollbar-thin scrollbar-thumb-slate-800 text-slate-200"
             />
           </div>
 
@@ -201,12 +195,12 @@ export default function NotesPage() {
             <button
               onClick={handleSave}
               disabled={isSaving || !title.trim()}
-              className="flex items-center gap-2.5 px-10 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 shadow-2xl hover:shadow-blue-500/50"
+              className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isSaving ? (
-                <Loader2 className="animate-spin" size={20} />
+                <Loader2 className="animate-spin" size={18} />
               ) : (
-                <Save size={20} />
+                <Save size={18} />
               )}
               Lưu ghi chú
             </button>

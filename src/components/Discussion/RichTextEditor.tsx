@@ -413,7 +413,7 @@ export default function RichTextEditor({
   // ✅ bỏ “nút sáng lên”: luôn 1 style cố định
   const toolbarBtnClass = () =>
     `relative inline-flex h-9 w-9 items-center justify-center rounded-md border text-xs transition-colors
-     border-slate-700 bg-slate-800 text-slate-200 hover:border-blue-400`;
+     border-slate-800 bg-slate-950 text-slate-400 hover:border-blue-500 hover:text-slate-100 hover:bg-slate-900`;
 
   const ToolBtn = ({
     tip,
@@ -434,9 +434,9 @@ export default function RichTextEditor({
       {children}
 
       {hoverTip === tip && (
-        <span className="absolute left-1/2 top-[calc(100%+8px)] z-50 -translate-x-1/2 whitespace-nowrap rounded-md border border-slate-700 bg-slate-950 px-2 py-1 text-[11px] text-slate-100 shadow-lg">
+        <span className="absolute left-1/2 top-[calc(100%+8px)] z-50 -translate-x-1/2 whitespace-nowrap rounded-md border border-slate-800 bg-slate-950 px-2 py-1 text-[11px] text-slate-100 shadow-lg">
           {TIP_TEXT[tip]}
-          <span className="absolute left-1/2 -top-1.5 h-3 w-3 -translate-x-1/2 rotate-45 border-l border-t border-slate-700 bg-slate-950" />
+          <span className="absolute left-1/2 -top-1.5 h-3 w-3 -translate-x-1/2 rotate-45 border-l border-t border-slate-800 bg-slate-950" />
         </span>
       )}
     </button>
@@ -445,33 +445,33 @@ export default function RichTextEditor({
   return (
     <div className="space-y-3">
       {/* Toolbar */}
-      <div className="flex flex-wrap gap-2 rounded-lg border border-slate-700 bg-slate-900/70 px-2 py-2">
+      <div className="flex flex-wrap gap-2 rounded-xl border border-slate-800 bg-slate-950 px-2 py-2 shadow-sm">
         <ToolBtn tip="heading" onClick={() => handleHeading()}>
-          <Heading size={16} />
+          <Heading size={15} />
         </ToolBtn>
 
-        <div className="mx-1 h-9 w-px bg-slate-700" />
+        <div className="mx-1 h-9 w-px bg-slate-800" />
 
         <ToolBtn tip="bold" onClick={() => handleBold()}>
-          <Bold size={16} />
+          <Bold size={15} />
         </ToolBtn>
         <ToolBtn tip="italic" onClick={() => handleItalic()}>
-          <Italic size={16} />
+          <Italic size={15} />
         </ToolBtn>
         <ToolBtn tip="underline" onClick={() => handleUnderline()}>
-          <Underline size={16} />
+          <Underline size={15} />
         </ToolBtn>
 
-        <div className="mx-1 h-9 w-px bg-slate-700" />
+        <div className="mx-1 h-9 w-px bg-slate-800" />
 
         <ToolBtn tip="ul" onClick={() => handleUl()}>
-          <List size={16} />
+          <List size={15} />
         </ToolBtn>
         <ToolBtn tip="ol" onClick={() => handleOl()}>
-          <ListOrdered size={16} />
+          <ListOrdered size={15} />
         </ToolBtn>
 
-        <div className="mx-1 h-9 w-px bg-slate-700" />
+        <div className="mx-1 h-9 w-px bg-slate-800" />
 
         {/* Code: click => inline code, Shift+click => code block */}
         <ToolBtn
@@ -481,24 +481,24 @@ export default function RichTextEditor({
             else handleInlineCode();
           }}
         >
-          <Code size={16} />
+          <Code size={15} />
         </ToolBtn>
 
         <ToolBtn tip="link" onClick={() => handleLink()}>
-          <LinkIcon size={16} />
+          <LinkIcon size={15} />
         </ToolBtn>
 
         <ToolBtn tip="image" onClick={() => handleImage()}>
-          <ImageIcon size={16} />
+          <ImageIcon size={15} />
         </ToolBtn>
 
         <ToolBtn tip="hr" onClick={() => handleHR()}>
-          <Minus size={16} />
+          <Minus size={15} />
         </ToolBtn>
       </div>
 
       {/* 2 màn hình: trái nhập, phải preview */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <textarea
           ref={taRef}
           value={value}
@@ -506,19 +506,23 @@ export default function RichTextEditor({
           onSelect={updateActiveFromSelection}
           onKeyUp={updateActiveFromSelection}
           onMouseUp={updateActiveFromSelection}
-          className="min-h-[280px] w-full resize-none rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-          placeholder="Soạn nội dung ở đây..."
+          className="min-h-[350px] w-full resize-none rounded-xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm text-slate-200 placeholder-slate-650 outline-none focus:border-blue-500 transition-colors"
+          placeholder="Soạn nội dung bài viết ở đây (hỗ trợ Markdown)..."
         />
 
-        <div className="min-h-[280px] w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm">
-          <div
-            className="prose prose-invert max-w-none"
-            dangerouslySetInnerHTML={{ __html: previewHtml }}
-          />
+        <div className="min-h-[350px] w-full rounded-xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm overflow-y-auto max-h-[500px]">
+          {previewHtml ? (
+            <div
+              className="prose prose-invert prose-slate max-w-none prose-sm"
+              dangerouslySetInnerHTML={{ __html: previewHtml }}
+            />
+          ) : (
+            <span className="text-slate-600 italic text-xs">Xem trước nội dung hiển thị ở đây...</span>
+          )}
         </div>
       </div>
 
-      <p className="text-xs text-slate-500">
+      <p className="text-[11px] text-slate-500">
         Mẹo: Bấm <b>Mã</b> để chèn <code>`code`</code>. Giữ <b>Shift</b> rồi bấm{" "}
         <b>Mã</b> để tạo khối mã <code>```...```</code>.
       </p>

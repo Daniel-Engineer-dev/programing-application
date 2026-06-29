@@ -154,15 +154,9 @@ export default function GuideDetail() {
     );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-pink-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/3 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl" />
-      </div>
-
+    <div className="min-h-screen bg-slate-950 text-white relative">
       {/* Hero Header */}
-      <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden">
+      <div className="relative w-full h-[280px] md:h-[320px] overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
@@ -173,56 +167,44 @@ export default function GuideDetail() {
           }}
         />
         
-        {/* Enhanced Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/70 to-slate-900/30" />
-        <div className="absolute inset-0 bg-gradient-to-r from-pink-900/20 to-orange-900/20" />
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-slate-950/80" />
 
         <div className="relative z-10 max-w-6xl mx-auto h-full flex flex-col justify-end p-6 md:p-12">
           {/* Back Button */}
           <Link
             href="/explore"
-            className="absolute top-10 left-6 md:left-12 flex items-center text-slate-100/80 hover:text-white transition-all duration-300 group"
+            className="absolute top-8 left-6 md:left-12 flex items-center text-slate-400 hover:text-white transition-colors group"
           >
-            <div className="absolute inset-0 bg-pink-500/0 group-hover:bg-pink-500/10 rounded-lg blur-xl transition-all duration-300" />
-            <ArrowLeft className="relative w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-            <span className="relative text-xs font-semibold tracking-widest uppercase">
+            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+            <span className="text-xs font-bold tracking-widest uppercase">
               Quay lại
             </span>
           </Link>
 
-          <header className="article-header mb-6">
-            {/* Icon Badge */}
-            <div className="inline-flex mb-4">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-orange-600 rounded-xl blur-lg opacity-50" />
-                <div className="relative bg-gradient-to-br from-pink-600 to-orange-600 p-3 rounded-xl">
-                  <BookMarked size={24} className="text-white" />
-                </div>
-              </div>
-            </div>
-
+          <header className="article-header mb-2">
             {/* Title */}
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white via-pink-100 to-orange-100 bg-clip-text text-transparent leading-tight">
+            <h1 className="text-3xl md:text-5xl font-bold mb-4 text-white tracking-tight leading-tight">
               {guide.title}
             </h1>
 
             {/* Meta Labels */}
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 shadow-lg">
-                <User className="w-4 h-4 mr-2 text-pink-400" />
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-200">
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg text-slate-400">
+                <User className="w-3.5 h-3.5 mr-1.5 text-pink-400" />
+                <span className="text-xs font-semibold uppercase tracking-wider">
                   {guide.author}
                 </span>
               </div>
-              <div className="flex items-center bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 shadow-lg">
-                <Layers className="w-4 h-4 mr-2 text-purple-400" />
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-200">
+              <div className="flex items-center bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg text-slate-400">
+                <Layers className="w-3.5 h-3.5 mr-1.5 text-purple-400" />
+                <span className="text-xs font-semibold uppercase tracking-wider">
                   {guide.level}
                 </span>
               </div>
-              <div className="flex items-center bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 shadow-lg">
-                <FileText className="w-4 h-4 mr-2 text-orange-400" />
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-200">
+              <div className="flex items-center bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg text-slate-400">
+                <FileText className="w-3.5 h-3.5 mr-1.5 text-orange-400" />
+                <span className="text-xs font-semibold uppercase tracking-wider">
                   {guide.type}
                 </span>
               </div>
@@ -234,55 +216,49 @@ export default function GuideDetail() {
       {/* Main Content */}
       <main className="relative z-10 max-w-6xl mx-auto p-6 md:p-12">
         <div className="grid lg:grid-cols-3 gap-12">
-          <div className="lg:col-span-2 space-y-12">
+          <div className="lg:col-span-2 space-y-10">
             {/* Introduction */}
             <section className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="h-8 w-1 bg-gradient-to-b from-pink-500 to-orange-500 rounded-full" />
-                <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-                  Giới thiệu
+              <div className="flex items-center gap-2 mb-4 border-b border-slate-800 pb-2">
+                <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  Tóm tắt & Giới thiệu
                 </h2>
               </div>
-              <div className="relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-pink-600 via-orange-600 to-pink-600 rounded-2xl opacity-20 group-hover:opacity-30 blur transition-opacity duration-500" />
-                <div className="relative bg-slate-900/80 backdrop-blur-xl p-8 rounded-2xl border border-slate-700/50 shadow-2xl">
-                  <div className="absolute top-6 left-6 text-pink-500/20 text-6xl font-serif">"</div>
-                  <p className="text-lg text-slate-300 leading-relaxed italic pl-8">
-                    {guide.desc}
-                  </p>
-                </div>
+              <div className="bg-slate-900 border border-slate-800 p-6 rounded-xl shadow-sm">
+                <p className="text-sm text-slate-300 leading-relaxed pl-4 border-l-2 border-pink-500">
+                  {guide.desc}
+                </p>
               </div>
             </section>
 
             {/* Main Content */}
             <section className="animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: '100ms' }}>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="h-8 w-1 bg-gradient-to-b from-pink-500 to-orange-500 rounded-full" />
-                <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+              <div className="flex items-center gap-2 mb-4 border-b border-slate-800 pb-2">
+                <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                   Nội dung hướng dẫn
                 </h2>
               </div>
               <div
-                className="prose prose-lg prose-invert max-w-none
+                className="prose prose-sm md:prose-base prose-invert max-w-none
                   prose-headings:font-bold prose-headings:tracking-tight
-                  prose-h1:text-4xl prose-h1:mb-6 prose-h1:bg-gradient-to-r prose-h1:from-white prose-h1:to-slate-400 prose-h1:bg-clip-text prose-h1:text-transparent
-                  prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-4 prose-h2:bg-gradient-to-r prose-h2:from-pink-300 prose-h2:to-orange-300 prose-h2:bg-clip-text prose-h2:text-transparent
-                  prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-3 prose-h3:text-pink-200
-                  prose-p:text-slate-300 prose-p:leading-8 prose-p:mb-6
+                  prose-h1:text-2xl prose-h1:mb-4 prose-h1:text-white prose-h1:pb-2 prose-h1:border-b prose-h1:border-slate-800
+                  prose-h2:text-xl prose-h2:mt-8 prose-h2:mb-3 prose-h2:text-slate-105 prose-h2:pb-1 prose-h2:border-b prose-h2:border-slate-800/60
+                  prose-h3:text-lg prose-h3:mt-6 prose-h3:mb-2 prose-h3:text-slate-200
+                  prose-p:text-slate-300 prose-p:leading-7 prose-p:mb-4
                   prose-strong:text-white prose-strong:font-bold
                   prose-em:text-pink-300 prose-em:italic
                   prose-a:text-pink-400 prose-a:no-underline hover:prose-a:text-pink-300 hover:prose-a:underline prose-a:transition-colors
-                  prose-code:text-orange-400 prose-code:bg-slate-800 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-sm prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
-                  prose-pre:bg-slate-900/50 prose-pre:border prose-pre:border-slate-700 prose-pre:rounded-xl prose-pre:shadow-2xl
-                  prose-ul:text-slate-300 prose-ul:my-6
-                  prose-ol:text-slate-300 prose-ol:my-6
-                  prose-li:my-2 prose-li:leading-7
-                  prose-blockquote:border-l-4 prose-blockquote:border-pink-500 prose-blockquote:bg-slate-900/50 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:italic prose-blockquote:text-slate-400 prose-blockquote:rounded-r-xl
-                  prose-img:rounded-xl prose-img:shadow-2xl prose-img:my-8
-                  prose-hr:border-slate-700 prose-hr:my-12
-                  prose-table:border prose-table:border-slate-700 prose-table:rounded-lg prose-table:overflow-hidden
-                  prose-th:bg-slate-800 prose-th:text-white prose-th:font-bold prose-th:px-4 prose-th:py-3
-                  prose-td:border-slate-700 prose-td:px-4 prose-td:py-3"
+                  prose-code:text-orange-400 prose-code:bg-slate-900 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-code:font-mono prose-code:before:content-none prose-code:after:content-none prose-code:border prose-code:border-slate-800
+                  prose-pre:bg-slate-950 prose-pre:border prose-pre:border-slate-800 prose-pre:rounded-xl prose-pre:shadow-sm
+                  prose-ul:text-slate-300 prose-ul:my-4
+                  prose-ol:text-slate-300 prose-ol:my-4
+                  prose-li:my-1.5 prose-li:leading-6
+                  prose-blockquote:border-l-2 prose-blockquote:border-pink-500 prose-blockquote:bg-slate-900/50 prose-blockquote:py-3 prose-blockquote:px-5 prose-blockquote:italic prose-blockquote:text-slate-400 prose-blockquote:rounded-r-lg
+                  prose-img:rounded-xl prose-img:shadow-sm prose-img:my-6
+                  prose-hr:border-slate-800 prose-hr:my-8
+                  prose-table:border prose-table:border-slate-800 prose-table:rounded-lg prose-table:overflow-hidden
+                  prose-th:bg-slate-900 prose-th:text-slate-200 prose-th:font-semibold prose-th:px-3 prose-th:py-2
+                  prose-td:border-slate-800 prose-td:px-3 prose-td:py-2"
                 dangerouslySetInnerHTML={{ __html: guide.htmlContent }}
               />
             </section>
@@ -292,109 +268,103 @@ export default function GuideDetail() {
           <aside className="lg:col-span-1">
             <div className="sticky top-10 space-y-6 animate-in fade-in slide-in-from-right-4 duration-700" style={{ animationDelay: '200ms' }}>
               {/* Author Card */}
-              <div className="relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-pink-600 to-orange-600 rounded-2xl opacity-20 group-hover:opacity-30 blur transition-opacity duration-500" />
-                <div className="relative bg-slate-900/80 backdrop-blur-xl p-6 rounded-2xl border border-slate-700/50 shadow-2xl">
-                  <h3 className="text-sm font-bold tracking-widest uppercase bg-gradient-to-r from-pink-400 to-orange-400 bg-clip-text text-transparent mb-6 pb-4 border-b border-slate-700">
-                    Thông tin bài viết
-                  </h3>
-                  <ul className="space-y-4">
-                    <li className="flex justify-between items-center group/item hover:bg-slate-800/50 p-3 rounded-lg transition-colors">
-                      <span className="text-sm font-medium text-slate-400">
-                        Tác giả
-                      </span>
-                      <span className="text-sm font-semibold text-white">
-                        {guide.author}
-                      </span>
-                    </li>
-                    <li className="flex justify-between items-center group/item hover:bg-slate-800/50 p-3 rounded-lg transition-colors">
-                      <span className="text-sm font-medium text-slate-400">
-                        Cấp độ
-                      </span>
-                      <span className="text-sm font-bold text-pink-400 uppercase">
-                        {guide.level}
-                      </span>
-                    </li>
-                    <li className="flex justify-between items-center group/item hover:bg-slate-800/50 p-3 rounded-lg transition-colors">
-                      <span className="text-sm font-medium text-slate-400">
-                        Định dạng
-                      </span>
-                      <span className="text-sm font-semibold text-orange-300">
-                        {guide.type}
-                      </span>
-                    </li>
-                    <li className="flex justify-between items-center group/item hover:bg-slate-800/50 p-3 rounded-lg transition-colors">
-                      <span className="text-sm font-medium text-slate-400 flex items-center gap-2">
-                        <Clock size={14} />
-                        Thời gian đọc
-                      </span>
-                      <span className="text-sm font-semibold text-slate-300">
-                        ~10 phút
-                      </span>
-                    </li>
-                  </ul>
-                </div>
+              <div className="bg-slate-900 border border-slate-800 p-6 rounded-xl shadow-sm">
+                <h3 className="text-xs font-bold tracking-widest uppercase text-slate-400 mb-6 pb-4 border-b border-slate-800">
+                  Thông tin bài viết
+                </h3>
+                <ul className="space-y-4">
+                  <li className="flex justify-between items-center group/item hover:bg-slate-800/30 p-2.5 rounded-lg transition-colors">
+                    <span className="text-xs font-medium text-slate-450">
+                      Tác giả
+                    </span>
+                    <span className="text-xs font-semibold text-white">
+                      {guide.author}
+                    </span>
+                  </li>
+                  <li className="flex justify-between items-center group/item hover:bg-slate-800/30 p-2.5 rounded-lg transition-colors">
+                    <span className="text-xs font-medium text-slate-450">
+                      Cấp độ
+                    </span>
+                    <span className="text-xs font-bold text-pink-400 uppercase">
+                      {guide.level}
+                    </span>
+                  </li>
+                  <li className="flex justify-between items-center group/item hover:bg-slate-800/30 p-2.5 rounded-lg transition-colors">
+                    <span className="text-xs font-medium text-slate-450">
+                      Định dạng
+                    </span>
+                    <span className="text-xs font-semibold text-orange-450">
+                      {guide.type}
+                    </span>
+                  </li>
+                  <li className="flex justify-between items-center group/item hover:bg-slate-800/30 p-2.5 rounded-lg transition-colors">
+                    <span className="text-xs font-medium text-slate-450 flex items-center gap-1.5">
+                      <Clock size={12} />
+                      Thời gian đọc
+                    </span>
+                    <span className="text-xs font-semibold text-slate-355">
+                      ~10 phút
+                    </span>
+                  </li>
+                </ul>
               </div>
 
               {/* Actions */}
-              <div className="relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-orange-600 to-pink-600 rounded-2xl opacity-20 group-hover:opacity-30 blur transition-opacity duration-500" />
-                <div className="relative bg-slate-900/80 backdrop-blur-xl p-6 rounded-2xl border border-slate-700/50 shadow-2xl">
-                  <h3 className="text-sm font-bold tracking-widest uppercase bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent mb-4">
-                    Hành động
-                  </h3>
-                  <div className="space-y-2">
-                    <button 
-                        onClick={handleSaveGuide}
-                        className={`w-full px-4 py-3 rounded-xl font-semibold text-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 flex items-center justify-center gap-2
-                        ${isSaved 
-                            ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white' 
-                            : 'bg-gradient-to-r from-pink-600 to-orange-600 hover:from-pink-500 hover:to-orange-500 text-white'
-                        }`}
-                    >
-                      {isSaved ? (
-                          <>
-                            <BookmarkCheck className="w-4 h-4" />
-                            Đã lưu
-                          </>
-                      ) : (
-                          <>
-                            <BookMarked className="w-4 h-4" />
-                            Lưu hướng dẫn
-                          </>
-                      )}
-                    </button>
-                    <button 
-                        onClick={handleMarkAsRead}
-                        className={`w-full px-4 py-3 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2
-                        ${isRead 
-                            ? 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white shadow-lg' 
-                            : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700'
-                        }`}
-                    >
-                      {isRead ? (
-                          <>
-                            <Check className="w-4 h-4" />
-                            Đã đọc
-                          </>
-                      ) : (
-                          "Đánh dấu đã đọc"
-                      )}
-                    </button>
-                    <button 
-                        onClick={handlePrint}
-                        className="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-4 py-3 rounded-xl font-semibold text-sm transition-all duration-300 border border-slate-700 flex items-center justify-center gap-2"
-                    >
-                      <Printer className="w-4 h-4" />
-                      In tài liệu
-                    </button>
-                  </div>
+              <div className="bg-slate-900 border border-slate-800 p-6 rounded-xl shadow-sm">
+                <h3 className="text-xs font-bold tracking-widest uppercase text-slate-400 mb-4">
+                  Hành động
+                </h3>
+                <div className="space-y-2">
+                  <button 
+                      onClick={handleSaveGuide}
+                      className={`w-full px-4 py-2.5 rounded-xl font-semibold text-xs transition-colors border flex items-center justify-center gap-2
+                      ${isSaved 
+                          ? 'bg-slate-800 hover:bg-slate-700 text-pink-400 border border-pink-500/20' 
+                          : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border-slate-700'
+                      }`}
+                  >
+                    {isSaved ? (
+                        <>
+                          <BookmarkCheck className="w-3.5 h-3.5" />
+                          Đã lưu
+                        </>
+                    ) : (
+                        <>
+                          <Bookmark className="w-3.5 h-3.5" />
+                          Lưu hướng dẫn
+                        </>
+                    )}
+                  </button>
+                  <button 
+                      onClick={handleMarkAsRead}
+                      className={`w-full px-4 py-2.5 rounded-xl font-semibold text-xs transition-colors flex items-center justify-center gap-2
+                      ${isRead 
+                          ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm' 
+                          : 'bg-slate-850 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800'
+                      }`}
+                  >
+                    {isRead ? (
+                        <>
+                          <Check className="w-3.5 h-3.5" />
+                          Đã đọc
+                        </>
+                    ) : (
+                        "Đánh dấu đã đọc"
+                    )}
+                  </button>
+                  <button 
+                      onClick={handlePrint}
+                      className="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-4 py-2.5 rounded-xl font-semibold text-xs transition-colors border border-slate-700 flex items-center justify-center gap-2"
+                  >
+                    <Printer className="w-3.5 h-3.5" />
+                    In tài liệu
+                  </button>
                 </div>
               </div>
 
               {/* Info Note */}
-              <div className="p-4 bg-slate-900/50 backdrop-blur-sm rounded-xl border border-slate-800">
-                <p className="text-xs text-slate-500 leading-relaxed italic">
+              <div className="p-4 bg-slate-900/50 rounded-xl border border-slate-800">
+                <p className="text-[10px] text-slate-500 leading-relaxed italic">
                   Tài liệu này được đồng bộ từ Firebase Cloud Firestore
                 </p>
               </div>

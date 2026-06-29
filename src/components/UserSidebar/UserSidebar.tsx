@@ -27,41 +27,27 @@ export default function UserSidebar() {
             key={item.href}
             href={item.href}
             className={`
-              group relative block px-4 py-3.5 rounded-xl
+              group relative block px-4 py-3 rounded-lg
               text-sm font-semibold
-              transition-all duration-300
+              transition-all duration-250
               flex items-center gap-3
-              overflow-hidden
               ${
                 isActive
-                  ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-xl shadow-blue-500/30" 
-                  : "text-slate-300 hover:text-white hover:bg-gradient-to-r hover:from-slate-800 hover:to-slate-700"
+                  ? "bg-blue-600 text-white" 
+                  : "text-slate-400 hover:text-white hover:bg-slate-900"
               }
             `}
           >
-            {/* Background glow effect khi active */}
-            {isActive && (
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-blue-600/20 blur-xl opacity-50"></div>
-            )}
-            
             {/* Icon */}
             <Icon 
               size={18} 
-              className={`relative z-10 transition-transform group-hover:scale-110 ${
-                isActive ? "" : "group-hover:text-blue-400"
+              className={`transition-colors ${
+                isActive ? "text-white" : "text-slate-400 group-hover:text-white"
               }`} 
             />
             
             {/* Label */}
-            <span className="relative z-10">{item.label}</span>
-            
-            {/* Active indicator */}
-            {isActive && (
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-l-full"></div>
-            )}
-            
-            {/* Hover shine effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+            <span>{item.label}</span>
           </Link>
         );
       })}

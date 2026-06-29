@@ -242,38 +242,87 @@ export default function EditorPanel({
     );
     setSubmissionResult(null); // Ẩn modal kết quả nộp bài nếu đang mở
 
-    const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
-
     try {
-      const newResults = publicTestCases.map(
-        () =>
-          ({
-            passed: null,
-            actualOutput: "",
-            stderr: "",
-            status: "Pending",
-          } as RunResult)
-      );
+      const response = await axios.post("/piston", {
+        source_code: code,
+        language: language,
+        problemId: problemId,
+        testCases: publicTestCases,
+      });
 
-      for (let i = 0; i < publicTestCases.length; i++) {
-        const tc = publicTestCases[i];
-        try {
-          const response = await axios.post("/piston", {
-            source_code: code,
-            language: language,
-            stdin: tc.input,
-            problemId: problemId,
-          });
+      const resData = response.data;
 
-          const resultData = response.data;
+      // 1. Trường hợp sử dụng Hàng đợi (Judge0)
+      if (resData.useQueue && Array.isArray(resData.tokens)) {
+        const tokenStr = resData.tokens.join(",");
+        let isPolling = true;
+        
+        while (isPolling) {
+          await new Promise(r => setTimeout(r, 1000));
+          try {
+            const pollRes = await axios.get(`/piston?tokens=${tokenStr}`);
+            const pollData = pollRes.data;
+
+            if (pollData.batch && Array.isArray(pollData.results)) {
+              const updatedResults = publicTestCases.map((tc, i) => {
+                const runVal = pollData.results.find((r: any) => r.index === i) || pollData.results[i];
+                const finished = runVal.finished;
+                const expected = tc.expectedOutput.trim();
+                const actual = runVal.stdout ? runVal.stdout.trim() : "";
+                const stderr = runVal.stderr || "";
+                
+                const runtime = runVal.time
+                  ? `${(runVal.time * 1000).toFixed(0)} ms`
+                  : "0 ms";
+                const memory = runVal.memory
+                  ? `${(runVal.memory / 1024 / 1024).toFixed(2)} MB`
+                  : "0 MB";
+
+                let status: RunResult["status"] = "Pending";
+                if (finished) {
+                  if (stderr) {
+                    status = "Runtime Error";
+                  } else if (actual === expected) {
+                    status = "Accepted";
+                  } else {
+                    status = "Wrong Answer";
+                  }
+                }
+
+                return {
+                  passed: finished ? (status === "Accepted") : null,
+                  actualOutput: finished ? actual : `Đang xử lý (${runVal.status_name || "Trong hàng đợi"})...`,
+                  stderr: finished ? stderr : "",
+                  status: finished ? status : "Pending",
+                  runtime: finished ? runtime : "",
+                  memory: finished ? memory : "",
+                };
+              });
+
+              setRunResults(updatedResults);
+
+              if (pollData.finished) {
+                isPolling = false;
+              }
+            }
+          } catch (pollError) {
+            console.error("Lỗi polling chạy thử code:", pollError);
+            isPolling = false;
+          }
+        }
+      } 
+      // 2. Trường hợp Fallback (chạy ngay qua Piston)
+      else if (resData.batch && Array.isArray(resData.results)) {
+        const updatedResults = publicTestCases.map((tc, i) => {
+          const runVal = resData.results.find((r: any) => r.index === i) || resData.results[i];
           const expected = tc.expectedOutput.trim();
-          const actual = resultData.stdout ? resultData.stdout.trim() : "";
-          const stderr = resultData.stderr || "";
-          const runtime = resultData.time
-            ? `${(resultData.time * 1000).toFixed(0)} ms`
+          const actual = runVal.stdout ? runVal.stdout.trim() : "";
+          const stderr = runVal.stderr || "";
+          const runtime = runVal.time
+            ? `${(runVal.time * 1000).toFixed(0)} ms`
             : "0 ms";
-          const memory = resultData.memory
-            ? `${(resultData.memory / 1024 / 1024).toFixed(2)} MB`
+          const memory = runVal.memory
+            ? `${(runVal.memory / 1024 / 1024).toFixed(2)} MB`
             : "0 MB";
 
           let status: RunResult["status"] = "Accepted";
@@ -287,7 +336,7 @@ export default function EditorPanel({
             passed = false;
           }
 
-          newResults[i] = {
+          return {
             passed,
             actualOutput: actual,
             stderr,
@@ -295,12 +344,21 @@ export default function EditorPanel({
             runtime,
             memory,
           };
-          setRunResults([...newResults]);
-        } catch (error) {
-          console.error(`Lỗi test case ${i}`, error);
-        }
-        if (i < publicTestCases.length - 1) await delay(300);
+        });
+        setRunResults(updatedResults);
       }
+    } catch (error) {
+      console.error("Lỗi khi chạy code:", error);
+      setRunResults(
+        publicTestCases.map(() => ({
+          passed: false,
+          actualOutput: "",
+          stderr: "Lỗi kết nối máy chủ thực thi.",
+          status: "Runtime Error",
+          runtime: "0 ms",
+          memory: "0 MB",
+        }))
+      );
     } finally {
       setIsRunning(false);
     }
@@ -362,7 +420,6 @@ export default function EditorPanel({
 
     setIsSubmitting(true);
     setSubmissionResult(null);
-    const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
     let passedCount = 0;
     let finalStatus: SubmissionResult["status"] = "Accepted";
@@ -370,23 +427,70 @@ export default function EditorPanel({
     let maxMemory = 0;
 
     try {
-      for (let i = 0; i < allTestCases.length; i++) {
-        const tc = allTestCases[i];
+      const response = await axios.post("/piston", {
+        source_code: code,
+        language: language,
+        problemId: problemId,
+        testCases: allTestCases,
+      });
 
-        try {
-          const response = await axios.post("/piston", {
-            source_code: code,
-            language: language,
-            stdin: tc.input,
-            problemId: problemId,
-          });
+      const resData = response.data;
 
-          const resultData = response.data;
+      // 1. Trường hợp sử dụng Hàng đợi (Judge0)
+      if (resData.useQueue && Array.isArray(resData.tokens)) {
+        const tokenStr = resData.tokens.join(",");
+        let isPolling = true;
+        let pollData: any = null;
+
+        while (isPolling) {
+          await new Promise(r => setTimeout(r, 1000));
+          try {
+            const pollRes = await axios.get(`/piston?tokens=${tokenStr}`);
+            pollData = pollRes.data;
+
+            if (pollData.finished) {
+              isPolling = false;
+            }
+          } catch (pollError) {
+            console.error("Lỗi polling nộp bài:", pollError);
+            isPolling = false;
+          }
+        }
+
+        if (pollData && pollData.batch && Array.isArray(pollData.results)) {
+          for (let i = 0; i < allTestCases.length; i++) {
+            const tc = allTestCases[i];
+            const runVal = pollData.results.find((r: any) => r.index === i) || pollData.results[i];
+            const expected = tc.expectedOutput.trim();
+            const actual = runVal.stdout ? runVal.stdout.trim() : "";
+            const stderr = runVal.stderr || "";
+
+            maxRuntime = Math.max(maxRuntime, runVal.time || 0);
+            maxMemory = Math.max(maxMemory, runVal.memory || 0);
+
+            if (stderr) {
+              finalStatus = "Runtime Error";
+            } else if (actual === expected) {
+              passedCount++;
+            } else {
+              if (finalStatus === "Accepted") finalStatus = "Wrong Answer";
+            }
+          }
+        } else {
+          finalStatus = "Runtime Error";
+        }
+      } 
+      // 2. Trường hợp Fallback (chạy ngay qua Piston)
+      else if (resData.batch && Array.isArray(resData.results)) {
+        for (let i = 0; i < allTestCases.length; i++) {
+          const tc = allTestCases[i];
+          const runVal = resData.results.find((r: any) => r.index === i) || resData.results[i];
           const expected = tc.expectedOutput.trim();
-          const actual = resultData.stdout ? resultData.stdout.trim() : "";
-          const stderr = resultData.stderr || "";
-          maxRuntime = Math.max(maxRuntime, resultData.time || 0);
-          maxMemory = Math.max(maxMemory, resultData.memory || 0);
+          const actual = runVal.stdout ? runVal.stdout.trim() : "";
+          const stderr = runVal.stderr || "";
+          
+          maxRuntime = Math.max(maxRuntime, runVal.time || 0);
+          maxMemory = Math.max(maxMemory, runVal.memory || 0);
 
           if (stderr) {
             finalStatus = "Runtime Error";
@@ -395,12 +499,9 @@ export default function EditorPanel({
           } else {
             if (finalStatus === "Accepted") finalStatus = "Wrong Answer";
           }
-        } catch (error) {
-          console.error("Lỗi server submit:", error);
-          finalStatus = "Runtime Error";
         }
-
-        if (i < allTestCases.length - 1) await delay(300);
+      } else {
+        finalStatus = "Runtime Error";
       }
 
       const result = {
@@ -427,6 +528,13 @@ export default function EditorPanel({
 
     } catch (err) {
       console.error(err);
+      setSubmissionResult({
+        total: allTestCases.length,
+        passed: 0,
+        status: "Runtime Error",
+        runtime: "0 ms",
+        memory: "0 MB",
+      });
     } finally {
       setIsSubmitting(false);
     }

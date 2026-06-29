@@ -115,41 +115,92 @@ export function useContestSubmission({ contestId, userId }: UseContestSubmission
           }
       }
 
-      // 2. Execute Code via Piston
+      // 2. Execute Code via Piston/Judge0
       let passedCount = 0;
       let finalStatus = "Accepted";
       let maxRuntime = 0;
       let maxMemory = 0;
 
-      // NOTE: Logic chạy loop từng testcase như cũ để đảm bảo tương thích
-      for (let i = 0; i < testCases.length; i++) {
-        const tc = testCases[i];
+      try {
         const response = await axios.post("/piston", {
             source_code: code,
             language: language,
-            stdin: tc.input,
             problemId: actualProblemDocId,
+            testCases: testCases,
         });
 
         const resData = response.data;
-        const actualOut = (resData.stdout || "").trim();
-        const expectedOut = tc.expectedOutput.trim();
-        const stderr = resData.stderr || "";
 
-        maxRuntime = Math.max(maxRuntime, resData.time || 0);
-        maxMemory = Math.max(maxMemory, resData.memory || 0);
+        // 1. Trường hợp sử dụng Hàng đợi (Judge0)
+        if (resData.useQueue && Array.isArray(resData.tokens)) {
+          const tokenStr = resData.tokens.join(",");
+          let isPolling = true;
+          let pollData: any = null;
 
-        if (stderr) {
+          while (isPolling) {
+            await new Promise(r => setTimeout(r, 1000));
+            try {
+              const pollRes = await axios.get(`/piston?tokens=${tokenStr}`);
+              pollData = pollRes.data;
+
+              if (pollData.finished) {
+                isPolling = false;
+              }
+            } catch (pollError) {
+              console.error("Lỗi polling nộp bài contest:", pollError);
+              isPolling = false;
+            }
+          }
+
+          if (pollData && pollData.batch && Array.isArray(pollData.results)) {
+            for (let i = 0; i < testCases.length; i++) {
+              const tc = testCases[i];
+              const runVal = pollData.results.find((r: any) => r.index === i) || pollData.results[i];
+              const actualOut = (runVal.stdout || "").trim();
+              const expectedOut = tc.expectedOutput.trim();
+              const stderr = runVal.stderr || "";
+
+              maxRuntime = Math.max(maxRuntime, runVal.time || 0);
+              maxMemory = Math.max(maxMemory, runVal.memory || 0);
+
+              if (stderr) {
+                  finalStatus = "Runtime Error";
+              } else if (actualOut === expectedOut) {
+                  passedCount++;
+              } else {
+                  if (finalStatus === "Accepted") finalStatus = "Wrong Answer";
+              }
+            }
+          } else {
             finalStatus = "Runtime Error";
-        } else if (actualOut === expectedOut) {
-            passedCount++;
+          }
+        } 
+        // 2. Trường hợp Fallback (chạy ngay qua Piston)
+        else if (resData.batch && Array.isArray(resData.results)) {
+          for (let i = 0; i < testCases.length; i++) {
+            const tc = testCases[i];
+            const runVal = resData.results.find((r: any) => r.index === i) || resData.results[i];
+            const actualOut = (runVal.stdout || "").trim();
+            const expectedOut = tc.expectedOutput.trim();
+            const stderr = runVal.stderr || "";
+
+            maxRuntime = Math.max(maxRuntime, runVal.time || 0);
+            maxMemory = Math.max(maxMemory, runVal.memory || 0);
+
+            if (stderr) {
+                finalStatus = "Runtime Error";
+            } else if (actualOut === expectedOut) {
+                passedCount++;
+            } else {
+                if (finalStatus === "Accepted") finalStatus = "Wrong Answer";
+            }
+          }
         } else {
-            if (finalStatus === "Accepted") finalStatus = "Wrong Answer";
+          finalStatus = "Runtime Error";
         }
-        
-        if (i < testCases.length - 1) {
-            await new Promise(r => setTimeout(r, 200));
-        }
+      } catch (error) {
+        console.error("Lỗi khi nộp bài contest:", error);
+        finalStatus = "Runtime Error";
       }
 
       if (finalStatus === "Accepted" && passedCount < testCases.length) {

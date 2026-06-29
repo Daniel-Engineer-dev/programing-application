@@ -189,6 +189,15 @@ export default function ChatbotWidget() {
     }
   };
 
+  // Listen to toggle-chatbot event from NavBar
+  useEffect(() => {
+    const handleToggle = () => {
+      setIsOpen((prev) => !prev);
+    };
+    window.addEventListener("toggle-chatbot", handleToggle);
+    return () => window.removeEventListener("toggle-chatbot", handleToggle);
+  }, []);
+
   return (
     <>
       <AnimatePresence>
@@ -418,20 +427,6 @@ export default function ChatbotWidget() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {!isOpen && (
-        <motion.button
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 text-white rounded-xl p-3 shadow-lg border border-blue-500 flex items-center justify-center transition-colors duration-200"
-        >
-          <Bot size={22} />
-          <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-500 font-bold text-sm whitespace-nowrap">
-            Trò chuyện với AI
-          </span>
-        </motion.button>
-      )}
     </>
   );
 }

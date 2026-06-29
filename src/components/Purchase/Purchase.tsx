@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -92,6 +92,29 @@ export default function PurchasePage() {
   const [status, setStatus] = useState<"ALL" | OrderStatus>("ALL");
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
+  // Custom Dropdown State & Ref
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const statusOptions: { value: "ALL" | OrderStatus; label: string }[] = [
+    { value: "ALL", label: "Tất cả trạng thái" },
+    { value: "PAID", label: "Đã thanh toán" },
+    { value: "PENDING", label: "Đang chờ" },
+    { value: "CANCELLED", label: "Đã huỷ" },
+  ];
+
+  const currentStatusLabel = statusOptions.find(opt => opt.value === status)?.label || "Tất cả trạng thái";
+
   // tick để countdown chạy
   const [, forceTick] = useState(0);
   useEffect(() => {
@@ -164,28 +187,21 @@ export default function PurchasePage() {
   }, [orders, search, status, selectedDate]);
 
   return (
-    <div className="text-white bg-gradient-to-br from-slate-950 via-blue-950/30 to-slate-900 min-h-screen p-8 relative overflow-hidden">
-      {/* Animated Background Orbs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
-      </div>
-      
+    <div className="text-white bg-slate-950 min-h-screen p-8 relative">
       <div className="relative z-10">
       <div className="flex items-start justify-between gap-6 mb-10">
         <div>
-          <h1 className="text-5xl font-bold mb-3 bg-gradient-to-r from-blue-400 via-cyan-400 to-sky-400 bg-clip-text text-transparent">Lịch sử giao dịch</h1>
-          <p className="text-slate-300 text-lg">
+          <h1 className="text-3xl font-bold mb-2 text-white">Lịch sử giao dịch</h1>
+          <p className="text-slate-400 text-base">
             Theo dõi các đơn hàng và trạng thái thanh toán của bạn.
           </p>
         </div>
 
         <button
           onClick={() => router.push(SHOP_PATH)}
-          className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 px-6 py-3.5 rounded-xl font-semibold flex items-center gap-2.5 shadow-2xl hover:shadow-blue-500/50 transition-all hover:scale-105"
+          className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-4 py-2.5 rounded-lg text-sm font-semibold flex items-center gap-2 transition-colors"
         >
-          <ShoppingBag size={20} />
+          <ShoppingBag size={18} />
           <span>Cửa hàng</span>
         </button>
       </div>
@@ -194,25 +210,43 @@ export default function PurchasePage() {
         <div className="relative flex-1">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
           <input
-            className="bg-gradient-to-br from-slate-900/80 to-blue-900/20 border border-blue-500/30 pl-12 pr-4 py-3.5 rounded-xl w-full text-white outline-none focus:border-blue-400 focus:shadow-lg focus:shadow-blue-500/20 transition-all backdrop-blur-xl"
+            className="h-11 w-full bg-slate-900 border border-slate-800 hover:border-slate-700 focus:border-blue-600 pl-12 pr-4 rounded-lg text-white outline-none transition-colors text-sm font-medium"
             placeholder="Tìm theo mã đơn hàng hoặc tên sản phẩm..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
-        <div className="relative">
-          <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
-          <select
-            className="bg-gradient-to-br from-slate-900/80 to-blue-900/20 border border-blue-500/30 pl-12 pr-8 py-3.5 rounded-xl text-white outline-none focus:border-blue-400 transition-all appearance-none cursor-pointer backdrop-blur-xl"
-            value={status}
-            onChange={(e) => setStatus(e.target.value as any)}
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            className="h-11 w-48 bg-slate-900 border border-slate-800 hover:border-slate-700 focus:border-blue-600 pl-12 pr-8 rounded-lg text-white outline-none transition-colors flex items-center justify-between gap-2 cursor-pointer text-left text-sm font-semibold relative"
           >
-            <option value="ALL" className="bg-slate-900">Tất cả trạng thái</option>
-            <option value="PAID" className="bg-slate-900">Đã thanh toán</option>
-            <option value="PENDING" className="bg-slate-900">Đang chờ</option>
-            <option value="CANCELLED" className="bg-slate-900">Đã huỷ</option>
-          </select>
+            <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <span className="truncate pr-2 block w-full">{currentStatusLabel}</span>
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 text-xs">▼</span>
+          </button>
+          
+          {dropdownOpen && (
+            <div className="absolute left-0 mt-1.5 w-48 bg-slate-900 border border-slate-800 rounded-lg shadow-xl overflow-hidden z-20">
+              {statusOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => {
+                    setStatus(opt.value);
+                    setDropdownOpen(false);
+                  }}
+                  className={`w-full text-left px-4 py-2.5 text-sm transition-colors hover:bg-slate-850 ${
+                    status === opt.value
+                      ? "text-blue-400 font-bold bg-slate-850/50"
+                      : "text-slate-350"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="relative">
@@ -224,15 +258,15 @@ export default function PurchasePage() {
             placeholderText="dd/mm/yyyy"
             isClearable
             popperPlacement="bottom-end"
-            className="bg-gradient-to-br from-slate-900/80 to-blue-900/20 border border-blue-500/30 pl-12 pr-4 py-3.5 rounded-xl w-48 text-white outline-none focus:border-blue-400 transition-all backdrop-blur-xl"
+            className="h-11 w-48 bg-slate-900 border border-slate-800 hover:border-slate-700 focus:border-blue-600 pl-12 pr-4 rounded-lg text-white outline-none transition-colors text-sm font-semibold"
             calendarClassName="bg-slate-900 text-white border border-slate-700"
           />
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-slate-900/50 to-blue-900/20 border border-blue-500/20 rounded-2xl overflow-hidden backdrop-blur-xl shadow-2xl">
+      <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
         <table className="w-full text-left">
-          <thead className="bg-gradient-to-r from-slate-800/90 to-blue-900/40 text-blue-300 border-b border-blue-500/20">
+          <thead className="bg-slate-950 text-slate-400 border-b border-slate-800 text-sm font-semibold">
             <tr>
               <th className="p-3">Mã đơn hàng</th>
               <th>Sản phẩm</th>
@@ -244,16 +278,16 @@ export default function PurchasePage() {
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-blue-500/10">
+          <tbody className="divide-y divide-slate-800">
             {fetching ? (
-              <tr className="border-t border-slate-700">
-                <td className="p-3 text-slate-300" colSpan={7}>
+              <tr className="border-t border-slate-800">
+                <td className="p-3 text-slate-400" colSpan={7}>
                   Đang tải dữ liệu...
                 </td>
               </tr>
             ) : filtered.length === 0 ? (
-              <tr className="border-t border-slate-700">
-                <td className="p-3 text-slate-300" colSpan={7}>
+              <tr className="border-t border-slate-800">
+                <td className="p-3 text-slate-400" colSpan={7}>
                   Không có giao dịch phù hợp với bộ lọc hiện tại.
                 </td>
               </tr>
@@ -269,19 +303,19 @@ export default function PurchasePage() {
                 return (
                   <tr
                     key={o.id}
-                    className="hover:bg-gradient-to-r hover:from-slate-800/40 hover:to-blue-900/20 transition-all duration-300 cursor-pointer group border-l-4 border-l-transparent hover:border-l-blue-500"
+                    className="hover:bg-slate-850/50 transition-colors cursor-pointer group border-l-2 border-l-transparent hover:border-l-blue-600 border-b border-slate-800"
                     onClick={() => router.push(`/orders/${o.id}`)}
                   >
-                    <td className="p-4 font-bold text-blue-400">{displayOrderCode(o.id)}</td>
+                    <td className="p-4 font-bold text-slate-300 group-hover:text-blue-400 transition-colors">{displayOrderCode(o.id)}</td>
                     <td className="p-4 group-hover:text-blue-300 transition-colors">{o.productName}</td>
                     <td className="p-4 font-semibold">{o.quantity}</td>
-                    <td className="p-4">{formatDateDDMMYYYY(o.purchasedAt)}</td>
+                    <td className="p-4 text-slate-450">{formatDateDDMMYYYY(o.purchasedAt)}</td>
                     <td className="p-4 font-semibold text-emerald-400">{formatVND(money)}</td>
                     <td className="p-4">
-                      <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold ${
-                        o.status === 'PAID' ? 'bg-gradient-to-r from-green-500/10 to-emerald-500/10 text-green-400 border border-green-500/30 shadow-lg shadow-green-500/10' :
-                        o.status === 'PENDING' ? 'bg-gradient-to-r from-yellow-500/10 to-amber-500/10 text-yellow-400 border border-yellow-500/30 shadow-lg shadow-yellow-500/10' :
-                        'bg-gradient-to-r from-red-500/10 to-rose-500/10 text-red-400 border border-red-500/30 shadow-lg shadow-red-500/10'
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold ${
+                        o.status === 'PAID' ? 'bg-green-950/40 text-green-400 border border-green-900/50' :
+                        o.status === 'PENDING' ? 'bg-yellow-950/40 text-yellow-455 border border-yellow-900/50' :
+                        'bg-red-950/40 text-red-400 border border-red-900/50'
                       }`}>{st.text}</span>
                     </td>
                     <td className="p-4 font-mono text-slate-400">{countdown}</td>

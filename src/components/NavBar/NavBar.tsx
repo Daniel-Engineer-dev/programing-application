@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 
 import { useAuthContext } from "@/contexts/authContext";
 import UserMenu from "@/components/AvatarUser/AvatarUser";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Bot, Bell } from "lucide-react";
 import ChatUI from "../ChatUI/ChatUI";
 const links = [
   { href: "/problems", label: "Bài Tập", theme: "blue" },
@@ -129,7 +129,17 @@ export default function NavBar() {
         </ul>
 
         {/* Right: User Menu / Auth */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          <button
+            className="relative p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+            title="Trò chuyện với AI"
+            onClick={() =>
+              window.dispatchEvent(new CustomEvent("toggle-chatbot"))
+            }
+          >
+            <Bot size={20} />
+          </button>
+
           {user && (
             <button
               className="relative p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
@@ -146,6 +156,16 @@ export default function NavBar() {
               )}
             </button>
           )}
+
+          <button
+            className="relative p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+            title="Thông báo"
+            onClick={() => {
+              // Phát triển tính năng thông báo sau
+            }}
+          >
+            <Bell size={20} />
+          </button>
           {!user ? (
             <Link href="/auth/login" className="hidden md:block">
               <button className="text-white bg-blue-600 hover:bg-blue-700 font-bold py-2 px-6 rounded-lg transition-colors border border-blue-500">

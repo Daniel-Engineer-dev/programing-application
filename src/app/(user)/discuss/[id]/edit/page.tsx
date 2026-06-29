@@ -166,16 +166,10 @@ export default function EditDiscussionPage() {
   // ===== NOT LOGGED IN STATE =====
   if (!user) {
     return (
-      <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-        {/* Animated background */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -left-40 -top-40 h-80 w-80 animate-pulse rounded-full bg-blue-600/20 blur-3xl" />
-          <div className="absolute -bottom-40 -right-40 h-96 w-96 animate-pulse rounded-full bg-purple-600/20 blur-3xl" style={{ animationDelay: "1s" }} />
-        </div>
-
+      <div className="relative min-h-screen bg-slate-950">
         <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4">
-          <div className="w-full max-w-md rounded-2xl border border-slate-700/50 bg-slate-900/80 p-8 text-center shadow-2xl backdrop-blur-xl">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-orange-600">
+          <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-8 text-center shadow-sm">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-600">
               <Edit3 className="h-8 w-8 text-white" />
             </div>
             <h2 className="mb-2 text-xl font-bold text-white">Đăng nhập để tiếp tục</h2>
@@ -184,7 +178,7 @@ export default function EditDiscussionPage() {
             </p>
             <button
               onClick={() => router.push("/auth/login")}
-              className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition-all hover:shadow-xl hover:shadow-blue-500/30"
+              className="w-full rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-500"
             >
               Đi tới trang đăng nhập
             </button>
@@ -197,11 +191,7 @@ export default function EditDiscussionPage() {
   // ===== LOADING STATE =====
   if (loading) {
     return (
-      <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -left-40 -top-40 h-80 w-80 animate-pulse rounded-full bg-blue-600/20 blur-3xl" />
-          <div className="absolute -bottom-40 -right-40 h-96 w-96 animate-pulse rounded-full bg-purple-600/20 blur-3xl" />
-        </div>
+      <div className="relative min-h-screen bg-slate-950">
         <div className="relative z-10 flex min-h-screen items-center justify-center">
           <div className="flex flex-col items-center gap-4">
             <Loader2 className="h-8 w-8 animate-spin text-blue-400" />
@@ -215,12 +205,9 @@ export default function EditDiscussionPage() {
   // ===== ERROR STATE (no content) =====
   if (error && !title) {
     return (
-      <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -left-40 -top-40 h-80 w-80 animate-pulse rounded-full bg-red-600/20 blur-3xl" />
-        </div>
+      <div className="relative min-h-screen bg-slate-950">
         <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4">
-          <div className="w-full max-w-md rounded-2xl border border-red-500/30 bg-slate-900/80 p-8 text-center shadow-2xl backdrop-blur-xl">
+          <div className="w-full max-w-md rounded-2xl border border-red-500/30 bg-slate-900 p-8 text-center shadow-sm">
             <p className="text-lg font-semibold text-red-400">{error}</p>
             <Link
               href="/discuss"
@@ -236,14 +223,7 @@ export default function EditDiscussionPage() {
 
   // ===== MAIN EDIT FORM =====
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* Animated background orbs */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-40 -top-40 h-80 w-80 animate-pulse rounded-full bg-amber-600/20 blur-3xl" />
-        <div className="absolute -bottom-40 -right-40 h-96 w-96 animate-pulse rounded-full bg-orange-600/20 blur-3xl" style={{ animationDelay: "1s" }} />
-        <div className="absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-full bg-purple-600/10 blur-3xl" style={{ animationDelay: "2s" }} />
-      </div>
-
+    <div className="relative min-h-screen bg-slate-950">
       <main className="relative z-10 mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Back button */}
         <Link
@@ -256,21 +236,16 @@ export default function EditDiscussionPage() {
 
         {/* Header */}
         <div className="mb-8">
-          <div className="mb-2 flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg shadow-amber-500/25">
-              <Edit3 className="h-6 w-6 text-white" />
-            </div>
-            <h1 className="text-2xl font-bold text-white sm:text-3xl">
-              Chỉnh sửa bài thảo luận
-            </h1>
-          </div>
+          <h1 className="text-2xl font-bold text-white sm:text-3xl mb-2">
+            Chỉnh sửa bài thảo luận
+          </h1>
           <p className="text-sm text-slate-400">
             Cập nhật nội dung bài viết của bạn
           </p>
         </div>
 
         {/* Form Card */}
-        <div className="rounded-2xl border border-slate-700/50 bg-slate-900/80 p-6 shadow-2xl backdrop-blur-xl sm:p-8">
+        <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-sm sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Title Input */}
             <div>
@@ -280,7 +255,7 @@ export default function EditDiscussionPage() {
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full rounded-xl border border-slate-700/50 bg-slate-800/50 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition-all focus:border-amber-500/50 focus:bg-slate-800 focus:ring-2 focus:ring-amber-500/20"
+                className="w-full rounded-xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition-all focus:border-blue-500"
               />
             </div>
 
@@ -292,7 +267,7 @@ export default function EditDiscussionPage() {
               <textarea
                 value={excerpt}
                 onChange={(e) => setExcerpt(e.target.value)}
-                className="w-full resize-none rounded-xl border border-slate-700/50 bg-slate-800/50 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition-all focus:border-amber-500/50 focus:bg-slate-800 focus:ring-2 focus:ring-amber-500/20"
+                className="w-full resize-none rounded-xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition-all focus:border-blue-500"
                 rows={2}
               />
             </div>
@@ -314,10 +289,10 @@ export default function EditDiscussionPage() {
                         key={topic}
                         type="button"
                         onClick={() => toggleTopic(topic)}
-                        className={`rounded-full border px-4 py-1.5 text-xs font-medium transition-all ${
+                        className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-all duration-150 ${
                           selected
-                            ? "border-amber-500/50 bg-amber-500/20 text-amber-300 shadow-lg shadow-amber-500/10"
-                            : "border-slate-600/50 bg-slate-800/50 text-slate-400 hover:border-amber-400/50 hover:bg-slate-700/50 hover:text-slate-300"
+                            ? "border-blue-500 bg-blue-600/10 text-blue-400 font-semibold"
+                            : "border-slate-800 bg-slate-950 text-slate-400 hover:border-slate-700 hover:text-slate-200"
                         }`}
                       >
                         {topic}
@@ -337,13 +312,13 @@ export default function EditDiscussionPage() {
                       handleAddTopic();
                     }
                   }}
-                  className="flex-1 rounded-xl border border-slate-700/50 bg-slate-800/50 px-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none transition-all focus:border-amber-500/50 focus:bg-slate-800 focus:ring-2 focus:ring-amber-500/20"
+                  className="flex-1 rounded-xl border border-slate-800 bg-slate-950 px-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none transition-all focus:border-blue-500"
                   placeholder="Thêm chủ đề mới..."
                 />
                 <button
                   type="button"
                   onClick={handleAddTopic}
-                  className="rounded-xl bg-slate-700/80 px-5 py-2.5 text-sm font-semibold text-slate-200 transition-all hover:bg-slate-600"
+                  className="rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 px-5 py-2.5 text-sm font-semibold text-slate-200 hover:text-white transition-colors"
                 >
                   Thêm
                 </button>
@@ -359,7 +334,7 @@ export default function EditDiscussionPage() {
               <label className="mb-2 block text-sm font-semibold text-slate-200">
                 Nội dung chi tiết <span className="text-red-400">*</span>
               </label>
-              <div className="overflow-hidden rounded-xl border border-slate-700/50 bg-slate-800/30">
+              <div className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900">
                 <RichTextEditor value={content} onChange={setContent} />
               </div>
             </div>
@@ -376,7 +351,7 @@ export default function EditDiscussionPage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-amber-500/25 transition-all hover:shadow-xl hover:shadow-amber-500/30 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+                className="rounded-xl bg-blue-600 px-8 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {saving ? (
                   <span className="flex items-center gap-2">
@@ -393,8 +368,8 @@ export default function EditDiscussionPage() {
 
         {/* Success Modal */}
         {showTopicSuccess && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="w-full max-w-md rounded-2xl border border-slate-700/50 bg-slate-900/95 p-6 shadow-2xl backdrop-blur-xl">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+            <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-lg">
               <div className="mb-4 flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/20">
                   <CheckCircle2 className="h-5 w-5 text-emerald-400" />
@@ -411,7 +386,7 @@ export default function EditDiscussionPage() {
                 <button
                   type="button"
                   onClick={() => setShowTopicSuccess(false)}
-                  className="rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition-all hover:shadow-xl"
+                  className="rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500"
                 >
                   OK
                 </button>
