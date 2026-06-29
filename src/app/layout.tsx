@@ -1,6 +1,11 @@
 import "./globals.css";
 import { AuthProvider } from "@/contexts/authContext";
 import SystemAnnouncement from "@/components/Global/SystemAnnouncement";
+import LenisProvider from "@/components/Global/LenisProvider";
+import { Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata = {
   title: "Codepro",
@@ -13,11 +18,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi " suppressHydrationWarning>
+    <html lang="vi " suppressHydrationWarning className={cn("font-sans", geist.variable)}>
       <body className="min-h-screen bg-slate-900 text-gray-900 antialiased">
         <SystemAnnouncement />
         <AuthProvider>
-          {children}
+          <LenisProvider>
+            {children}
+          </LenisProvider>
         </AuthProvider>
       </body>
     </html>
