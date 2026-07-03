@@ -169,7 +169,7 @@ export default function Footer() {
             </span>
             <span className="flex items-center gap-2">
               <MapPin size={15} className="text-blue-400" />
-              Hà Nội, Việt Nam
+              Hồ Chí Minh, Việt Nam
             </span>
           </div>
 

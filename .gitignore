@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Firebase Admin SDK private keys (KHONG BAO GIO commit)
+*firebase-adminsdk*.json
+serviceAccountKey.json
+codepro-web-programing-firebase-adminsdk-*.json
