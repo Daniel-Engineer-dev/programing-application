@@ -20,24 +20,32 @@ const links = [
 const getThemeColors = (theme: string, isActive: boolean) => {
   const themes = {
     blue: {
-      active: "text-white bg-blue-600 border-blue-500",
-      hover: "hover:bg-slate-800 hover:text-white",
+      active: "text-white bg-blue-600 border-blue-400 shadow-lg shadow-blue-600/30",
+      hover:
+        "hover:bg-blue-500/15 hover:text-blue-200 hover:border-blue-500/40 hover:shadow-lg hover:shadow-blue-500/20",
       mobileBg: "bg-blue-600",
+      mobileHover: "hover:bg-blue-500/15 hover:text-blue-200",
     },
     green: {
-      active: "text-white bg-blue-600 border-blue-500",
-      hover: "hover:bg-slate-800 hover:text-white",
-      mobileBg: "bg-blue-600",
+      active: "text-white bg-emerald-600 border-emerald-400 shadow-lg shadow-emerald-600/30",
+      hover:
+        "hover:bg-emerald-500/15 hover:text-emerald-200 hover:border-emerald-500/40 hover:shadow-lg hover:shadow-emerald-500/20",
+      mobileBg: "bg-emerald-600",
+      mobileHover: "hover:bg-emerald-500/15 hover:text-emerald-200",
     },
     purple: {
-      active: "text-white bg-blue-600 border-blue-500",
-      hover: "hover:bg-slate-800 hover:text-white",
-      mobileBg: "bg-blue-600",
+      active: "text-white bg-purple-600 border-purple-400 shadow-lg shadow-purple-600/30",
+      hover:
+        "hover:bg-purple-500/15 hover:text-purple-200 hover:border-purple-500/40 hover:shadow-lg hover:shadow-purple-500/20",
+      mobileBg: "bg-purple-600",
+      mobileHover: "hover:bg-purple-500/15 hover:text-purple-200",
     },
     red: {
-      active: "text-white bg-blue-600 border-blue-500",
-      hover: "hover:bg-slate-800 hover:text-white",
-      mobileBg: "bg-blue-600",
+      active: "text-white bg-rose-600 border-rose-400 shadow-lg shadow-rose-600/30",
+      hover:
+        "hover:bg-rose-500/15 hover:text-rose-200 hover:border-rose-500/40 hover:shadow-lg hover:shadow-rose-500/20",
+      mobileBg: "bg-rose-600",
+      mobileHover: "hover:bg-rose-500/15 hover:text-rose-200",
     },
   };
 
@@ -85,9 +93,9 @@ export default function NavBar() {
 
   return (
     <header
-      className={`sticky top-0 z-50 bg-slate-950/95 backdrop-blur transition-all ${
+      className={`sticky top-0 z-50 bg-blue-950/95 backdrop-blur transition-all ${
         elevated
-          ? "border-b border-slate-800 shadow-sm"
+          ? "border-b border-blue-900 shadow-sm"
           : "border-b border-transparent"
       }`}
     >
@@ -114,7 +122,7 @@ export default function NavBar() {
               <li key={l.href}>
                 <Link href={l.href}>
                   <button
-                    className={`text-sm font-bold py-2 px-4 rounded-lg transition-colors duration-200 border ${
+                    className={`text-sm font-bold py-2 px-4 rounded-lg border transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 ${
                       isActive(l.href)
                         ? colors.active
                         : `text-slate-300 border-transparent ${colors.hover}`
@@ -205,7 +213,7 @@ export default function NavBar() {
                     className={`block rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                       isActive(l.href)
                         ? `${colors.mobileBg} text-white`
-                        : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                        : `text-slate-300 ${colors.mobileHover}`
                     }`}
                   >
                     {l.label}

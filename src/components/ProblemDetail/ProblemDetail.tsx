@@ -496,7 +496,7 @@ export default function ProblemDetails({
       </div>
 
       {/* Content Area (Scrollable) */}
-      <div className="p-5 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+      <div className="p-5 overflow-y-auto flex-1 min-h-0 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
         {/* --- TAB 1: MÔ TẢ (Bao gồm Đề bài + Ví dụ + Ràng buộc) --- */}
         {tab === "description" && (
           <div className="space-y-8">

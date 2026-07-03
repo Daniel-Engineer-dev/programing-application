@@ -1,6 +1,6 @@
 
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Editor from "@monaco-editor/react";
 import axios from "axios";
 import { useContestSubmission } from "@/hooks/useContestSubmission";
@@ -85,6 +85,47 @@ export default function EditorPanel({
   const [isSubmitting, setIsSubmitting] = useState(false); // Loading cho nút Nộp bài
   const [submissionResult, setSubmissionResult] =
     useState<SubmissionResult | null>(null); // Kết quả nộp bài
+
+  // --- STATE CO GIÃN PANEL TESTCASE ---
+  const panelRef = useRef<HTMLDivElement>(null); // Container chứa cả editor + testcase
+  const [outputHeight, setOutputHeight] = useState(300); // Chiều cao testcase (px)
+  const [isResizing, setIsResizing] = useState(false);
+
+  // Bắt đầu kéo thanh chia
+  const startResize = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+  }, []);
+
+  // Xử lý kéo: tính chiều cao testcase = đáy container - vị trí chuột, có clamp
+  useEffect(() => {
+    if (!isResizing) return;
+
+    const onMove = (e: MouseEvent) => {
+      const container = panelRef.current;
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      const newHeight = rect.bottom - e.clientY;
+      // Giữ tối thiểu 80px, tối đa 75% chiều cao panel để editor không bị mất
+      const min = 80;
+      const max = rect.height * 0.75;
+      setOutputHeight(Math.min(Math.max(newHeight, min), max));
+    };
+    const onUp = () => setIsResizing(false);
+
+    // Chặn bôi đen text & đổi con trỏ khi đang kéo
+    document.body.style.userSelect = "none";
+    document.body.style.cursor = "row-resize";
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+
+    return () => {
+      document.body.style.userSelect = "";
+      document.body.style.cursor = "";
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+  }, [isResizing]);
   // --- EFFECT: ĐỒNG BỘ KHI KHÔI PHỤC CODE TỪ LỊCH SỬ ---
   useEffect(() => {
     if (initialCode !== undefined) {
@@ -891,24 +932,40 @@ export default function EditorPanel({
         </div>
       </div>
 
-      {/* EDITOR */}
-      <div className="flex-1 overflow-hidden relative">
-        <Editor
-          height="100%"
-          language={language === "cpp" ? "cpp" : language}
-          theme="vs-dark"
-          value={code} // Gán giá trị code từ state đã được đồng bộ
-          onChange={handleEditorChange}
-          options={{
-            minimap: { enabled: false },
-            fontSize: 14,
-            automaticLayout: true,
-          }}
-        />
-      </div>
+      {/* VÙNG CO GIÃN: Editor (trên) + Testcase (dưới) */}
+      <div ref={panelRef} className="flex-1 flex flex-col min-h-0 overflow-hidden rounded-b-2xl">
+        {/* EDITOR */}
+        <div className="flex-1 min-h-0 overflow-hidden relative">
+          <Editor
+            height="100%"
+            language={language === "cpp" ? "cpp" : language}
+            theme="vs-dark"
+            value={code} // Gán giá trị code từ state đã được đồng bộ
+            onChange={handleEditorChange}
+            options={{
+              minimap: { enabled: false },
+              fontSize: 14,
+              automaticLayout: true,
+            }}
+          />
+        </div>
 
-      {/* OUTPUT PANEL (Chỉ hiển thị cho Chạy thử) */}
-      <div className="h-[40%] bg-slate-950 flex flex-col rounded-b-2xl border-t border-slate-700">
+        {/* THANH KÉO CO GIÃN */}
+        <div
+          onMouseDown={startResize}
+          className={`group relative h-1.5 shrink-0 cursor-row-resize bg-slate-800 transition-colors hover:bg-blue-500/60 ${
+            isResizing ? "bg-blue-500" : ""
+          }`}
+          title="Kéo để thay đổi kích thước"
+        >
+          {/* Tay nắm ở giữa */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-1 w-10 rounded-full bg-slate-600 group-hover:bg-blue-300" />
+        </div>
+
+        {/* OUTPUT PANEL (Chỉ hiển thị cho Chạy thử) */}
+        <div
+          style={{ height: outputHeight }}
+          className="shrink-0 min-h-0 bg-slate-950 flex flex-col rounded-b-2xl">
         {publicTestCases.length === 0 && (
           <div className="flex items-center justify-center h-full text-gray-500 text-sm">
             Không có Test Case mẫu nào để hiển thị.
@@ -1015,6 +1072,7 @@ export default function EditorPanel({
             </div>
           </>
         )}
+        </div>
       </div>
     </div>
   );

@@ -138,7 +138,7 @@ export default function ContestProblemPage({
     );
 
   return (
-    <div className="flex h-screen w-full bg-slate-950 fixed">
+    <div className="flex h-screen w-full bg-slate-950 fixed z-60">
       <ProblemDetails
         title={problem.title}
         problemId={problem.id}

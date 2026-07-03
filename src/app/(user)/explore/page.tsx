@@ -128,7 +128,7 @@ export default function ExplorePage() {
       return (
     <Link
       href={href}
-      className="group relative block h-52 w-full overflow-hidden rounded-xl border border-slate-800 bg-slate-900 transition-colors shadow-sm hover:border-blue-500/60"
+      className="group relative block h-52 w-full overflow-hidden rounded-xl border border-slate-800 bg-slate-900 transition-colors shadow-sm hover:border-emerald-500/60"
     >
       {/* Background Image */}
       <div
@@ -168,7 +168,7 @@ export default function ExplorePage() {
             )}
         </div>
         
-        <h3 className="text-xl font-bold text-white leading-tight line-clamp-2 drop-shadow-lg mb-2 group-hover:text-blue-300 transition-colors">
+        <h3 className="text-xl font-bold text-white leading-tight line-clamp-2 drop-shadow-lg mb-2 group-hover:text-emerald-300 transition-colors">
           {title}
         </h3>
         {subtitle && (

@@ -353,7 +353,7 @@ export default function ContestPage() {
                   className="block"
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
-                  <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm hover:border-blue-500/60 transition-all duration-200 animate-fadeIn">
+                  <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm hover:border-rose-500/60 transition-all duration-200 animate-fadeIn">
                     {/* Left */}
                     <div className="space-y-4 flex-1">
                       <div className="flex items-start gap-3">
@@ -361,7 +361,7 @@ export default function ContestPage() {
                           <Trophy className="w-5 h-5 text-blue-400" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="text-xl md:text-2xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">
+                          <h3 className="text-xl md:text-2xl font-bold text-white mb-2 group-hover:text-rose-400 transition-colors">
                             {contest.title}
                           </h3>
 

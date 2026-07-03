@@ -314,6 +314,30 @@
   html {
     @apply font-sans;
   }
+
+  /* Con trỏ dạng bàn tay cho mọi phần tử tương tác + bất kỳ phần tử nào
+     có hiệu ứng hover của Tailwind (class chứa "hover:") */
+  button,
+  a,
+  label,
+  summary,
+  [role="button"],
+  [role="tab"],
+  [role="link"],
+  [role="menuitem"],
+  [role="option"],
+  [onclick],
+  [class*="hover:"] {
+    cursor: pointer;
+  }
+
+  /* Vẫn giữ trạng thái không cho phép click đúng chuẩn */
+  button:disabled,
+  [aria-disabled="true"],
+  [disabled],
+  .cursor-not-allowed {
+    cursor: not-allowed;
+  }
 }
 
 /* ========================== LENIS SMOOTH SCROLL ========================== */

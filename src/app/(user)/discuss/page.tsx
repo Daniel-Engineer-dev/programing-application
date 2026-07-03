@@ -267,11 +267,11 @@ export default function DiscussionListPage() {
                 className="block group"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                <div className="bg-slate-900 border border-slate-800/80 rounded-2xl p-6 hover:border-blue-500/60 transition-all duration-200 shadow-sm">
+                <div className="bg-slate-900 border border-slate-800/80 rounded-2xl p-6 hover:border-purple-500/60 transition-all duration-200 shadow-sm">
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                     {/* Content */}
                     <div className="flex-1">
-                      <h2 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors mb-2">
+                      <h2 className="text-xl font-bold text-white group-hover:text-purple-400 transition-colors mb-2">
                         {d.title}
                       </h2>
                       <p className="text-sm text-slate-400 line-clamp-2 mb-3">

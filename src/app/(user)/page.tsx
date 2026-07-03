@@ -74,8 +74,10 @@ export default function HomePage() {
   // ===== Scroll Snap trên browser scrollbar =====
   useEffect(() => {
     const html = document.documentElement;
-    // Áp dụng scroll-snap lên html → dùng thanh scroll trình duyệt
-    html.style.scrollSnapType = "y mandatory";
+    // Áp dụng scroll-snap lên html → dùng thanh scroll trình duyệt.
+    // Dùng "proximity" thay vì "mandatory" để vẫn cuộn tự do xuống được footer
+    // (mandatory sẽ luôn hút về section cuối, không thể tới footer).
+    html.style.scrollSnapType = "y proximity";
     // Trừ đi chiều cao navbar (sticky) khi snap
     html.style.scrollPaddingTop = "3.5rem";
 
@@ -368,12 +370,6 @@ export default function HomePage() {
                                 fallbackArticleImages[index % fallbackArticleImages.length];
                             }}
                           />
-                        </div>
-
-                        <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-blue-600 mb-3">
-                          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                          </svg>
                         </div>
 
                         <h3 className="text-lg font-bold text-white group-hover:text-blue-300 transition-colors duration-200 mb-2">
