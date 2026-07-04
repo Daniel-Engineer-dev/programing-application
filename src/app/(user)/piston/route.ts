@@ -26,6 +26,8 @@ const JUDGE0_LANG_IDS: Record<string, number> = {
 const JUDGE0_URL = process.env.JUDGE0_API_URL || "http://localhost:2358";
 const JUDGE0_KEY = process.env.JUDGE0_API_KEY || "";
 const JUDGE0_HOST = process.env.JUDGE0_API_HOST || "judge0-ce.p.rapidapi.com";
+// Token xác thực cho Judge0 tự host (AUTHN_TOKEN trong judge0.conf)
+const JUDGE0_AUTH_TOKEN = process.env.JUDGE0_AUTH_TOKEN || "";
 
 const getJudge0Headers = () => {
   const headers: Record<string, string> = {
@@ -34,6 +36,10 @@ const getJudge0Headers = () => {
   if (JUDGE0_KEY) {
     headers["x-rapidapi-key"] = JUDGE0_KEY;
     headers["x-rapidapi-host"] = JUDGE0_HOST;
+  }
+  // Judge0 tự host yêu cầu header X-Auth-Token cho mọi request
+  if (JUDGE0_AUTH_TOKEN) {
+    headers["X-Auth-Token"] = JUDGE0_AUTH_TOKEN;
   }
   return headers;
 };
