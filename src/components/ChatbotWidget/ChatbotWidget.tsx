@@ -213,7 +213,7 @@ export default function ChatbotWidget() {
               duration: 0.5
             }}
             style={{ width: `${width}px` }}
-            className="fixed top-0 right-0 z-50 h-full bg-slate-950 border-l border-slate-800 shadow-xl flex flex-col font-sans"
+            className="fixed top-0 right-0 z-[70] h-full bg-slate-950 border-l border-slate-800 shadow-xl flex flex-col font-sans"
           >
             {/* Handle Resize với gradient */}
             <div
@@ -251,6 +251,7 @@ export default function ChatbotWidget() {
             {/* Chat Content với gradient background */}
             <div
               ref={scrollRef}
+              data-lenis-prevent
               className="flex-1 overflow-y-auto p-5 space-y-6 overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-950 bg-slate-950 relative"
             >
               {messages.map((msg, idx) => (

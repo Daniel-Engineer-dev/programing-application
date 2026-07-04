@@ -394,7 +394,8 @@ const ChatUI = () => {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -20, scale: 0.95 }}
           transition={{ duration: 0.2 }}
-          className="fixed top-16 right-4 z-[60] w-[380px] h-[600px] bg-gradient-to-br from-slate-900 via-indigo-950/50 to-slate-900 border border-white/10 shadow-2xl rounded-2xl flex flex-col overflow-hidden backdrop-blur-xl text-white"
+          data-lenis-prevent
+          className="fixed top-16 right-4 z-[70] w-[380px] h-[600px] bg-gradient-to-br from-slate-900 via-indigo-950/50 to-slate-900 border border-white/10 shadow-2xl rounded-2xl flex flex-col overflow-hidden backdrop-blur-xl text-white"
         >
           {!selectedFriend ? (
             <>
