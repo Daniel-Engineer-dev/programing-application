@@ -54,8 +54,11 @@ private_key_judge0.key
 /backups/
 /scratchpad/
 
-# Script dev/one-off (chua token VPS, khong thuoc source san pham)
-scripts/_*
+# Script seed/migrate DB & tooling dev (khong phai ma nguon ung dung)
+/scripts/
+
+# Claude Code agent/skills (khong phai ma nguon ung dung)
+/.agents/
 
 # Du lieu seed / tham chieu & tai lieu setup (khong phai ma nguon ung dung)
 /standardData/
