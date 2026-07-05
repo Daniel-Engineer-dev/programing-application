@@ -44,3 +44,21 @@ next-env.d.ts
 *firebase-adminsdk*.json
 serviceAccountKey.json
 codepro-web-programing-firebase-adminsdk-*.json
+
+# SSH / private keys (KHONG BAO GIO commit)
+*.key
+*.ppk
+private_key_judge0.key
+
+# Local backups & scratch (khong thuoc source)
+/backups/
+/scratchpad/
+
+# Script dev/one-off (chua token VPS, khong thuoc source san pham)
+scripts/_*
+
+# Du lieu seed / tham chieu & tai lieu setup (khong phai ma nguon ung dung)
+/standardData/
+SETUP_JUDGE0.md
+/listModel.js
+/pushProblemSample.js
