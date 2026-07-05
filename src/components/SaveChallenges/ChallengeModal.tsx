@@ -119,7 +119,7 @@ export default function ChallengeModal({
           <span>Chọn bài tập:</span>
           <span>Đã chọn: {selectedIds.length}</span>
         </p>
-        <div className="max-h-60 overflow-y-auto border border-slate-800 rounded bg-slate-950 p-2 mb-6 custom-scrollbar">
+        <div data-lenis-prevent className="max-h-60 overflow-y-auto border border-slate-800 rounded bg-slate-950 p-2 mb-6 custom-scrollbar">
           {filteredProblems.map((p) => (
             <div
               key={p.id}
