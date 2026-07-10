@@ -1,11 +1,20 @@
 // app/api/piston/run/route.ts
 import { NextResponse } from "next/server";
 import axios from "axios";
+import nodeHttp from "http";
+import nodeHttps from "https";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 
+// Keep-alive: tái dùng kết nối TCP tới Judge0/Piston qua các lần gọi (đỡ bắt tay lại)
+const keepAliveHttp = new nodeHttp.Agent({ keepAlive: true });
+const keepAliveHttps = new nodeHttps.Agent({ keepAlive: true });
+
 // Tạo instance axios cô lập để tránh header Authorization thừa từ client
-const http = axios.create();
+const http = axios.create({
+  httpAgent: keepAliveHttp,
+  httpsAgent: keepAliveHttps,
+});
 
 // Cấu hình ngôn ngữ và version mà Piston hỗ trợ (Fallback)
 const PISTON_CONFIG: Record<string, { language: string; version: string }> = {

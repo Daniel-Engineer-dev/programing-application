@@ -297,9 +297,12 @@ export default function EditorPanel({
       if (resData.useQueue && Array.isArray(resData.tokens)) {
         const tokenStr = resData.tokens.join(",");
         let isPolling = true;
-        
+        // Poll sớm (250ms) rồi giãn dần tới tối đa 1s: kết quả job nhanh hiện sớm hơn
+        let pollDelay = 250;
+
         while (isPolling) {
-          await new Promise(r => setTimeout(r, 1000));
+          await new Promise(r => setTimeout(r, pollDelay));
+          pollDelay = Math.min(pollDelay + 250, 1000);
           try {
             const pollRes = await axios.get(`/piston?tokens=${tokenStr}`);
             const pollData = pollRes.data;
@@ -482,9 +485,12 @@ export default function EditorPanel({
         const tokenStr = resData.tokens.join(",");
         let isPolling = true;
         let pollData: any = null;
+        // Poll sớm (250ms) rồi giãn dần tới tối đa 1s
+        let pollDelay = 250;
 
         while (isPolling) {
-          await new Promise(r => setTimeout(r, 1000));
+          await new Promise(r => setTimeout(r, pollDelay));
+          pollDelay = Math.min(pollDelay + 250, 1000);
           try {
             const pollRes = await axios.get(`/piston?tokens=${tokenStr}`);
             pollData = pollRes.data;
