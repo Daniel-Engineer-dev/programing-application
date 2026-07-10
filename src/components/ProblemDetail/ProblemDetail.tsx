@@ -86,17 +86,48 @@ function EditorialCodeSection({ codes }: { codes: Approach["code"] }) {
     python: "Python",
   };
 
+  // Copy an toàn: dùng Clipboard API khi ở secure context (HTTPS/localhost),
+  // nếu không (vd truy cập qua http://<IP-LAN>) thì fallback sang execCommand.
+  const copyToClipboard = async (text: string): Promise<boolean> => {
+    try {
+      if (
+        typeof navigator !== "undefined" &&
+        navigator.clipboard &&
+        window.isSecureContext
+      ) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch {
+      // rơi xuống fallback bên dưới
+    }
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return ok;
+    } catch {
+      return false;
+    }
+  };
+
   // Hàm xử lý copy
   const handleCopy = async () => {
     const codeToCopy = codes[selectedLang];
     if (codeToCopy) {
-      try {
-        await navigator.clipboard.writeText(codeToCopy);
+      const ok = await copyToClipboard(codeToCopy);
+      if (ok) {
         setCopied(true);
         // Reset lại icon sau 2 giây
         setTimeout(() => setCopied(false), 2000);
-      } catch (err) {
-        console.error("Lỗi khi copy: ", err);
+      } else {
+        console.error("Không thể sao chép mã lên clipboard.");
       }
     }
   };
@@ -277,7 +308,7 @@ export default function ProblemDetails({
     };
 
     if (platform === "copy") {
-      navigator.clipboard.writeText(url);
+      copyToClipboard(url);
       alert("Đã sao chép liên kết bài toán!");
       return;
     }
