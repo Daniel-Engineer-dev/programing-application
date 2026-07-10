@@ -25,6 +25,13 @@ type Problem = {
   title: string;
   difficulty: "Easy" | "Medium" | "Hard";
   tags: string[];
+  order?: number;
+};
+
+// Số thứ tự bài lấy từ tiền tố ID (vd "76-two-sum" -> 76), dùng làm khóa sắp xếp phụ
+const problemNo = (id: string) => {
+  const m = String(id).match(/^(\d+)/);
+  return m ? parseInt(m[1], 10) : Number.MAX_SAFE_INTEGER;
 };
 
 type StatusType = "Solved" | "Attempted" | "Todo";
@@ -55,6 +62,13 @@ export default function ProblemsTable() {
       const list = snapshot.docs.map(
         (doc) => ({ id: doc.id, ...doc.data() } as Problem)
       );
+      // Ưu tiên các bài có 'order' (bài đã kiểm thử) lên đầu, phần còn lại theo số thứ tự bài
+      list.sort((a, b) => {
+        const oa = typeof a.order === "number" ? a.order : Number.MAX_SAFE_INTEGER;
+        const ob = typeof b.order === "number" ? b.order : Number.MAX_SAFE_INTEGER;
+        if (oa !== ob) return oa - ob;
+        return problemNo(a.id) - problemNo(b.id);
+      });
       setProblems(list);
     });
   }, []);
