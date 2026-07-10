@@ -34,6 +34,10 @@ interface UserInteraction {
     read?: boolean;  // for guides
 }
 
+// Ảnh mặc định khi card không có ảnh hoặc ảnh nguồn tải lỗi (vd bị chặn hotlink)
+const EXPLORE_FALLBACK_IMG =
+  "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=60&w=800&auto=format&fit=crop";
+
 export default function ExplorePage() {
   const [topics, setTopics] = useState<Topic[]>([]);
   const [searchFocused, setSearchFocused] = useState(false);
@@ -132,14 +136,19 @@ export default function ExplorePage() {
     >
       {/* Background Image (lazy-load: chỉ tải khi card lọt vào tầm nhìn) */}
       <img
-        src={
-          bgImage ||
-          "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=60&w=800&auto=format&fit=crop"
-        }
+        src={bgImage || EXPLORE_FALLBACK_IMG}
         alt=""
         aria-hidden="true"
         loading="lazy"
         decoding="async"
+        referrerPolicy="no-referrer"
+        onError={(e) => {
+          const el = e.currentTarget;
+          if (!el.dataset.fbk) {
+            el.dataset.fbk = "1";
+            el.src = EXPLORE_FALLBACK_IMG;
+          }
+        }}
         className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
       />
 

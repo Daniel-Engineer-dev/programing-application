@@ -50,6 +50,10 @@ export default function ProblemsTable() {
   const [isDiffOpen, setIsDiffOpen] = useState(false);
   const [isTagOpen, setIsTagOpen] = useState(false);
 
+  // Phân trang (giảm số dòng render mỗi lần -> mượt hơn nhiều so với render cả 200 dòng)
+  const PAGE_SIZE = 20;
+  const [page, setPage] = useState(1);
+
   // 1. Theo dõi Auth
   useEffect(() => {
     const auth = getAuth();
@@ -108,6 +112,17 @@ export default function ProblemsTable() {
       return matchName && matchDifficulty && matchTag;
     });
   }, [problems, searchTerm, selectedDifficulty, selectedTags]);
+
+  // Về trang 1 mỗi khi thay đổi bộ lọc/tìm kiếm
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, selectedDifficulty, selectedTags]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredProblems.length / PAGE_SIZE));
+  const pagedProblems = useMemo(
+    () => filteredProblems.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+    [filteredProblems, page]
+  );
 
   const allTags = useMemo(() => {
     const tags = new Set<string>();
@@ -357,22 +372,16 @@ export default function ProblemsTable() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                <AnimatePresence mode="popLayout">
-                  {filteredProblems.map((p, i) => {
+                  {pagedProblems.map((p, i) => {
                     const status = statusMap[p.id] || "Todo";
 
                     return (
-                      <motion.tr
-                        layout
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        transition={{ duration: 0.2 }}
+                      <tr
                         key={p.id}
-                        className="hover:bg-white/5 transition-all group"
+                        className="hover:bg-white/5 transition-colors group"
                       >
                         <td className="px-6 py-5 text-slate-500 font-mono text-center text-xs">
-                          {i + 1}
+                          {(page - 1) * PAGE_SIZE + i + 1}
                         </td>
                         <td className="px-6 py-5">
                           <Link
@@ -433,10 +442,9 @@ export default function ProblemsTable() {
                             </div>
                           )}
                         </td>
-                      </motion.tr>
+                      </tr>
                     );
                   })}
-                </AnimatePresence>
               </tbody>
             </table>
           </div>
@@ -445,6 +453,29 @@ export default function ProblemsTable() {
             <div className="py-20 text-center">
               <Code2 className="w-16 h-16 text-slate-600 mx-auto mb-4" />
               <p className="text-slate-400 text-lg">Không tìm thấy bài tập nào...</p>
+            </div>
+          )}
+
+          {/* Phân trang */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 py-6">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="px-4 py-2 rounded-lg border border-slate-700 text-sm text-slate-300 disabled:opacity-40 hover:bg-white/5 transition-colors"
+              >
+                Trước
+              </button>
+              <span className="px-3 text-sm text-slate-400">
+                Trang {page}/{totalPages}
+              </span>
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="px-4 py-2 rounded-lg border border-slate-700 text-sm text-slate-300 disabled:opacity-40 hover:bg-white/5 transition-colors"
+              >
+                Sau
+              </button>
             </div>
           )}
         </div>
