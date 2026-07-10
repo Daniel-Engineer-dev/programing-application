@@ -364,7 +364,10 @@ export default function HomePage() {
                             src={getArticleImage(problem, index)}
                             alt={problem.title}
                             className="h-full w-full object-cover opacity-95 transition-opacity duration-200 group-hover:opacity-100"
-                            loading="lazy"
+                            // Ảnh slide đầu (above-the-fold) tải sớm + ưu tiên cao cho LCP; còn lại lazy
+                            loading={index < 3 ? "eager" : "lazy"}
+                            fetchPriority={index === 0 ? "high" : "auto"}
+                            decoding="async"
                             onError={(event) => {
                               event.currentTarget.src =
                                 fallbackArticleImages[index % fallbackArticleImages.length];

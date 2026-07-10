@@ -130,15 +130,17 @@ export default function ExplorePage() {
       href={href}
       className="group relative block h-52 w-full overflow-hidden rounded-xl border border-slate-800 bg-slate-900 transition-colors shadow-sm hover:border-emerald-500/60"
     >
-      {/* Background Image */}
-      <div
-        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-        style={{
-          backgroundImage: `url('${
-            bgImage ||
-            "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070"
-          }')`,
-        }}
+      {/* Background Image (lazy-load: chỉ tải khi card lọt vào tầm nhìn) */}
+      <img
+        src={
+          bgImage ||
+          "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=60&w=800&auto=format&fit=crop"
+        }
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+        decoding="async"
+        className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
       />
 
       {/* Overlay */}
