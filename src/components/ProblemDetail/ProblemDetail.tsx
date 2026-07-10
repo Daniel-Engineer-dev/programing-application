@@ -70,6 +70,39 @@ const readFileContent = (file: File): Promise<string> => {
     reader.readAsText(file);
   });
 };
+
+// Copy an toàn (module scope, dùng chung cho mọi component trong file):
+// ưu tiên Clipboard API khi ở secure context (HTTPS/localhost),
+// fallback sang execCommand cho http://<IP-LAN> hoặc trình duyệt cũ.
+const copyToClipboard = async (text: string): Promise<boolean> => {
+  try {
+    if (
+      typeof navigator !== "undefined" &&
+      navigator.clipboard &&
+      window.isSecureContext
+    ) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch {
+    // rơi xuống fallback bên dưới
+  }
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    const ok = document.execCommand("copy");
+    document.body.removeChild(ta);
+    return ok;
+  } catch {
+    return false;
+  }
+};
+
 function EditorialCodeSection({ codes }: { codes: Approach["code"] }) {
   const availableLanguages = Object.keys(codes) as (keyof Approach["code"])[];
   const [selectedLang, setSelectedLang] = useState<keyof Approach["code"]>(
@@ -84,37 +117,6 @@ function EditorialCodeSection({ codes }: { codes: Approach["code"] }) {
     java: "Java",
     javascript: "JS",
     python: "Python",
-  };
-
-  // Copy an toàn: dùng Clipboard API khi ở secure context (HTTPS/localhost),
-  // nếu không (vd truy cập qua http://<IP-LAN>) thì fallback sang execCommand.
-  const copyToClipboard = async (text: string): Promise<boolean> => {
-    try {
-      if (
-        typeof navigator !== "undefined" &&
-        navigator.clipboard &&
-        window.isSecureContext
-      ) {
-        await navigator.clipboard.writeText(text);
-        return true;
-      }
-    } catch {
-      // rơi xuống fallback bên dưới
-    }
-    try {
-      const ta = document.createElement("textarea");
-      ta.value = text;
-      ta.style.position = "fixed";
-      ta.style.opacity = "0";
-      document.body.appendChild(ta);
-      ta.focus();
-      ta.select();
-      const ok = document.execCommand("copy");
-      document.body.removeChild(ta);
-      return ok;
-    } catch {
-      return false;
-    }
   };
 
   // Hàm xử lý copy
