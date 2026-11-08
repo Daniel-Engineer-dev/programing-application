@@ -71,22 +71,6 @@ export default function HomePage() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // ===== Scroll Snap trên browser scrollbar =====
-  useEffect(() => {
-    const html = document.documentElement;
-    // Áp dụng scroll-snap lên html → dùng thanh scroll trình duyệt.
-    // Dùng "proximity" thay vì "mandatory" để vẫn cuộn tự do xuống được footer
-    // (mandatory sẽ luôn hút về section cuối, không thể tới footer).
-    html.style.scrollSnapType = "y proximity";
-    // Trừ đi chiều cao navbar (sticky) khi snap
-    html.style.scrollPaddingTop = "3.5rem";
-
-    return () => {
-      html.style.scrollSnapType = "";
-      html.style.scrollPaddingTop = "";
-    };
-  }, []);
-
   // Fetch articles from Firebase
   useEffect(() => {
     const fetchArticles = async () => {
@@ -167,7 +151,6 @@ export default function HomePage() {
     <PageTransition>
       {/* ===== SECTION 1: Hero ===== */}
       <section
-        style={{ scrollSnapAlign: "start", scrollSnapStop: "always" }}
         className={`relative flex ${sectionHeight} w-full items-center overflow-hidden px-4 py-6`}
       >
         {/* Glass Card Container */}
@@ -273,7 +256,6 @@ export default function HomePage() {
 
       {/* ===== SECTION 2: Featured Articles ===== */}
       <motion.section
-        style={{ scrollSnapAlign: "start", scrollSnapStop: "always" }}
         className={`flex ${sectionHeight} w-full items-center px-6 py-8`}
         initial="hidden"
         whileInView="visible"
@@ -417,7 +399,6 @@ export default function HomePage() {
 
       {/* ===== SECTION 3: Competitive Programming Showcase ===== */}
       <motion.section
-        style={{ scrollSnapAlign: "start", scrollSnapStop: "always" }}
         className={`flex ${sectionHeight} w-full items-center bg-slate-950 px-6 py-8`}
         initial="hidden"
         whileInView="visible"

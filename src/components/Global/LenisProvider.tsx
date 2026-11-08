@@ -15,10 +15,9 @@ const isWorkspaceRoute = (pathname: string) => {
 
 export default function LenisProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isHomepage = pathname === "/";
 
-  // Không dùng smooth-scroll toàn cục ở trang chủ và các trang giải bài (IDE)
-  if (isHomepage || isWorkspaceRoute(pathname)) {
+  // Các trang giải bài (IDE) cuộn riêng trong từng panel.
+  if (isWorkspaceRoute(pathname)) {
     return <>{children}</>;
   }
 
